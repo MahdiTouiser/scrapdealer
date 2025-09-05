@@ -9,8 +9,7 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "dev:admin": "pnpm --filter @scrapdealer/admin dev",
-    "dev:mobile": "pnpm --filter @scrapdealer/mobile start",
-    "prepare": "husky"
+    "dev:mobile": "pnpm --filter @scrapdealer/mobile start"
   },
   "keywords": [],
   "author": "",
@@ -20,10 +19,8 @@
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "@types/node": "^24.3.1",
-    "changesets": "^1.0.2",
+    "babel-plugin-module-resolver": "^5.0.2",
     "eslint": "^9.35.0",
-    "husky": "^9.1.7",
-    "lint-staged": "^16.1.6",
     "prettier": "^3.6.2",
     "tsx": "^4.20.5",
     "turbo": "^2.5.6",

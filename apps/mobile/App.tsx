@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 import { View } from 'react-native';
 import {
   Button,
@@ -34,7 +32,9 @@ export default function App() {
           <Text variant="headlineSmall" style={{ fontWeight: typography.h1.weight as any }}>
             ScrapDealer Mobile
           </Text>
-          <Button mode="contained" style={{ marginTop: 12 }}>Primary Action</Button>
+          <Button mode="contained" style={{ marginTop: 12 }}>
+            Primary Action
+          </Button>
         </View>
       </SafeAreaView>
     </PaperProvider>
