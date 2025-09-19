@@ -1,4 +1,3 @@
-🌟 ScrapDealer
 ScrapDealer is a modern app for efficient scrap management, featuring:
 
 Admin Web CMS: A sleek, React-powered dashboard for administrators.<br>
