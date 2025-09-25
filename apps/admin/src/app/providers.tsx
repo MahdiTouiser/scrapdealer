@@ -18,9 +18,8 @@ const theme = createTheme({
     },
     shape: { borderRadius: radii.md },
     typography: {
-        fontFamily: typography.fontFamily,
         h1: { fontSize: typography.h1.size, fontWeight: typography.h1.weight },
-        body1: { fontSize: typography.body.size, fontWeight: typography.body.weight }
+        body1: { fontSize: typography.body1.size, fontWeight: typography.body1.weight }
     }
 });
 
