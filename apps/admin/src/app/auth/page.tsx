@@ -151,7 +151,7 @@ export default function LoginPage() {
                         id="login-title"
                         sx={{ textAlign: 'center', color: 'text.primary', mb: 1, fontWeight: 600 }}
                     >
-                        ضایعات چی
+                        {fa.scrapDealer}
                     </Typography>
                     <Typography
                         variant="subtitle1"

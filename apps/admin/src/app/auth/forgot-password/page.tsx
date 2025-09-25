@@ -137,7 +137,7 @@ export default function ForgotPasswordPage() {
                         id="forgot-password-title"
                         sx={{ textAlign: 'center', color: 'text.primary', mb: 1, fontWeight: 600 }}
                     >
-                        ضایعات چی
+                        {fa.scrapDealer}
                     </Typography>
                     <Typography
                         variant="subtitle1"
@@ -193,7 +193,7 @@ export default function ForgotPasswordPage() {
 
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
                         <StyledLink href="/auth" variant="body2">
-                            بازگشت به صفحه ورود
+                            {fa.returnToLoginPage}
                         </StyledLink>
                     </Box>
                 </Box>
