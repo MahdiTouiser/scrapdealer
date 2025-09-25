@@ -1,8 +1,5 @@
 export const typography = {
-  fontFamily: {
-    primary: 'System', // Use system fonts for better RTL support
-    mono: 'Courier',
-  },
+
   fontSize: {
     xs: 12,
     sm: 14,
