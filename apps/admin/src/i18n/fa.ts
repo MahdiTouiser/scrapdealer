@@ -20,6 +20,15 @@ const fa = {
       usernameMin: 'نام کاربری باید حداقل ۳ حرف باشد',
     },
   },
+  scrapDealer: 'ضایعات چی',
+  returnToLoginPage: 'بازگشت به صفحه ورود',
+  logout: 'خروج',
+  dashboard: 'داشبورد مدیریتی',
+  mainPage: 'صفحه اصلی',
+  main: 'اصلی',
+  buyers: ' خریداران',
+  sellers: 'فروشندگان',
+  categories: 'دسته بندی ها',
 };
 
 export default fa;
