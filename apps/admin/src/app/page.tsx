@@ -1,16 +1,16 @@
-'use client';
+// src/app/admin/page.tsx
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
-import {
-  Button,
-  Container,
-  Typography,
-} from '@mui/material';
+export default async function AdminRootPage() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('auth_token')?.value;
 
-export default function Page() {
-  return (
-    <Container sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom>ScrapDealer Admin</Typography>
-      <Button variant="contained">Primary Action</Button>
-    </Container>
-  );
+  if (token) {
+    redirect('/dashboard');
+  } else {
+    redirect('/auth');
+  }
+
+  return null;
 }

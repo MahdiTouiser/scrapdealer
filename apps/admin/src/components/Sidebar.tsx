@@ -2,38 +2,41 @@
 
 import React, { useState } from 'react';
 
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
+
 import fa from '@/i18n/fa';
 import { theme } from '@/theme';
 import {
-    ChevronLeft,
-    ChevronRight,
-    Home,
-    Logout,
-    Person,
-    Recycling,
-    Settings,
+  ChevronLeft,
+  ChevronRight,
+  Home,
+  Logout,
+  Person,
+  Recycling,
+  Settings,
 } from '@mui/icons-material';
 import {
-    Box,
-    CssBaseline,
-    Divider,
-    Drawer,
-    IconButton,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Tooltip,
-    Typography,
+  Box,
+  CssBaseline,
+  Divider,
+  Drawer,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Tooltip,
+  Typography,
 } from '@mui/material';
 import {
-    keyframes,
-    styled,
-    ThemeProvider,
+  keyframes,
+  styled,
+  ThemeProvider,
 } from '@mui/material/styles';
 
-// Animations
 const slideIn = keyframes`
   from { transform: translateX(20px); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
@@ -44,7 +47,6 @@ const slideOut = keyframes`
   to { transform: translateX(20px); opacity: 0; }
 `;
 
-// DrawerHeader
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
@@ -59,6 +61,13 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 const Sidebar: React.FC = () => {
     const [open, setOpen] = useState(true);
     const [selectedItem, setSelectedItem] = useState<string | null>(fa.login.title);
+    const router = useRouter();
+
+    const handleLogout = () => {
+        Cookies.remove("auth_token");
+        router.push("/auth");
+        toast.success('از سامانه با موفقیت خارج شدید')
+    };
 
     const handleDrawerToggle = () => setOpen(!open);
     const handleItemClick = (text: string) => setSelectedItem(text);
@@ -113,7 +122,6 @@ const Sidebar: React.FC = () => {
                         },
                     }}
                 >
-                    {/* ✅ Logo Section */}
                     <Box
                         sx={{
                             display: 'flex',
@@ -161,7 +169,6 @@ const Sidebar: React.FC = () => {
 
                     <Divider />
 
-                    {/* Menu */}
                     <List sx={{ px: 1 }}>
                         {menuItems.map((section) => (
                             <Box key={section.section}>
@@ -233,7 +240,6 @@ const Sidebar: React.FC = () => {
 
                     <Box sx={{ flexGrow: 1 }} />
 
-                    {/* Footer */}
                     <Box sx={{ p: 1, borderTop: '1px solid #eee' }}>
                         <Tooltip title={!open ? `${fa.logout}` : ''} placement="right" arrow>
                             <ListItemButton
@@ -245,6 +251,7 @@ const Sidebar: React.FC = () => {
                                         bgcolor: 'rgba(244,67,54,0.1)',
                                     },
                                 }}
+                                onClick={handleLogout}
                             >
                                 <ListItemIcon
                                     sx={{

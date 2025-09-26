@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -9,21 +10,21 @@ import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-    Recycling,
-    Visibility,
-    VisibilityOff,
+  Recycling,
+  Visibility,
+  VisibilityOff,
 } from '@mui/icons-material';
 import {
-    Alert,
-    Box,
-    Button,
-    Container,
-    IconButton,
-    InputAdornment,
-    Link,
-    Paper,
-    TextField,
-    Typography,
+  Alert,
+  Box,
+  Button,
+  Container,
+  IconButton,
+  InputAdornment,
+  Link,
+  Paper,
+  TextField,
+  Typography,
 } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { styled } from '@mui/material/styles';
@@ -125,20 +126,31 @@ export default function LoginPage() {
     const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
         resolver: zodResolver(loginSchema),
     });
+    const router = useRouter();
 
     const [showPassword, setShowPassword] = useState(false);
 
-    const { mutate: login, loading } = useApi({
+    const { mutateAsync: login, loading } = useApi<{ data: string }, LoginFormData>({
         key: ['login'],
         url: '/Authentication/CredentialLogin',
         method: 'POST',
         onSuccess: 'ورود موفقیت‌آمیز بود',
         onError: 'ورود ناموفق بود',
-    }) as { mutate: (data: LoginFormData) => void; loading: boolean };
+    });
 
-    const onSubmit = (data: LoginFormData) => {
-        login(data);
+    const onSubmit = async (data: LoginFormData) => {
+        try {
+            const response = await login(data);
+            if (response.data) {
+                document.cookie = `auth_token=${response.data}; path=/; max-age=3600; secure; samesite=lax`;
+                router.push("/dashboard");
+            }
+        } catch (error) {
+            console.error("API Error:", error);
+        }
     };
+
+
 
     return (
         <StyledContainer maxWidth="sm">
