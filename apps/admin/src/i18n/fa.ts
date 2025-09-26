@@ -30,6 +30,7 @@ const fa = {
   sellers: 'فروشندگان',
   categories: 'دسته بندی ها',
   successfulLogout: 'با موفقیت از سامانه خارج شدید ',
+  adminDashboard: 'داشبورد مدیریتی',
 };
 
 export default fa;
