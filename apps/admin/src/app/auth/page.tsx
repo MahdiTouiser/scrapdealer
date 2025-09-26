@@ -142,7 +142,7 @@ export default function LoginPage() {
         try {
             const response = await login(data);
             if (response.data) {
-                document.cookie = `auth_token=${response.data}; path=/; max-age=3600; secure; samesite=lax`;
+                document.cookie = `auth_token=${response.data}; path=/; max-age=3600; samesite=lax`;
                 router.push("/dashboard");
             }
         } catch (error) {

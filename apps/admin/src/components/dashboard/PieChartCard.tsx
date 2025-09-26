@@ -17,6 +17,7 @@ import {
 interface PieData {
     name: string;
     value: number;
+    [key: string]: any; // This fixes the error
 }
 
 interface PieChartCardProps {
