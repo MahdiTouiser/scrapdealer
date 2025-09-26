@@ -46,7 +46,6 @@ import {
 } from '@mui/material';
 import {
   keyframes,
-  styled,
   ThemeProvider,
 } from '@mui/material/styles';
 
@@ -100,26 +99,14 @@ const slideIn = keyframes`
   to { transform: translateX(0); opacity: 1; }
 `;
 
-const slideOut = keyframes`
-  from { transform: translateX(0); opacity: 1; }
-  to { transform: translateX(20px); opacity: 0; }
-`;
+
 
 const glow = keyframes`
   0%, 100% { box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); }
   50% { box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); }
 `;
 
-const DrawerHeader = styled('div')(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: theme.spacing(0, 2),
-    minHeight: 64,
-    color: theme.palette.text.primary,
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-    borderBottom: `1px solid ${theme.palette.grey[200]}`,
-}));
+
 
 const Sidebar: React.FC = () => {
     const [open, setOpen] = useState(true);
@@ -474,7 +461,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, open, selected, component, hr
     <Tooltip title={!open ? item.text : ''} placement="right" arrow>
         <ListItem disablePadding sx={{ my: 0.5 }}>
             <ListItemButton
-                component={component}
+                component={component ?? 'a'}
                 href={href}
                 selected={selected}
                 sx={{
