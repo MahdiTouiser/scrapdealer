@@ -11,6 +11,23 @@ export const cacheRtl = createCache({
 export const theme = createTheme({
   direction: 'rtl',
   typography: {
-    fontFamily: `'Vazirmatn', 'Tahoma', 'sans-serif'`,
+    fontFamily: 'Vazirmatn, sans-serif',
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          fontFamily: 'Vazirmatn, sans-serif',
+        },
+      },
+    },
+  },
+  palette: {
+    primary: {
+      main: '#0288d1',
+    },
+    secondary: {
+      main: '#01579b',
+    },
   },
 });

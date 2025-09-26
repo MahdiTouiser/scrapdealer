@@ -1,24 +1,18 @@
 'use client';
 
-import {
-  ReactNode,
-  useEffect,
-} from 'react';
+import { ReactNode } from 'react';
 
-import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation';
+import MainLayout from '@/components/layouts/MainLayout';
+import ProtectedLayout from '@/components/layouts/ProtectedLayout';
 
-interface Props {
-    children: ReactNode;
-}
+interface Props { children: ReactNode }
 
-export default function ProtectedLayout({ children }: Props) {
-    const router = useRouter();
-
-    useEffect(() => {
-        const token = Cookies.get('auth_token');
-        if (!token) router.replace('/auth');
-    }, [router]);
-
-    return <>{children}</>;
+export default function PersistentProtectedLayout({ children }: Props) {
+    return (
+        <ProtectedLayout>
+            <MainLayout>
+                {children}
+            </MainLayout>
+        </ProtectedLayout>
+    );
 }

@@ -2,6 +2,6 @@ import { ReactNode } from 'react';
 
 interface Props { children: ReactNode }
 
-export default function DashboardLayout({ children }: Props) {
+export default function BuyersLayout({ children }: Props) {
     return <>{children}</>;
 }
