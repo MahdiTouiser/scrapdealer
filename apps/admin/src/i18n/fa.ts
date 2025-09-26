@@ -29,6 +29,7 @@ const fa = {
   buyers: ' خریداران',
   sellers: 'فروشندگان',
   categories: 'دسته بندی ها',
+  successfulLogout: 'با موفقیت از سامانه خارج شدید ',
 };
 
 export default fa;
