@@ -5,7 +5,6 @@ import React, {
   useState,
 } from 'react';
 
-import Cookies from 'js-cookie';
 import Link from 'next/link';
 import {
   usePathname,
@@ -131,8 +130,8 @@ const Sidebar: React.FC = () => {
     };
 
     const handleLogout = () => {
-        Cookies.remove('auth_token');
-        router.push('/auth');
+        localStorage.removeItem("auth_token");
+        router.push("/auth");
         toast.success(fa.successfulLogout);
     };
 
