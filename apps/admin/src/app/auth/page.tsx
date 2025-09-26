@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -125,10 +126,11 @@ export default function LoginPage() {
     const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
         resolver: zodResolver(loginSchema),
     });
+    const router = useRouter();
 
     const [showPassword, setShowPassword] = useState(false);
 
-    const { mutateAsync: login, loading } = useApi<{ token: string }, LoginFormData>({
+    const { mutateAsync: login, loading } = useApi<{ data: string }, LoginFormData>({
         key: ['login'],
         url: '/Authentication/CredentialLogin',
         method: 'POST',
@@ -138,12 +140,16 @@ export default function LoginPage() {
 
     const onSubmit = async (data: LoginFormData) => {
         try {
-            const response = await login?.(data);
-            console.log("API Response:", response);
+            const response = await login(data);
+            if (response.data) {
+                document.cookie = `auth_token=${response.data}; path=/; max-age=3600; secure; samesite=lax`;
+                router.push("/dashboard");
+            }
         } catch (error) {
             console.error("API Error:", error);
         }
     };
+
 
 
     return (

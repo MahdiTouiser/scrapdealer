@@ -52,7 +52,6 @@ export function useApi<TData = unknown, TVariables = unknown>({
 }: UseApiOptions<TVariables>) {
     const queryClient = useQueryClient();
 
-    // Query (GET requests only)
     const query = useQuery<TData, ApiError>({
         queryKey: key,
         queryFn: () => {
@@ -62,7 +61,6 @@ export function useApi<TData = unknown, TVariables = unknown>({
         enabled: method === 'GET',
     });
 
-    // Mutation (POST, PUT, PATCH, DELETE)
     const mutation = useMutation<TData, ApiError, TVariables>({
         mutationFn: async (data: TVariables) => {
             const endpoint = typeof url === 'function' ? url(data) : url;
@@ -80,17 +78,16 @@ export function useApi<TData = unknown, TVariables = unknown>({
         },
     });
 
-    // Always return the same object shape
+    const noop = () => { };
+    const noopAsync = async () => undefined as unknown as TData;
+
     return {
-        // Query data (GET only)
         data: method === 'GET' ? query.data : undefined,
         refetch: method === 'GET' ? query.refetch : undefined,
 
-        // Mutation methods (non-GET only, otherwise undefined)
-        mutate: method !== 'GET' ? mutation.mutate : undefined,
-        mutateAsync: method !== 'GET' ? mutation.mutateAsync : undefined,
+        mutate: method === 'GET' ? noop : mutation.mutate,
+        mutateAsync: method === 'GET' ? noopAsync : mutation.mutateAsync,
 
-        // Shared states
         loading: method === 'GET' ? query.isLoading : mutation.isPending,
         error: method === 'GET' ? query.error : mutation.error,
     };

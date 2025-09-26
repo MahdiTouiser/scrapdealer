@@ -23,9 +23,6 @@ const queryClient = new QueryClient();
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fa" dir="rtl">
-      <head>
-        <title>ScrapDealer Admin</title>
-      </head>
       <body>
         <CacheProvider value={cacheRtl}>
           <ThemeProvider theme={theme}>
