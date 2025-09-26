@@ -1,6 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import {
+  useState,
+  useTransition,
+} from 'react';
 
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -128,6 +131,7 @@ export default function LoginPage() {
     });
     const router = useRouter();
 
+    const [isPending, startTransition] = useTransition();
     const [showPassword, setShowPassword] = useState(false);
 
     const { mutateAsync: login, loading } = useApi<{ data: string }, LoginFormData>({
@@ -138,12 +142,18 @@ export default function LoginPage() {
         onError: 'ورود ناموفق بود',
     });
 
+
     const onSubmit = async (data: LoginFormData) => {
         try {
             const response = await login(data);
+
             if (response.data) {
-                document.cookie = `auth_token=${response.data}; path=/; max-age=3600; samesite=lax`;
-                router.push("/dashboard");
+                localStorage.setItem('auth_token', response.data);
+
+                startTransition(() => {
+                    router.push('/dashboard');
+                    router.refresh();
+                });
             }
         } catch (error) {
             console.error("API Error:", error);
