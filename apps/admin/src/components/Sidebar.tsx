@@ -1,9 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, {
+  useEffect,
+  useState,
+} from 'react';
 
 import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import {
+  usePathname,
+  useRouter,
+} from 'next/navigation';
 import toast from 'react-hot-toast';
 
 import fa from '@/i18n/fa';
@@ -43,6 +50,51 @@ import {
   ThemeProvider,
 } from '@mui/material/styles';
 
+interface MenuItem {
+    text: string;
+    icon: React.ReactNode;
+    path: string;
+}
+
+interface MenuSection {
+    section: string;
+    collapsible?: boolean;
+    items: MenuItem[];
+}
+
+const MENU_SECTIONS: MenuSection[] = [
+    {
+        section: fa.main,
+        items: [{ text: fa.dashboard, icon: <DashboardIcon />, path: '/dashboard' }],
+    },
+    {
+        section: fa.buyers,
+        collapsible: true,
+        items: [
+            { text: 'لیست خریداران', icon: <ShoppingCart />, path: '/buyers' },
+            { text: 'خریداران فعال', icon: <Person />, path: '/buyers/active' },
+            { text: 'تنظیمات خریداران', icon: <Settings />, path: '/buyers/settings' },
+        ],
+    },
+    {
+        section: fa.sellers,
+        collapsible: true,
+        items: [
+            { text: 'لیست فروشندگان', icon: <Store />, path: '/sellers' },
+            { text: 'فروشندگان فعال', icon: <Person />, path: '/sellers/active' },
+            { text: 'تنظیمات فروشندگان', icon: <Settings />, path: '/sellers/settings' },
+        ],
+    },
+    {
+        section: fa.categories,
+        collapsible: true,
+        items: [
+            { text: 'همه دسته‌ها', icon: <Category />, path: '/categories' },
+            { text: 'مدیریت دسته‌ها', icon: <Settings />, path: '/categories/manage' },
+        ],
+    },
+];
+
 const slideIn = keyframes`
   from { transform: translateX(20px); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
@@ -53,82 +105,49 @@ const slideOut = keyframes`
   to { transform: translateX(20px); opacity: 0; }
 `;
 
+const glow = keyframes`
+  0%, 100% { box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); }
+  50% { box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); }
+`;
+
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: theme.spacing(0, 2),
     minHeight: 64,
-    background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-    color: theme.palette.common.white,
-    fontWeight: 700,
+    color: theme.palette.text.primary,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    borderBottom: `1px solid ${theme.palette.grey[200]}`,
 }));
-
 
 const Sidebar: React.FC = () => {
     const [open, setOpen] = useState(true);
+    const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(
+        Object.fromEntries(MENU_SECTIONS.map((section) => [section.section, section.collapsible ?? false]))
+    );
     const [selectedItem, setSelectedItem] = useState<string>(fa.dashboard);
-    const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({
-        [fa.buyers]: true,
-    });
     const router = useRouter();
+    const pathname = usePathname();
 
-    const handleDrawerToggle = () => setOpen(!open);
+    useEffect(() => {
+        const selected =
+            MENU_SECTIONS.flatMap((section) => section.items).find((item) => item.path === pathname)?.text ??
+            fa.dashboard;
+        setSelectedItem(selected);
+    }, [pathname]);
 
-    const handleItemClick = (text: string, path?: string) => {
-        setSelectedItem(text);
-        if (path) {
-            console.log(`Navigate to: ${path}`);
-        }
-    };
+    const handleDrawerToggle = () => setOpen((prev) => !prev);
 
     const handleSectionToggle = (section: string) => {
-        setExpandedSections(prev => ({
-            ...prev,
-            [section]: !prev[section]
-        }));
+        setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
     };
 
     const handleLogout = () => {
-        Cookies.remove("auth_token");
-        router.push("/auth");
+        Cookies.remove('auth_token');
+        router.push('/auth');
         toast.success(fa.successfulLogout);
     };
-
-    const menuItems = [
-        {
-            section: fa.main,
-            items: [
-                { text: fa.dashboard, icon: <DashboardIcon />, path: '/' },
-            ],
-        },
-        {
-            section: fa.buyers,
-            collapsible: true,
-            items: [
-                { text: 'لیست خریداران', icon: <ShoppingCart />, path: '/buyers' },
-                { text: 'خریداران فعال', icon: <Person />, path: '/buyers/active' },
-                { text: 'تنظیمات خریداران', icon: <Settings />, path: '/buyers/settings' },
-            ],
-        },
-        {
-            section: fa.sellers,
-            collapsible: true,
-            items: [
-                { text: 'لیست فروشندگان', icon: <Store />, path: '/sellers' },
-                { text: 'فروشندگان فعال', icon: <Person />, path: '/sellers/active' },
-                { text: 'تنظیمات فروشندگان', icon: <Settings />, path: '/sellers/settings' },
-            ],
-        },
-        {
-            section: fa.categories,
-            collapsible: true,
-            items: [
-                { text: 'همه دسته‌ها', icon: <Category />, path: '/categories' },
-                { text: 'مدیریت دسته‌ها', icon: <Settings />, path: '/categories/manage' },
-            ],
-        },
-    ];
 
     return (
         <ThemeProvider theme={theme}>
@@ -137,29 +156,29 @@ const Sidebar: React.FC = () => {
                 <Drawer
                     variant="permanent"
                     sx={{
-                        width: open ? 280 : 80,
+                        width: open ? 280 : 72,
                         flexShrink: 0,
-                        [`& .MuiDrawer-paper`]: {
-                            width: open ? 280 : 80,
+                        '& .MuiDrawer-paper': {
+                            width: open ? 280 : 72,
                             boxSizing: 'border-box',
                             background: theme.palette.common.white,
                             borderLeft: 'none',
-                            boxShadow: '4px 0 24px rgba(0,0,0,0.08)',
-                            transition: 'width 0.3s cubic-bezier(0.4,0,0.2,1)',
-                            overflow: 'hidden',
-                            overflowY: 'auto',
-                            '&::-webkit-scrollbar': {
-                                width: '6px',
-                            },
-                            '&::-webkit-scrollbar-track': {
-                                background: theme.palette.grey[100],
-                            },
+                            boxShadow: '4px 0 24px rgba(0, 0, 0, 0.08)',
+                            transition: theme.transitions.create('width', {
+                                easing: theme.transitions.easing.easeInOut,
+                                duration: theme.transitions.duration.standard,
+                            }),
+                            overflowY: open ? 'auto' : 'hidden',
+                            '&::-webkit-scrollbar': open
+                                ? {
+                                    width: '6px',
+                                    background: theme.palette.grey[100],
+                                }
+                                : { display: 'none' },
                             '&::-webkit-scrollbar-thumb': {
                                 background: theme.palette.grey[400],
                                 borderRadius: '3px',
-                                '&:hover': {
-                                    background: theme.palette.grey[500],
-                                },
+                                '&:hover': { background: theme.palette.grey[500] },
                             },
                         },
                     }}
@@ -182,7 +201,6 @@ const Sidebar: React.FC = () => {
                                 width: open ? '80%' : '60%',
                                 height: '2px',
                                 background: `linear-gradient(90deg, transparent, ${theme.palette.primary.main}, transparent)`,
-                                transition: 'width 0.3s ease',
                             },
                         }}
                     >
@@ -196,16 +214,22 @@ const Sidebar: React.FC = () => {
                                     height: '100%',
                                     borderRadius: '50%',
                                     background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                                    opacity: 0.1,
-                                    animation: 'pulse 2s infinite',
+                                    opacity: 0.15,
+                                    animation: 'pulse 2.5s infinite',
                                 },
                                 '@keyframes pulse': {
-                                    '0%, 100%': { transform: 'scale(1)', opacity: 0.1 },
-                                    '50%': { transform: 'scale(1.1)', opacity: 0.2 },
+                                    '0%, 100%': { transform: 'scale(1)', opacity: 0.15 },
+                                    '50%': { transform: 'scale(1.15)', opacity: 0.25 },
                                 },
                             }}
                         >
-                            <Recycling sx={{ fontSize: 56, color: theme.palette.primary.main }} />
+                            <Recycling
+                                sx={{
+                                    fontSize: 60,
+                                    color: theme.palette.primary.main,
+                                    filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))',
+                                }}
+                            />
                         </Box>
                         {open && (
                             <Typography
@@ -217,8 +241,7 @@ const Sidebar: React.FC = () => {
                                     backgroundClip: 'text',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
-                                    textAlign: 'center',
-                                    letterSpacing: '-0.5px',
+                                    letterSpacing: '0.5px',
                                 }}
                             >
                                 {fa.scrapDealer}
@@ -226,40 +249,63 @@ const Sidebar: React.FC = () => {
                         )}
                     </Box>
 
-                    <DrawerHeader>
-                        <Typography
-                            variant="h6"
-                            noWrap
-                            sx={{
-                                opacity: open ? 1 : 0,
-                                animation: open
-                                    ? `${slideIn} 0.3s ease-in forwards`
-                                    : `${slideOut} 0.3s ease-out forwards`,
-                                visibility: open ? 'visible' : 'hidden',
-                                fontWeight: 600,
-                                fontSize: '1.1rem',
-                            }}
-                        >
-                            {fa.dashboard}
-                        </Typography>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: open ? 'space-between' : 'center',
+                            padding: open ? theme.spacing(0, 2) : theme.spacing(0, 1),
+                            minHeight: 64,
+                            background: theme.palette.common.white,
+                            borderBottom: `1px solid ${theme.palette.grey[200]}`,
+                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                            position: 'relative',
+                            overflow: 'visible',
+                        }}
+                    >
+                        {open ? (
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    fontWeight: 600,
+                                    fontSize: '1.1rem',
+                                    letterSpacing: '0.3px',
+                                    color: theme.palette.primary.main,
+                                    animation: `${slideIn} 0.3s ease-in`,
+                                }}
+                            >
+                                {fa.dashboard}
+                            </Typography>
+                        ) : (
+                            <Box sx={{ display: 'none' }} />
+                        )}
+
                         <IconButton
                             onClick={handleDrawerToggle}
                             sx={{
-                                color: theme.palette.common.white,
+                                color: theme.palette.primary.main,
                                 '&:hover': {
-                                    background: 'rgba(255,255,255,0.15)',
+                                    background: 'rgba(0, 0, 0, 0.04)',
+                                    transform: 'scale(1.1)',
                                 },
+                                transition: 'all 0.2s ease',
+                                minWidth: 'auto',
+                                width: 40,
+                                height: 40,
+                                visibility: 'visible !important',
+                                opacity: '1 !important',
                             }}
+                            aria-label={open ? 'Close sidebar' : 'Open sidebar'}
                         >
-                            {open ? <ChevronRight /> : <ChevronLeft />}
+                            {open ? <ChevronLeft /> : <ChevronRight />}
                         </IconButton>
-                    </DrawerHeader>
+                    </Box>
 
-                    <Divider />
+                    <Divider sx={{ borderColor: theme.palette.grey[200], mx: 1 }} />
 
                     <List sx={{ px: 1, pt: 1 }}>
-                        {menuItems.map((section) => (
-                            <Box key={section.section} sx={{ mb: 1 }}>
+                        {MENU_SECTIONS.map((section) => (
+                            <Box key={section.section} sx={{ mb: 1.5 }} role="group" aria-label={section.section}>
                                 {section.collapsible ? (
                                     <>
                                         {open && (
@@ -267,34 +313,41 @@ const Sidebar: React.FC = () => {
                                                 onClick={() => handleSectionToggle(section.section)}
                                                 sx={{
                                                     borderRadius: 2,
+                                                    justifyContent: open ? 'space-between' : 'center',
                                                     px: 2,
                                                     py: 1,
                                                     mb: 0.5,
                                                     '&:hover': {
                                                         bgcolor: theme.palette.action.hover,
+                                                        animation: `${glow} 1.5s infinite`,
                                                     },
+                                                    transition: 'background 0.2s ease',
                                                 }}
+                                                aria-expanded={expandedSections[section.section]}
                                             >
-                                                <Typography
-                                                    variant="subtitle2"
-                                                    sx={{
-                                                        flex: 1,
-                                                        color: theme.palette.primary.main,
-                                                        fontWeight: 700,
-                                                        fontSize: '0.9rem',
-                                                        letterSpacing: '0.3px',
-                                                    }}
-                                                >
-                                                    {section.section}
-                                                </Typography>
+                                                {open && (
+                                                    <Typography
+                                                        variant="subtitle2"
+                                                        sx={{
+                                                            flex: 1,
+                                                            color: theme.palette.primary.main,
+                                                            fontWeight: 700,
+                                                            fontSize: '0.9rem',
+                                                            letterSpacing: '0.2px',
+                                                        }}
+                                                    >
+                                                        {section.section}
+                                                    </Typography>
+                                                )}
                                                 {expandedSections[section.section] ? (
                                                     <ExpandLess sx={{ color: theme.palette.primary.main }} />
                                                 ) : (
                                                     <ExpandMore sx={{ color: theme.palette.primary.main }} />
                                                 )}
                                             </ListItemButton>
+
                                         )}
-                                        <Collapse in={open && (expandedSections[section.section] ?? false)} timeout="auto">
+                                        <Collapse in={open && (expandedSections[section.section] ?? false)} timeout="auto" unmountOnExit>
                                             <List disablePadding>
                                                 {section.items.map((item) => (
                                                     <MenuItem
@@ -302,20 +355,27 @@ const Sidebar: React.FC = () => {
                                                         item={item}
                                                         open={open}
                                                         selected={selectedItem === item.text}
-                                                        onClick={() => handleItemClick(item.text, item.path)}
+                                                        component={Link}
+                                                        href={item.path}
                                                     />
                                                 ))}
                                             </List>
                                         </Collapse>
-                                        {!open && section.items.map((item) => (
-                                            <MenuItem
-                                                key={item.text}
-                                                item={item}
-                                                open={open}
-                                                selected={selectedItem === item.text}
-                                                onClick={() => handleItemClick(item.text, item.path)}
-                                            />
-                                        ))}
+
+                                        {!open && (
+                                            <List disablePadding>
+                                                {section.items.map((item) => (
+                                                    <MenuItem
+                                                        key={item.text}
+                                                        item={item}
+                                                        open={open}
+                                                        selected={selectedItem === item.text}
+                                                        component={Link}
+                                                        href={item.path}
+                                                    />
+                                                ))}
+                                            </List>
+                                        )}
                                     </>
                                 ) : (
                                     <>
@@ -329,7 +389,7 @@ const Sidebar: React.FC = () => {
                                                     color: theme.palette.primary.main,
                                                     fontWeight: 700,
                                                     fontSize: '0.9rem',
-                                                    letterSpacing: '0.3px',
+                                                    letterSpacing: '0.2px',
                                                 }}
                                             >
                                                 {section.section}
@@ -341,7 +401,8 @@ const Sidebar: React.FC = () => {
                                                 item={item}
                                                 open={open}
                                                 selected={selectedItem === item.text}
-                                                onClick={() => handleItemClick(item.text, item.path)}
+                                                component={Link}
+                                                href={item.path}
                                             />
                                         ))}
                                     </>
@@ -352,28 +413,30 @@ const Sidebar: React.FC = () => {
 
                     <Box sx={{ flexGrow: 1 }} />
 
-                    <Box sx={{ p: 1, borderTop: `2px solid ${theme.palette.grey[200]}`, background: theme.palette.grey[50] }}>
+                    <Box sx={{ p: 1, borderTop: `2px solid ${theme.palette.grey[200]}` }}>
                         <Tooltip title={!open ? fa.logout : ''} placement="right" arrow>
                             <ListItemButton
+                                onClick={handleLogout}
                                 sx={{
                                     borderRadius: 2,
                                     justifyContent: open ? 'initial' : 'center',
                                     px: 2,
                                     py: 1.5,
                                     '&:hover': {
-                                        bgcolor: theme.palette.error.light + '1A',
+                                        bgcolor: theme.palette.error.light + '33',
                                         transform: 'translateX(-2px)',
+                                        animation: `${glow} 1.5s infinite`,
                                     },
-                                    transition: 'all 0.25s ease',
+                                    transition: 'all 0.2s ease',
                                 }}
-                                onClick={handleLogout}
+                                aria-label="Logout"
                             >
                                 <ListItemIcon
                                     sx={{
                                         minWidth: 0,
                                         mr: open ? 2 : 'auto',
-                                        justifyContent: 'center',
                                         color: theme.palette.error.main,
+                                        transform: 'scale(1.1)',
                                     }}
                                 >
                                     <Logout />
@@ -386,6 +449,7 @@ const Sidebar: React.FC = () => {
                                         '& .MuiTypography-root': {
                                             fontWeight: 600,
                                             color: theme.palette.error.main,
+                                            fontSize: '0.95rem',
                                         },
                                     }}
                                 />
@@ -398,41 +462,45 @@ const Sidebar: React.FC = () => {
     );
 };
 
-const MenuItem: React.FC<{
-    item: { text: string; icon: React.ReactNode; path?: string };
+interface MenuItemProps {
+    item: MenuItem;
     open: boolean;
     selected: boolean;
-    onClick: () => void;
-}> = ({ item, open, selected, onClick }) => (
+    component?: React.ElementType;
+    href?: string;
+}
+
+const MenuItem: React.FC<MenuItemProps> = ({ item, open, selected, component, href }) => (
     <Tooltip title={!open ? item.text : ''} placement="right" arrow>
         <ListItem disablePadding sx={{ my: 0.5 }}>
             <ListItemButton
+                component={component}
+                href={href}
                 selected={selected}
-                onClick={onClick}
                 sx={{
                     minHeight: 48,
                     borderRadius: 2,
                     justifyContent: open ? 'initial' : 'center',
                     px: 2,
                     mx: 0.5,
-                    bgcolor: selected ? theme.palette.action.selected : 'transparent',
+                    bgcolor: selected ? theme.palette.primary.light + '33' : 'transparent',
                     borderRight: selected ? `3px solid ${theme.palette.primary.main}` : '3px solid transparent',
                     '&:hover': {
                         bgcolor: theme.palette.action.hover,
-                        transform: 'translateX(-4px)',
                         borderRight: `3px solid ${theme.palette.primary.main}`,
+                        animation: `${glow} 1.5s infinite`,
                     },
-                    transition: 'all 0.25s cubic-bezier(0.4,0,0.2,1)',
+                    transition: 'all 0.2s ease',
                 }}
+                aria-label={item.text}
             >
                 <ListItemIcon
                     sx={{
                         minWidth: 0,
                         mr: open ? 2 : 'auto',
-                        justifyContent: 'center',
                         color: selected ? theme.palette.primary.main : theme.palette.text.secondary,
                         transform: selected ? 'scale(1.1)' : 'scale(1)',
-                        transition: 'all 0.2s ease',
+                        transition: 'transform 0.2s ease',
                     }}
                 >
                     {item.icon}
@@ -442,11 +510,11 @@ const MenuItem: React.FC<{
                     sx={{
                         opacity: open ? 1 : 0,
                         visibility: open ? 'visible' : 'hidden',
-                        transition: 'opacity 0.3s ease',
                         '& .MuiTypography-root': {
                             fontWeight: selected ? 600 : 400,
                             fontSize: '0.95rem',
                             color: selected ? theme.palette.primary.main : theme.palette.text.primary,
+                            letterSpacing: '0.1px',
                         },
                     }}
                 />

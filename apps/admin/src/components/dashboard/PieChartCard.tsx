@@ -4,6 +4,7 @@ import {
   Cell,
   Pie,
   PieChart,
+  PieLabelRenderProps,
   ResponsiveContainer,
   Tooltip,
 } from 'recharts';
@@ -13,11 +14,17 @@ import {
   Typography,
 } from '@mui/material';
 
+interface PieData {
+    name: string;
+    value: number;
+}
+
 interface PieChartCardProps {
     title: string;
-    data: { name: string; value: number }[];
+    data: PieData[];
     colors?: string[];
 }
+
 const PieChartCard: React.FC<PieChartCardProps> = ({
     title,
     data,
@@ -26,15 +33,21 @@ const PieChartCard: React.FC<PieChartCardProps> = ({
     return (
         <Paper
             sx={{
-                padding: 2,
-                borderRadius: 2,
-                boxShadow: 3,
+                p: 3,
+                borderRadius: 3,
+                boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
                 bgcolor: 'background.paper',
+                direction: 'rtl', // Persian support
             }}
         >
-            <Typography variant="h6" gutterBottom sx={{ fontWeight: 'medium' }}>
+            <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ fontWeight: 600, mb: 2, fontFamily: 'Vazirmatn, sans-serif' }}
+            >
                 {title}
             </Typography>
+
             <ResponsiveContainer width="100%" height={350}>
                 <PieChart>
                     <Pie
@@ -43,19 +56,26 @@ const PieChartCard: React.FC<PieChartCardProps> = ({
                         nameKey="name"
                         cx="50%"
                         cy="50%"
-                        outerRadius={100}
-                        label={({ name, percent }) => `${name} (${(percent as number * 100).toFixed(0)}%)`}
-                        labelLine={{ stroke: '#999' }}
+                        outerRadius={110}
+                        innerRadius={40}
+                        paddingAngle={4}
+                        label={(props: PieLabelRenderProps & { percent?: number; name?: string }) => {
+                            const name = props.name ?? '';
+                            const percent = props.percent ?? 0;
+                            return `${name} (${(percent * 100).toFixed(0)}%)`;
+                        }}
+                        labelLine={{ stroke: '#ccc' }}
                     >
                         {data.map((_, index) => (
-                            <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                            <Cell key={index} fill={colors[index % colors.length]} />
                         ))}
                     </Pie>
                     <Tooltip
                         contentStyle={{
                             backgroundColor: '#fff',
-                            borderRadius: '8px',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                            borderRadius: 12,
+                            boxShadow: '0 3px 10px rgba(0,0,0,0.12)',
+                            fontFamily: 'Vazirmatn, sans-serif',
                         }}
                     />
                 </PieChart>
