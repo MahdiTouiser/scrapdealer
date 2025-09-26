@@ -1,10 +1,10 @@
 import toast from 'react-hot-toast';
 
 import {
-    QueryKey,
-    useMutation,
-    useQuery,
-    useQueryClient,
+  QueryKey,
+  useMutation,
+  useQuery,
+  useQueryClient,
 } from '@tanstack/react-query';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -52,7 +52,7 @@ export function useApi<TData = unknown, TVariables = unknown>({
 }: UseApiOptions<TVariables>) {
     const queryClient = useQueryClient();
 
-    // For GET requests
+    // Query (GET requests only)
     const query = useQuery<TData, ApiError>({
         queryKey: key,
         queryFn: () => {
@@ -62,12 +62,13 @@ export function useApi<TData = unknown, TVariables = unknown>({
         enabled: method === 'GET',
     });
 
+    // Mutation (POST, PUT, PATCH, DELETE)
     const mutation = useMutation<TData, ApiError, TVariables>({
         mutationFn: async (data: TVariables) => {
             const endpoint = typeof url === 'function' ? url(data) : url;
             return fetchApi<TData>(endpoint, {
                 method,
-                body: data ? JSON.stringify(data) : null,
+                body: JSON.stringify(data),
             });
         },
         onSuccess: () => {
@@ -79,19 +80,18 @@ export function useApi<TData = unknown, TVariables = unknown>({
         },
     });
 
-    if (method === 'GET') {
-        return {
-            data: query.data,
-            loading: query.isLoading,
-            error: query.error,
-            refetch: query.refetch,
-        };
-    }
-
+    // Always return the same object shape
     return {
-        mutate: mutation.mutate,
-        loading: mutation.isPending,
-        error: mutation.error,
+        // Query data (GET only)
+        data: method === 'GET' ? query.data : undefined,
+        refetch: method === 'GET' ? query.refetch : undefined,
+
+        // Mutation methods (non-GET only, otherwise undefined)
+        mutate: method !== 'GET' ? mutation.mutate : undefined,
+        mutateAsync: method !== 'GET' ? mutation.mutateAsync : undefined,
+
+        // Shared states
+        loading: method === 'GET' ? query.isLoading : mutation.isPending,
+        error: method === 'GET' ? query.error : mutation.error,
     };
 }
-
