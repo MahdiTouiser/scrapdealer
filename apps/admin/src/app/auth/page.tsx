@@ -149,7 +149,8 @@ export default function LoginPage() {
 
             if (response.data) {
                 localStorage.setItem('auth_token', response.data);
-
+                console.log(response);
+                console.log(response.data);
                 startTransition(() => {
                     router.push('/dashboard');
                     router.refresh();
