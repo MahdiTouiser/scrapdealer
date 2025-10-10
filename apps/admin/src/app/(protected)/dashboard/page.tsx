@@ -1,6 +1,6 @@
 'use client';
 
-import PageTitle from '@/components/common/PageTilte';
+import PageTitle from '@/components/common/PageTitle';
 import BarChartCard from '@/components/dashboard/BarChartCard';
 import KpiCard from '@/components/dashboard/KpiCard';
 import LineChartCard from '@/components/dashboard/LineChartCard';
@@ -45,13 +45,6 @@ export default function DashboardPage() {
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
             <PageTitle title={fa.adminDashboard} />
-            {/* <Typography
-                variant="h4"
-                component="h1"
-                sx={{ mb: 4, fontWeight: "bold" }}
-            >
-                {fa.adminDashboard}
-            </Typography> */}
             <Grid container spacing={2} sx={{ mb: 3 }}>
                 <Grid size={3}>
                     <Item>

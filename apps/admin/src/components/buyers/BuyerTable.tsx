@@ -16,7 +16,7 @@ interface Buyer {
 
 const BuyerTable: React.FC = () => {
     const [rowData] = useState<Buyer[]>([
-        { id: 1, name: "مهدی توسیر", company: "ضایعات چی", phone: "09121234567", status: "فعال" },
+        { id: 1, name: "مهدی تویسرکانی", company: "ضایعات چی", phone: "09121234567", status: "فعال" },
         { id: 2, name: "سارا محمدی", company: "شرکت فولاد", phone: "09351234567", status: "فعال" },
         { id: 3, name: "علی رضایی", company: "شرکت بازیافت", phone: "09135554433", status: "غیرفعال" },
         { id: 4, name: "نگار موسوی", company: "آهن قراضه شرق", phone: "09221112233", status: "فعال" },
