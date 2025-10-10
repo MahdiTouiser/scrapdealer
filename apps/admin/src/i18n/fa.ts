@@ -32,6 +32,8 @@ const fa = {
   successfulLogout: 'با موفقیت از سامانه خارج شدید ',
   adminDashboard: 'داشبورد مدیریتی',
   supports: 'پشتیبان ها',
+  permissionLevel: 'مدیریت سطح دسترسی',
+  activity: 'پیگیری فعالیت ها',
 };
 
 export default fa;
