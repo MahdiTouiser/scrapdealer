@@ -1,97 +1,48 @@
 'use client';
 
 import React, {
-  useEffect,
-  useState,
+    useEffect,
+    useState,
 } from 'react';
 
 import Link from 'next/link';
 import {
-  usePathname,
-  useRouter,
+    usePathname,
+    useRouter,
 } from 'next/navigation';
 import toast from 'react-hot-toast';
 
 import fa from '@/i18n/fa';
 import { theme } from '@/theme';
 import {
-  Category,
-  ChevronLeft,
-  ChevronRight,
-  Dashboard as DashboardIcon,
-  ExpandLess,
-  ExpandMore,
-  Logout,
-  Person,
-  Recycling,
-  Settings,
-  ShoppingCart,
-  Store,
+    ChevronLeft,
+    ChevronRight,
+    ExpandLess,
+    ExpandMore,
+    Logout,
+    Recycling,
 } from '@mui/icons-material';
 import {
-  Box,
-  Collapse,
-  CssBaseline,
-  Divider,
-  Drawer,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Tooltip,
-  Typography,
+    Box,
+    Collapse,
+    CssBaseline,
+    Divider,
+    Drawer,
+    IconButton,
+    List,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Tooltip,
+    Typography,
 } from '@mui/material';
 import {
-  keyframes,
-  ThemeProvider,
+    keyframes,
+    ThemeProvider,
 } from '@mui/material/styles';
 
-interface MenuItem {
-    text: string;
-    icon: React.ReactNode;
-    path: string;
-}
-
-interface MenuSection {
-    section: string;
-    collapsible?: boolean;
-    items: MenuItem[];
-}
-
-const MENU_SECTIONS: MenuSection[] = [
-    {
-        section: fa.main,
-        items: [{ text: fa.dashboard, icon: <DashboardIcon />, path: '/dashboard' }],
-    },
-    {
-        section: fa.buyers,
-        collapsible: true,
-        items: [
-            { text: 'لیست خریداران', icon: <ShoppingCart />, path: '/buyers' },
-            { text: 'خریداران فعال', icon: <Person />, path: '/buyers/active' },
-            { text: 'تنظیمات خریداران', icon: <Settings />, path: '/buyers/settings' },
-        ],
-    },
-    {
-        section: fa.sellers,
-        collapsible: true,
-        items: [
-            { text: 'لیست فروشندگان', icon: <Store />, path: '/sellers' },
-            { text: 'فروشندگان فعال', icon: <Person />, path: '/sellers/active' },
-            { text: 'تنظیمات فروشندگان', icon: <Settings />, path: '/sellers/settings' },
-        ],
-    },
-    {
-        section: fa.categories,
-        collapsible: true,
-        items: [
-            { text: 'همه دسته‌ها', icon: <Category />, path: '/categories' },
-            { text: 'مدیریت دسته‌ها', icon: <Settings />, path: '/categories/manage' },
-        ],
-    },
-];
+import MenuItem from './MenuItem';
+import { MENU_SECTIONS } from './MenuSections';
 
 const slideIn = keyframes`
   from { transform: translateX(20px); opacity: 0; }
@@ -100,7 +51,7 @@ const slideIn = keyframes`
 
 
 
-const glow = keyframes`
+export const glow = keyframes`
   0%, 100% { box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); }
   50% { box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); }
 `;
@@ -110,8 +61,9 @@ const glow = keyframes`
 const Sidebar: React.FC = () => {
     const [open, setOpen] = useState(true);
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(
-        Object.fromEntries(MENU_SECTIONS.map((section) => [section.section, section.collapsible ?? false]))
+        Object.fromEntries(MENU_SECTIONS.map((section) => [section.section, false]))
     );
+
     const [selectedItem, setSelectedItem] = useState<string>(fa.dashboard);
     const router = useRouter();
     const pathname = usePathname();
@@ -448,65 +400,7 @@ const Sidebar: React.FC = () => {
     );
 };
 
-interface MenuItemProps {
-    item: MenuItem;
-    open: boolean;
-    selected: boolean;
-    component?: React.ElementType;
-    href?: string;
-}
 
-const MenuItem: React.FC<MenuItemProps> = ({ item, open, selected, component, href }) => (
-    <Tooltip title={!open ? item.text : ''} placement="right" arrow>
-        <ListItem disablePadding sx={{ my: 0.5 }}>
-            <ListItemButton
-                component={component ?? 'a'}
-                href={href}
-                selected={selected}
-                sx={{
-                    minHeight: 48,
-                    borderRadius: 2,
-                    justifyContent: open ? 'initial' : 'center',
-                    px: 2,
-                    mx: 0.5,
-                    bgcolor: selected ? theme.palette.primary.light + '33' : 'transparent',
-                    borderRight: selected ? `3px solid ${theme.palette.primary.main}` : '3px solid transparent',
-                    '&:hover': {
-                        bgcolor: theme.palette.action.hover,
-                        borderRight: `3px solid ${theme.palette.primary.main}`,
-                        animation: `${glow} 1.5s infinite`,
-                    },
-                    transition: 'all 0.2s ease',
-                }}
-                aria-label={item.text}
-            >
-                <ListItemIcon
-                    sx={{
-                        minWidth: 0,
-                        mr: open ? 2 : 'auto',
-                        color: selected ? theme.palette.primary.main : theme.palette.text.secondary,
-                        transform: selected ? 'scale(1.1)' : 'scale(1)',
-                        transition: 'transform 0.2s ease',
-                    }}
-                >
-                    {item.icon}
-                </ListItemIcon>
-                <ListItemText
-                    primary={item.text}
-                    sx={{
-                        opacity: open ? 1 : 0,
-                        visibility: open ? 'visible' : 'hidden',
-                        '& .MuiTypography-root': {
-                            fontWeight: selected ? 600 : 400,
-                            fontSize: '0.95rem',
-                            color: selected ? theme.palette.primary.main : theme.palette.text.primary,
-                            letterSpacing: '0.1px',
-                        },
-                    }}
-                />
-            </ListItemButton>
-        </ListItem>
-    </Tooltip>
-);
+
 
 export default Sidebar;

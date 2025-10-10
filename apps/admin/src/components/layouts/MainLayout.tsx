@@ -1,5 +1,5 @@
 'use client';
-import Sidebar from '@/components/Sidebar';
+import Sidebar from '@/components/sidebar/Sidebar';
 import {
   Box,
   Toolbar,
