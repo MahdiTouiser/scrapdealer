@@ -1,8 +1,8 @@
 'use client';
 
 import {
-  ReactNode,
-  useEffect,
+    ReactNode,
+    useEffect,
 } from 'react';
 
 import { useRouter } from 'next/navigation';
@@ -16,9 +16,7 @@ export default function ProtectedLayout({ children }: Props) {
 
     useEffect(() => {
         const token = localStorage.getItem('auth_token');
-        if (!token) {
-            router.replace('/auth');
-        }
+        if (!token) router.replace('/auth');
     }, [router]);
 
     return <>{children}</>;
