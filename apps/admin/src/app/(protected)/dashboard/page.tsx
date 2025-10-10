@@ -1,11 +1,11 @@
 'use client';
 
+import PageTitle from '@/components/common/PageTilte';
 import BarChartCard from '@/components/dashboard/BarChartCard';
 import KpiCard from '@/components/dashboard/KpiCard';
 import LineChartCard from '@/components/dashboard/LineChartCard';
 import PieChartCard from '@/components/dashboard/PieChartCard';
 import fa from '@/i18n/fa';
-import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
@@ -44,13 +44,14 @@ const projectsData = [
 export default function DashboardPage() {
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
-            <Typography
+            <PageTitle title={fa.adminDashboard} />
+            {/* <Typography
                 variant="h4"
                 component="h1"
                 sx={{ mb: 4, fontWeight: "bold" }}
             >
                 {fa.adminDashboard}
-            </Typography>
+            </Typography> */}
             <Grid container spacing={2} sx={{ mb: 3 }}>
                 <Grid size={3}>
                     <Item>
