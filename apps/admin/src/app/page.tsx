@@ -5,11 +5,9 @@ export default async function AdminRootPage() {
   const cookieStore = await cookies();
   const token = cookieStore.get('auth_token')?.value;
 
-  if (token) {
-    redirect('/dashboard');
-  } else {
-    redirect('/auth');
-  }
+  if (token) redirect('/dashboard');
+  else redirect('/auth');
+
 
   return null;
 }
