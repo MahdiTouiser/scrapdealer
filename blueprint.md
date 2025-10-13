@@ -1,4 +1,4 @@
-<!-- ⚠️ This README has been generated from the file(s) "blueprint.md" ⚠️-->ScrapDealer is a modern app for efficient scrap management, featuring:
+ScrapDealer is a modern app for efficient scrap management, featuring:
 
 Admin Web CMS: A sleek, React-powered dashboard for administrators.<br>
 User Mobile App: A cross-platform React Native app for seamless user interaction.
