@@ -1,9 +1,6 @@
 'use client';
 
-import {
-  useState,
-  useTransition,
-} from 'react';
+import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -13,25 +10,29 @@ import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  Recycling,
-  Visibility,
-  VisibilityOff,
+    AdminPanelSettings,
+    Recycling,
+    SupportAgent,
+    Visibility,
+    VisibilityOff,
 } from '@mui/icons-material';
 import {
-  Alert,
-  Box,
-  Button,
-  Container,
-  IconButton,
-  InputAdornment,
-  Link,
-  Paper,
-  TextField,
-  Typography,
+    Alert,
+    Box,
+    Button,
+    Container,
+    IconButton,
+    InputAdornment,
+    Paper,
+    TextField,
+    ToggleButton,
+    ToggleButtonGroup,
+    Typography,
 } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { styled } from '@mui/material/styles';
 
+// ✅ Schema
 const loginSchema = z.object({
     username: z.string().min(3, fa.login.errors.usernameMin),
     password: z.string().min(6, fa.login.errors.passwordMin),
@@ -55,68 +56,19 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
     maxWidth: 400,
     backgroundColor: theme.palette.background.paper,
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-    transition: 'box-shadow 0.3s ease-in-out',
-    '&:hover': {
-        boxShadow: '0 6px 16px rgba(0, 0, 0, 0.15)',
-    },
-}));
-
-const StyledTextField = styled(TextField)(({ theme }) => ({
-    '& .MuiOutlinedInput-root': {
-        borderRadius: 8,
-        backgroundColor: theme.palette.grey[50],
-        '& fieldset': {
-            borderColor: theme.palette.grey[300],
-        },
-        '&:hover fieldset': {
-            borderColor: theme.palette.grey[500],
-        },
-        '&.Mui-focused fieldset': {
-            borderColor: theme.palette.grey[700],
-        },
-    },
-    '& .MuiInputLabel-root': {
-        color: theme.palette.grey[600],
-        '&.Mui-focused': {
-            color: theme.palette.grey[800],
-        },
-    },
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
     padding: theme.spacing(1.5),
     borderRadius: 8,
-    backgroundColor: theme.palette.grey[800],
-    color: theme.palette.common.white,
     fontWeight: 500,
     textTransform: 'none',
-    transition: 'background-color 0.3s ease, transform 0.2s ease',
-    '&:hover': {
-        backgroundColor: theme.palette.grey[900],
-        transform: 'translateY(-2px)',
-    },
-    '&:disabled': {
-        backgroundColor: theme.palette.grey[400],
-        color: theme.palette.grey[600],
-    },
 }));
 
-const StyledLink = styled(Link)(({ theme }) => ({
-    color: theme.palette.grey[600],
-    textDecoration: 'none',
-    fontSize: '0.875rem',
-    transition: 'color 0.3s ease',
-    '&:hover': {
-        color: theme.palette.grey[800],
-        textDecoration: 'underline',
+const StyledTextField = styled(TextField)(() => ({
+    '& .MuiOutlinedInput-root': {
+        borderRadius: 8,
     },
-}));
-
-const StyledAlert = styled(Alert)(({ theme }) => ({
-    borderRadius: 8,
-    backgroundColor: theme.palette.error.light,
-    color: theme.palette.error.dark,
-    border: `1px solid ${theme.palette.error.main}`,
 }));
 
 const LogoIcon = styled(Recycling)(({ theme }) => ({
@@ -131,7 +83,7 @@ export default function LoginPage() {
     });
     const router = useRouter();
 
-    const [isPending, startTransition] = useTransition();
+    const [role, setRole] = useState<'admin' | 'supporter'>('supporter');
     const [showPassword, setShowPassword] = useState(false);
 
     const { mutateAsync: login, loading } = useApi<{ data: string }, LoginFormData>({
@@ -142,53 +94,56 @@ export default function LoginPage() {
         onError: 'ورود ناموفق بود',
     });
 
-
     const onSubmit = async (data: LoginFormData) => {
         try {
             const response = await login(data);
 
             if (response.data) {
                 localStorage.setItem('auth_token', response.data);
-                console.log(response);
-                console.log(response.data);
-                startTransition(() => {
-                    router.push('/dashboard');
-                    router.refresh();
-                });
+                localStorage.setItem('user_role', role);
+
+                router.push(role === 'admin' ? '/dashboard/' : '/supporter/dashboard');
+                router.refresh();
             }
         } catch (error) {
-            console.error("API Error:", error);
+            console.error('API Error:', error);
         }
     };
 
-
-
     return (
         <StyledContainer maxWidth="sm">
-            <StyledPaper elevation={0} role="form" aria-labelledby="login-title">
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <LogoIcon aria-hidden="true" />
-                    <Typography
-                        variant="h4"
-                        component="h1"
-                        id="login-title"
-                        sx={{ textAlign: 'center', color: 'text.primary', mb: 1, fontWeight: 600 }}
-                    >
+            <StyledPaper elevation={3}>
+                <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
+                    <LogoIcon />
+                    <Typography variant="h4" fontWeight={600} mb={0.5}>
                         {fa.scrapDealer}
                     </Typography>
-                    <Typography
-                        variant="subtitle1"
-                        sx={{ textAlign: 'center', color: 'grey.600', mb: 3 }}
-                    >
+                    <Typography color="grey.600" mb={3}>
                         {fa.login.title}
                     </Typography>
+
+                    {/* ✅ Role Toggle */}
+                    <ToggleButtonGroup
+                        color="primary"
+                        value={role}
+                        exclusive
+                        onChange={(_, value) => value && setRole(value)}
+                        sx={{ mb: 3 }}
+                    >
+                        <ToggleButton value="supporter" sx={{ px: 3, py: 1 }}>
+                            <SupportAgent sx={{ mr: 1 }} /> ورود پشتیبان
+                        </ToggleButton>
+                        <ToggleButton value="admin" sx={{ px: 3, py: 1 }}>
+                            <AdminPanelSettings sx={{ mr: 1 }} /> ورود ادمین
+                        </ToggleButton>
+                    </ToggleButtonGroup>
                 </Box>
 
                 <Box
                     component="form"
                     onSubmit={handleSubmit(onSubmit)}
                     noValidate
-                    sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}
+                    sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
                 >
                     <StyledTextField
                         label={fa.login.username}
@@ -211,8 +166,6 @@ export default function LoginPage() {
                                     <IconButton
                                         onClick={() => setShowPassword(prev => !prev)}
                                         edge="end"
-                                        sx={{ color: 'grey.600', '&:hover': { color: 'grey.800' } }}
-                                        aria-label={showPassword ? 'مخفی کردن رمز عبور' : 'نمایش رمز عبور'}
                                     >
                                         {showPassword ? <VisibilityOff /> : <Visibility />}
                                     </IconButton>
@@ -221,16 +174,10 @@ export default function LoginPage() {
                         }}
                     />
 
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                        <StyledLink href="/auth/forgot-password" variant="body2">
-                            {fa.login.forgotPassword}
-                        </StyledLink>
-                    </Box>
-
                     {errors.root && (
-                        <StyledAlert severity="error">
+                        <Alert severity="error" sx={{ borderRadius: 2 }}>
                             {errors.root.message}
-                        </StyledAlert>
+                        </Alert>
                     )}
 
                     <StyledButton
@@ -238,18 +185,16 @@ export default function LoginPage() {
                         fullWidth
                         variant="contained"
                         disabled={loading}
-                        aria-label={loading ? fa.login.submitting : fa.login.submit}
                     >
                         {loading ? (
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <CircularProgress size={20} sx={{ color: 'grey.600' }} />
+                                <CircularProgress size={20} />
                                 {fa.login.submitting}
                             </Box>
                         ) : (
                             fa.login.submit
                         )}
                     </StyledButton>
-
                 </Box>
             </StyledPaper>
         </StyledContainer>
