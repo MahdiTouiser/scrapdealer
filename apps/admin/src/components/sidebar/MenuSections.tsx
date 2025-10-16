@@ -5,7 +5,6 @@ import {
     Category,
     Dashboard,
     History,
-    Inventory,
     ReceiptLong,
     Security,
     Settings,
@@ -31,7 +30,6 @@ export const MENU_SECTIONS: MenuSection[] = [
             { text: 'فروشندگان خرد', icon: <Store />, path: '/sellers/retail' },
             { text: 'فروشندگان عمده', icon: <Store />, path: '/sellers/wholesale' },
             { text: 'احراز هویت فروشندگان', icon: <VerifiedUser />, path: '/sellers/verification' },
-            { text: 'آگهی‌های ثبت‌شده', icon: <Inventory />, path: '/sellers/ads' },
         ],
     },
     {
