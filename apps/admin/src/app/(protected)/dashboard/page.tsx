@@ -2,6 +2,7 @@
 
 import PageTitle from '@/components/common/PageTitle';
 import BarChartCard from '@/components/dashboard/BarChartCard';
+import DateTimeCard from '@/components/dashboard/DateTimeCard';
 import KpiCard from '@/components/dashboard/KpiCard';
 import LineChartCard from '@/components/dashboard/LineChartCard';
 import PieChartCard from '@/components/dashboard/PieChartCard';
@@ -73,13 +74,17 @@ const pieData = [
     { name: 'فولاد', value: 20 },
 ];
 
-
 export default function DashboardPage() {
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
             <PageTitle title={fa.adminDashboard} />
 
             <Grid container spacing={2} sx={{ mb: 3 }}>
+                <Grid size={3}>
+                    <Item>
+                        <DateTimeCard locale="fa-IR" />
+                    </Item>
+                </Grid>
                 <Grid size={3}>
                     <Item>
                         <KpiCard title="تعداد نفرات نصب‌کننده نرم‌افزار" value={kpiStats.appInstalls.toLocaleString()} />

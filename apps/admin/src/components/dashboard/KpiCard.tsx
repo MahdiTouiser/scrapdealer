@@ -12,7 +12,18 @@ interface KpiCardProps {
     color?: string;
 }
 
+const toPersianDigits = (value: string | number): string => {
+    if (typeof value === 'number') {
+        return value.toLocaleString('fa-IR');
+    }
+    return value.replace(/\d/g, (digit) =>
+        '۰۱۲۳۴۵۶۷۸۹'[parseInt(digit, 10)]
+    );
+};
+
 const KpiCard: React.FC<KpiCardProps> = ({ title, value, color = '#1976d2' }) => {
+    const persianValue = toPersianDigits(value);
+
     return (
         <Paper
             sx={{
@@ -46,7 +57,6 @@ const KpiCard: React.FC<KpiCardProps> = ({ title, value, color = '#1976d2' }) =>
                 sx={{
                     mb: 1,
                     fontWeight: 500,
-                    fontFamily: 'Vazirmatn, sans-serif',
                     color: 'text.secondary',
                 }}
             >
@@ -57,11 +67,10 @@ const KpiCard: React.FC<KpiCardProps> = ({ title, value, color = '#1976d2' }) =>
                 variant="h4"
                 sx={{
                     fontWeight: 700,
-                    fontFamily: 'Vazirmatn, sans-serif',
                     color: 'text.primary',
                 }}
             >
-                {value}
+                {persianValue}
             </Typography>
         </Paper>
     );
