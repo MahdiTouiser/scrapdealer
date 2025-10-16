@@ -1,6 +1,5 @@
 import fa from '@/i18n/fa';
 import {
-    AccountBalance,
     AdminPanelSettings,
     BarChart,
     Campaign,
@@ -12,7 +11,6 @@ import {
     History,
     Inventory,
     Newspaper,
-    People,
     Percent,
     PriceChange,
     ReceiptLong,
@@ -53,7 +51,16 @@ export const MENU_SECTIONS: MenuSection[] = [
         section: 'مدیریت خریداران',
         collapsible: true,
         items: [
-            { text: 'لیست خریداران', icon: <ShoppingCart />, path: '/buyers' },
+            {
+                text: 'خریداران خرد',
+                icon: <ShoppingCart />,
+                path: '/buyers/retail',
+            },
+            {
+                text: 'خریداران عمده',
+                icon: <ShoppingCart />,
+                path: '/buyers/wholesale',
+            },
             { text: 'احراز هویت خریداران', icon: <VerifiedUser />, path: '/buyers/verification' },
             { text: 'طرح‌های تشویقی', icon: <CardGiftcard />, path: '/buyers/incentives' },
             { text: 'پیام‌ها', icon: <Chat />, path: '/buyers/messages' },
@@ -61,6 +68,7 @@ export const MENU_SECTIONS: MenuSection[] = [
             { text: 'شکایات خریداران', icon: <Feedback />, path: '/buyers/complaints' },
         ],
     },
+
     {
         section: 'پشتیبان‌ها',
         collapsible: true,
@@ -68,14 +76,6 @@ export const MENU_SECTIONS: MenuSection[] = [
             { text: 'لیست پشتیبان‌ها', icon: <SupportAgent />, path: '/supports' },
             { text: 'مدیریت سطح دسترسی', icon: <AdminPanelSettings />, path: '/supports/permissions' },
             { text: 'پیگیری فعالیت‌ها', icon: <History />, path: '/supports/activity' },
-        ],
-    },
-    {
-        section: 'مدیریت پیمانکاران',
-        collapsible: true,
-        items: [
-            { text: 'پیمانکاران فعال', icon: <People />, path: '/contractors' },
-            { text: 'بررسی مالی پیمانکاران', icon: <AccountBalance />, path: '/contractors/finance' },
         ],
     },
     {

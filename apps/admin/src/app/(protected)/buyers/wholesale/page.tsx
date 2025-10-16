@@ -1,18 +1,18 @@
 "use client";
 
-import BuyerTable from '@/components/buyers/BuyerTable';
+import WholeSaleTable from '@/components/buyers/wholesale/WholeSaleTable';
 import PageTitle from '@/components/common/PageTitle';
 import fa from '@/i18n/fa';
 import { Box } from '@mui/material';
 
-const Buyers = () => {
+const WholeSaleBuyers = () => {
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
-            <PageTitle title={fa.buyers}
+            <PageTitle title={fa.wholeSaleBuyers}
             />
-            <BuyerTable />
+            <WholeSaleTable />
         </Box>
     );
 };
 
-export default Buyers;
+export default WholeSaleBuyers;
