@@ -7,7 +7,7 @@ import { Box } from '@mui/material';
 
 const RetailBuyers = () => {
     return (
-        <Box sx={{ flexGrow: 1, p: 3 }}>
+        <Box sx={{ flexGrow: 1, p: 3}}>
             <PageTitle title={fa.retailBuyers}
             />
             <RetailTable />
