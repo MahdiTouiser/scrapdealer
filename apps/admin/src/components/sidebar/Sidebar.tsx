@@ -41,6 +41,7 @@ import {
     ThemeProvider,
 } from '@mui/material/styles';
 
+import ThemeToggle from '../common/ToggleTheme';
 import MenuItem from './MenuItem';
 import { MENU_SECTIONS } from './MenuSections';
 
@@ -352,6 +353,8 @@ const Sidebar: React.FC = () => {
                     <Box sx={{ flexGrow: 1 }} />
 
                     <Box sx={{ p: 1, borderTop: `2px solid ${theme.palette.grey[200]}` }}>
+                        <ThemeToggle open={open} />
+
                         <Tooltip title={!open ? fa.logout : ''} placement="right" arrow>
                             <ListItemButton
                                 onClick={handleLogout}

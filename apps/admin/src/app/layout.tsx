@@ -4,15 +4,10 @@ import './globals.css';
 
 import { Toaster } from 'react-hot-toast';
 
-import {
-  cacheRtl,
-  theme,
-} from '@/theme';
+import { cacheRtl } from '@/theme';
+import { CustomThemeProvider } from '@/theme/ThemeProvider';
 import { CacheProvider } from '@emotion/react';
-import {
-  CssBaseline,
-  ThemeProvider,
-} from '@mui/material';
+import { CssBaseline } from '@mui/material';
 import {
   QueryClient,
   QueryClientProvider,
@@ -25,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="fa" dir="rtl">
       <body>
         <CacheProvider value={cacheRtl}>
-          <ThemeProvider theme={theme}>
+          <CustomThemeProvider> 
             <CssBaseline />
             <QueryClientProvider client={queryClient}>
               {children}
@@ -37,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 }}
               />
             </QueryClientProvider>
-          </ThemeProvider>
+          </CustomThemeProvider>
         </CacheProvider>
       </body>
     </html>
