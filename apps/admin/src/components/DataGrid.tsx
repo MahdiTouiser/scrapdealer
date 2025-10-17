@@ -7,7 +7,6 @@ import type {
 import {
     AllCommunityModule,
     ModuleRegistry,
-    themeQuartz,
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 
@@ -140,7 +139,6 @@ function DataGrid<T>({
                     rowData={rowData}
                     columnDefs={rtlColumnDefs}
                     gridOptions={gridOptions}
-                    theme={themeQuartz}
                 />
             </div>
         </>

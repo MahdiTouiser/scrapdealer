@@ -9,10 +9,10 @@ import DataGrid from '@/components/DataGrid';
 interface RetailBuyer {
     id: number;
     name: string;
-    shopName: string; // نام فروشگاه
+    shopName: string;
     phone: string;
     city: string;
-    averageMonthlyPurchase: string; // میانگین خرید ماهانه
+    averageMonthlyPurchase: string;
     status: "فعال" | "غیرفعال";
 }
 

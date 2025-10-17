@@ -1,8 +1,6 @@
 'use client';
 
-import { useContext } from 'react';
-
-import { ThemeContext } from '@/theme/ThemeProvider';
+import { useThemeMode } from '@/contexts/ThemeContextProvider';
 import {
     Brightness4,
     Brightness7,
@@ -13,7 +11,7 @@ import {
 } from '@mui/material';
 
 export default function ThemeToggle({ open }: { open: boolean }) {
-    const { mode, toggleTheme } = useContext(ThemeContext);
+    const { mode, toggleMode } = useThemeMode();
 
     return (
         <Tooltip
@@ -22,7 +20,7 @@ export default function ThemeToggle({ open }: { open: boolean }) {
             arrow
         >
             <IconButton
-                onClick={toggleTheme}
+                onClick={toggleMode}
                 sx={{
                     color: mode === 'light' ? 'warning.main' : 'primary.light',
                     transition: 'all 0.3s ease',

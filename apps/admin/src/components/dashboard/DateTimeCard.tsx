@@ -26,14 +26,21 @@ const DateTimeCard: React.FC<DateTimeCardProps> = ({
     locale = 'fa-IR',
     color = '#1976d2',
 }) => {
-    const [currentTime, setCurrentTime] = useState(new Date());
+    const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
     useEffect(() => {
+        setCurrentTime(new Date());
+
         const timer = setInterval(() => {
             setCurrentTime(new Date());
         }, 1000);
+
         return () => clearInterval(timer);
     }, []);
+
+    if (!currentTime) {
+        return <Paper sx={{ py: 5, px: 4, borderRadius: 3, textAlign: 'center' }}>در حال بارگذاری...</Paper>;
+    }
 
     const formatTime = (date: Date) => {
         const time = date.toLocaleTimeString(locale, {

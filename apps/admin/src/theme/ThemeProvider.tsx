@@ -1,68 +1,69 @@
 'use client';
 
-import React, {
+import {
     createContext,
-    useEffect,
+    ReactNode,
+    useContext,
     useMemo,
     useState,
 } from 'react';
 
 import {
+    createTheme,
     CssBaseline,
     ThemeProvider as MuiThemeProvider,
 } from '@mui/material';
 
-import { darkTheme } from './darkTheme';
-import { lightTheme } from './lightTheme';
-
-type ThemeMode = 'light' | 'dark';
-
-interface ThemeContextProps {
-    mode: ThemeMode;
+interface ThemeContextType {
+    mode: 'light' | 'dark';
     toggleTheme: () => void;
 }
 
-export const ThemeContext = createContext<ThemeContextProps>({
+export const ThemeContext = createContext<ThemeContextType>({
     mode: 'light',
     toggleTheme: () => { },
 });
 
-export const CustomThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [mode, setMode] = useState<ThemeMode>('light');
+export const useThemeContext = () => useContext(ThemeContext);
 
-    useEffect(() => {
-        const stored = localStorage.getItem('theme');
-        if (stored === 'light' || stored === 'dark') {
-            setMode(stored);
-        } else {
-            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            setMode(systemDark ? 'dark' : 'light');
-        }
-    }, []);
+interface Props {
+    children: ReactNode;
+}
+
+export default function ThemeProvider({ children }: Props) {
+    const [mode, setMode] = useState<'light' | 'dark'>(
+        (localStorage.getItem('theme') as 'light' | 'dark') || 'light'
+    );
 
     const toggleTheme = () => {
-        setMode((prev) => {
-            const newMode = prev === 'light' ? 'dark' : 'light';
-            localStorage.setItem('theme', newMode);
-            return newMode;
+        setMode(prev => {
+            const next = prev === 'light' ? 'dark' : 'light';
+            localStorage.setItem('theme', next);
+            return next;
         });
     };
 
-    const theme = useMemo(() => (mode === 'light' ? lightTheme : darkTheme), [mode]);
+    const theme = useMemo(
+        () =>
+            createTheme({
+                palette: {
+                    mode,
+                    ...(mode === 'light'
+                        ? { primary: { main: '#0288d1' }, secondary: { main: '#01579b' } }
+                        : { primary: { main: '#90caf9' }, secondary: { main: '#f48fb1' } }),
+                    background: { default: mode === 'light' ? '#f5f5f5' : '#121212' },
+                },
+                typography: { fontFamily: 'Vazirmatn, sans-serif' },
+            }),
+        [mode]
+    );
 
     return (
         <ThemeContext.Provider value={{ mode, toggleTheme }}>
             <MuiThemeProvider theme={theme}>
                 <CssBaseline />
-                <div
-                    style={{
-                        transition: 'background-color 0.3s ease, color 0.3s ease',
-                        minHeight: '100vh',
-                    }}
-                >
-                    {children}
-                </div>
+                {children}
             </MuiThemeProvider>
         </ThemeContext.Provider>
     );
-};
+}

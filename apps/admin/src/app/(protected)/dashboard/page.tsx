@@ -13,17 +13,21 @@ import Paper from '@mui/material/Paper';
 import { styled } from '@mui/material/styles';
 
 const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: '#fff',
+    backgroundColor: theme.palette.background.paper,
+    color: theme.palette.text.secondary,
     ...theme.typography.body2,
     padding: theme.spacing(2),
     textAlign: 'center',
-    color: (theme.vars ?? theme).palette.text.secondary,
     borderRadius: 8,
-    boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-    ...theme.applyStyles('dark', {
-        backgroundColor: '#1A2027',
+    boxShadow: theme.shadows[2],
+    transition: theme.transitions.create(['background-color', 'color'], {
+        duration: theme.transitions.duration.shortest,
     }),
+    '&:hover': {
+        boxShadow: theme.shadows[4],
+    },
 }));
+
 
 const dailyStats = {
     buyers: 125,
