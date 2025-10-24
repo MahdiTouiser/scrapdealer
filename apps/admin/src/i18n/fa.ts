@@ -34,8 +34,10 @@ const fa = {
   supports: 'پشتیبان ها',
   permissionLevel: 'مدیریت سطح دسترسی',
   activity: 'پیگیری فعالیت ها',
-  wholeSaleBuyers: 'خریداران عمده',
+  wholeBuyers: 'خریداران عمده',
   retailBuyers: 'خریداران خرد',
+  retailSellers: 'فروشندگان خرد',
+  wholeSellers: 'فروشندگان عمده',
   verificationBuyers: 'احراز هویت خریداران',
 };
 
