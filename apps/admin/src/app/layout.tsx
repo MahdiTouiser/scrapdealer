@@ -1,33 +1,17 @@
-'use client';
-
 import './globals.css';
 
-import { Toaster } from 'react-hot-toast';
+import ClientProviders from './ClientProviders';
 
-import ThemeContextProvider from '@/contexts/ThemeContextProvider';
-import {
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
-
-const queryClient = new QueryClient();
+export const metadata = {
+  title: 'ضایعات چی',
+  description: 'ScrapDealer admin platform',
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fa" dir="rtl">
       <body>
-        <ThemeContextProvider>
-          <QueryClientProvider client={queryClient}>
-            {children}
-            <Toaster
-              position="top-right"
-              reverseOrder={false}
-              toastOptions={{
-                style: { fontFamily: 'Vazirmatn', textAlign: 'right' },
-              }}
-            />
-          </QueryClientProvider>
-        </ThemeContextProvider>
+        <ClientProviders>{children}</ClientProviders>
       </body>
     </html>
   );

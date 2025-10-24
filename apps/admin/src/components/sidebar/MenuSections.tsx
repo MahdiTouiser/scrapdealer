@@ -1,7 +1,6 @@
 import fa from '@/i18n/fa';
 import {
     AdminPanelSettings,
-    BarChart,
     Category,
     Dashboard,
     History,
@@ -55,7 +54,6 @@ export const MENU_SECTIONS: MenuSection[] = [
         collapsible: true,
         items: [
             { text: 'تراکنش‌ها', icon: <ReceiptLong />, path: '/finance/transactions' },
-            { text: 'گزارشات مالی', icon: <BarChart />, path: '/finance/reports' },
         ],
     },
     {

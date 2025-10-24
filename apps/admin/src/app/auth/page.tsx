@@ -32,7 +32,6 @@ import {
 import CircularProgress from '@mui/material/CircularProgress';
 import { styled } from '@mui/material/styles';
 
-// ✅ Schema
 const loginSchema = z.object({
     username: z.string().min(3, fa.login.errors.usernameMin),
     password: z.string().min(6, fa.login.errors.passwordMin),
@@ -45,7 +44,6 @@ const StyledContainer = styled(Container)(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.palette.grey[100],
     padding: theme.spacing(2),
 }));
 
