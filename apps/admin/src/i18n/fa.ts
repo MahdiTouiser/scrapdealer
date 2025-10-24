@@ -39,6 +39,8 @@ const fa = {
   retailSellers: 'فروشندگان خرد',
   wholeSellers: 'فروشندگان عمده',
   verificationBuyers: 'احراز هویت خریداران',
+  seeBuyersVerifications: 'در این بخش می‌توانید مدارک و وضعیت حساب خریداران را مشاهده، بررسی و تأیید کنید.',
+  seeSellersVerifications: 'در این بخش می‌توانید مدارک و وضعیت حساب فروشندگان را مشاهده، بررسی و تأیید کنید.',
 };
 
 export default fa;
