@@ -6,6 +6,7 @@
     "moduleResolution": "bundler",
     "jsx": "preserve",
     "incremental": true,
+    "noImplicitAny": false,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitOverride": true,

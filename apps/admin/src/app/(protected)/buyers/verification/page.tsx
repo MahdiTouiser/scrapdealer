@@ -2,8 +2,7 @@
 
 import React from 'react';
 
-import VerificationTable
-  from '@/components/buyers/verification/VerificationTable';
+import BuyersVerificationTable from '@/components/buyers/verification/BuyersVerificationTable';
 import PageTitle from '@/components/common/PageTitle';
 import fa from '@/i18n/fa';
 import {
@@ -12,17 +11,17 @@ import {
 } from '@mui/material';
 
 const BuyersVerification: React.FC = () => {
-    return (
-        <Box sx={{ p: 3 }}>
-            <PageTitle title={fa.verificationBuyers} />
+  return (
+    <Box sx={{ p: 3 }}>
+      <PageTitle title={fa.verificationBuyers} />
 
-            <Typography variant="body1" color="text.secondary" mb={3}>
-                در این بخش می‌توانید مدارک و وضعیت حساب خریداران را مشاهده، بررسی و تأیید کنید.
-            </Typography>
+      <Typography variant="body1" color="text.secondary" mb={3}>
+        {fa.seeBuyersVerifications}
+      </Typography>
 
-            <VerificationTable />
-        </Box>
-    );
+      <BuyersVerificationTable />
+    </Box>
+  );
 };
 
 export default BuyersVerification;
