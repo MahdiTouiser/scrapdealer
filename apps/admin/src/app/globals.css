@@ -9,3 +9,24 @@ html,
 body {
   font-family: 'Vazirmatn', sans-serif !important;
 }
+
+.ag-theme-alpine-dark {
+  --ag-background-color: #1e1e1e;
+  --ag-foreground-color: #ffffff;
+  --ag-header-background-color: #121212;
+  --ag-row-hover-color: #2a2a2a;
+  --ag-odd-row-background-color: #1a1a1a;
+  --ag-border-color: #333;
+  --ag-selection-background-color: #444;
+}
+
+.ag-theme-alpine .ag-header-cell-label,
+.ag-theme-alpine-dark .ag-header-cell-label {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.ag-theme-alpine .ag-cell,
+.ag-theme-alpine-dark .ag-cell {
+  font-size: 20px;
+}

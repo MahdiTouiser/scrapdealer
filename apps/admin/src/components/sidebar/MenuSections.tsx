@@ -5,7 +5,6 @@ import {
     Category,
     Dashboard,
     History,
-    Inventory,
     ReceiptLong,
     Security,
     Settings,
@@ -29,9 +28,8 @@ export const MENU_SECTIONS: MenuSection[] = [
         collapsible: true,
         items: [
             { text: 'فروشندگان خرد', icon: <Store />, path: '/sellers/retail' },
-            { text: 'فروشندگان عمده', icon: <Store />, path: '/sellers/wholesale' },
+            { text: 'فروشندگان عمده', icon: <Store />, path: '/sellers/whole' },
             { text: 'احراز هویت فروشندگان', icon: <VerifiedUser />, path: '/sellers/verification' },
-            { text: 'آگهی‌های ثبت‌شده', icon: <Inventory />, path: '/sellers/ads' },
         ],
     },
     {
@@ -39,7 +37,7 @@ export const MENU_SECTIONS: MenuSection[] = [
         collapsible: true,
         items: [
             { text: 'خریداران خرد', icon: <ShoppingCart />, path: '/buyers/retail' },
-            { text: 'خریداران عمده', icon: <ShoppingCart />, path: '/buyers/wholesale' },
+            { text: 'خریداران عمده', icon: <ShoppingCart />, path: '/buyers/whole' },
             { text: 'احراز هویت خریداران', icon: <VerifiedUser />, path: '/buyers/verification' },
         ],
     },

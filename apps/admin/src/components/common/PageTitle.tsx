@@ -1,9 +1,9 @@
 'use client';
 
-import { theme } from '@/theme';
 import {
     Box,
     Typography,
+    useTheme,
 } from '@mui/material';
 
 interface PageTitleProps {
@@ -11,6 +11,7 @@ interface PageTitleProps {
 }
 
 export default function PageTitle({ title }: PageTitleProps) {
+    const theme = useTheme();
     return (
         <Box
             sx={{
