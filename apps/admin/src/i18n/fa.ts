@@ -41,6 +41,7 @@ const fa = {
   verificationBuyers: 'احراز هویت خریداران',
   seeBuyersVerifications: 'در این بخش می‌توانید مدارک و وضعیت حساب خریداران را مشاهده، بررسی و تأیید کنید.',
   seeSellersVerifications: 'در این بخش می‌توانید مدارک و وضعیت حساب فروشندگان را مشاهده، بررسی و تأیید کنید.',
+  transactions: 'تراکنش ها',
 };
 
 export default fa;

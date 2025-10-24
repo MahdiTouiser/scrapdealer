@@ -5,35 +5,106 @@ import React, { useState } from 'react';
 import type { ColDef } from 'ag-grid-community';
 
 import DataGrid from '@/components/DataGrid';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import StarIcon from '@mui/icons-material/Star';
+import {
+    Box,
+    Chip,
+    Tooltip,
+} from '@mui/material';
 
 interface Supporter {
     id: number;
-    name: string;
-    role: "پشتیبان خریداران" | "پشتیبان فروشندگان" | "مدیر";
-    email: string;
-    phone: string;
+    fullName: string;
+    gender: "مرد" | "زن";
     status: "فعال" | "غیرفعال";
+    score: number; // 0-5
+    username: string;
+    password: string;
 }
 
 const SupportersTable: React.FC = () => {
     const [rowData] = useState<Supporter[]>([
-        { id: 1, name: "مهدی تویسرکانی", role: "پشتیبان فروشندگان", email: "mehdi@example.com", phone: "09121234567", status: "فعال" },
-        { id: 2, name: "سارا محمدی", role: "پشتیبان خریداران", email: "sara@example.com", phone: "09351234567", status: "فعال" },
-        { id: 3, name: "علی رضایی", role: "پشتیبان فروشندگان", email: "ali@example.com", phone: "09135554433", status: "غیرفعال" },
-        { id: 4, name: "نگار موسوی", role: "پشتیبان خریداران", email: "negar@example.com", phone: "09221112233", status: "فعال" },
-        { id: 5, name: "رضا کریمی", role: "مدیر", email: "reza@example.com", phone: "09178889977", status: "فعال" },
+        { id: 1, fullName: "مهدی تویسرکانی", gender: "مرد", status: "فعال", score: 4, username: "mehdi123", password: "123456" },
+        { id: 2, fullName: "سارا محمدی", gender: "زن", status: "فعال", score: 5, username: "sara_m", password: "abcdef" },
+        { id: 3, fullName: "علی رضایی", gender: "مرد", status: "غیرفعال", score: 3, username: "ali_r", password: "password123" },
+        { id: 4, fullName: "نگار موسوی", gender: "زن", status: "فعال", score: 4, username: "negar_m", password: "negar2025" },
     ]);
+
+    const handleCopy = (text: string) => {
+        navigator.clipboard.writeText(text);
+        alert("پسورد کپی شد: " + text);
+    };
 
     const [columnDefs] = useState<ColDef<Supporter>[]>([
-        { field: "id", headerName: "شناسه", sortable: true, filter: true, width: 100 },
-        { field: "name", headerName: "نام پشتیبان", sortable: true, filter: true, flex: 1 },
-        { field: "role", headerName: "نقش", sortable: true, filter: true, flex: 1 },
-        { field: "email", headerName: "ایمیل", sortable: true, filter: true, flex: 1 },
-        { field: "phone", headerName: "شماره تماس", sortable: true, filter: true, flex: 1 },
-        { field: "status", headerName: "وضعیت", sortable: true, filter: true, flex: 1 },
+        { field: "fullName", headerName: "نام و نام خانوادگی", flex: 1, sortable: true, filter: true },
+        {
+            field: "gender",
+            headerName: "جنسیت",
+            sortable: true,
+            filter: true,
+            cellRenderer: (params: any) =>
+                params.value === "مرد" ? "♂ مرد" : "♀ زن",
+        },
+        {
+            field: "status",
+            headerName: "وضعیت",
+            width: 120,
+            sortable: true,
+            filter: true,
+            cellRenderer: (params: any) => (
+                <Chip
+                    label={params.value}
+                    color={params.value === "فعال" ? "success" : "error"}
+                    size="small"
+                />
+            ),
+        },
+        {
+            field: "score",
+            headerName: "امتیاز",
+            width: 150,
+            sortable: true,
+            filter: true,
+            cellRenderer: (params: any) => (
+                <Box display="flex">
+                    {Array.from({ length: 5 }, (_, i) => (
+                        <StarIcon
+                            key={i}
+                            style={{
+                                color: i < params.value ? "#FFD700" : "#E0E0E0",
+                                fontSize: 18,
+                            }}
+                        />
+                    ))}
+                </Box>
+            ),
+        },
+        { field: "username", headerName: "نام کاربری ", flex: 1, sortable: true, filter: true },
+        {
+            field: "password",
+            headerName: "رمز عبور",
+            flex: 1,
+            cellRenderer: (params: any) => (
+                <Tooltip title="کلیک کنید برای کپی">
+                    <Box
+                        display="flex"
+                        alignItems="center"
+                        sx={{ cursor: "pointer" }}
+                        onClick={() => handleCopy(params.value)}
+                    >
+                        {params.value} <ContentCopyIcon fontSize="small" sx={{ ml: 0.5 }} />
+                    </Box>
+                </Tooltip>
+            ),
+        },
     ]);
 
-    return <DataGrid<Supporter> rowData={rowData} columnDefs={columnDefs} />;
+    return (
+        <div>
+            <DataGrid<Supporter> rowData={rowData} columnDefs={columnDefs} />
+        </div>
+    );
 };
 
 export default SupportersTable;
