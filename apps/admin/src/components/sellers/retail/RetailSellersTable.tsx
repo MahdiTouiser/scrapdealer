@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, {
     useCallback,
@@ -16,7 +16,7 @@ import {
 interface RetailSeller {
     id: number;
     fullName: string;
-    company: string;
+    address: string;
     phone: string;
     nationalId: string;
     region: "شمال" | "جنوب" | "شرق" | "غرب" | "تهران";
@@ -29,7 +29,7 @@ const RetailSellersTable: React.FC = () => {
         {
             id: 1,
             fullName: "سعید محمدی",
-            company: "فروشگاه ضایعات پارس",
+            address: "خیابان ولیعصر، پلاک ۱۲۳",
             phone: "09123334455",
             nationalId: "0098765432",
             region: "تهران",
@@ -39,7 +39,7 @@ const RetailSellersTable: React.FC = () => {
         {
             id: 2,
             fullName: "الهام کریمی",
-            company: "ضایعات شرق",
+            address: "خیابان رسالت، کوچه سوم",
             phone: "09351231234",
             nationalId: "1122446688",
             region: "شرق",
@@ -49,7 +49,7 @@ const RetailSellersTable: React.FC = () => {
         {
             id: 3,
             fullName: "حسین رستمی",
-            company: "فروشگاه آهن غرب",
+            address: "خیابان آزادی، نبش میدان انقلاب",
             phone: "09128889977",
             nationalId: "5566778899",
             region: "غرب",
@@ -59,7 +59,7 @@ const RetailSellersTable: React.FC = () => {
         {
             id: 4,
             fullName: "نرگس شریفی",
-            company: "فلزات نوین جنوب",
+            address: "بلوار نادری، خیابان جنوبی",
             phone: "09176668899",
             nationalId: "7788996655",
             region: "جنوب",
@@ -82,7 +82,7 @@ const RetailSellersTable: React.FC = () => {
     const [columnDefs] = useState<ColDef<RetailSeller>[]>([
         { field: "id", headerName: "شناسه", maxWidth: 100 },
         { field: "fullName", headerName: "نام و نام خانوادگی", flex: 1 },
-        { field: "company", headerName: "شرکت", flex: 1 },
+        { field: "address", headerName: "آدرس", flex: 1 },
         { field: "phone", headerName: "شماره تماس", flex: 1 },
         { field: "nationalId", headerName: "کد ملی", flex: 1 },
         {

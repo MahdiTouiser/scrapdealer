@@ -78,7 +78,6 @@ export const colors = {
     inverse: '#FFFFFF',
     disabled: '#BDC1C6',
   },
-  // Legacy support
   gray: {
     50: '#F8F9FA',
     100: '#F1F3F4',

@@ -120,7 +120,6 @@ export default function LoginPage() {
                         {fa.login.title}
                     </Typography>
 
-                    {/* ✅ Role Toggle */}
                     <ToggleButtonGroup
                         color="primary"
                         value={role}
