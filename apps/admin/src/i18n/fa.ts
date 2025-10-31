@@ -46,8 +46,8 @@ const fa = {
   reviewedRequests: 'درخواست های بررسی شده',
   newRequests: 'درخواست های جدید',
   sellersManagement: 'مدیریت فروشندگان',
-  buyersManagement: 'مدیریت خریداران',  
-  
+  buyersManagement: 'مدیریت خریداران',
+  settings: 'تنظیمات سیستم',
 };
 
 export default fa;

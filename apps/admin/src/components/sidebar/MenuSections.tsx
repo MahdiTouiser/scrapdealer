@@ -1,13 +1,11 @@
 import fa from '@/i18n/fa';
 import {
   AdminPanelSettings,
-  Category,
   Dashboard,
   History,
   Home,
   LocationOn,
   ReceiptLong,
-  Security,
   Settings,
   ShoppingCart,
   Store,
@@ -72,9 +70,7 @@ export const MENU_SECTIONS: MenuSection[] = [
         section: 'تنظیمات سیستم',
         collapsible: true,
         items: [
-            { text: 'تنظیمات کلی', icon: <Settings />, path: '/settings' },
-            { text: 'دسته‌بندی‌ها', icon: <Category />, path: '/categories' },
-            { text: 'مدیریت نقش‌ها', icon: <Security />, path: '/roles' },
+            { text: 'تنظیمات سیستم', icon: <Settings />, path: '/settings' },
         ],
     },
 ];
