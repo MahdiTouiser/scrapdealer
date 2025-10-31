@@ -22,7 +22,7 @@ interface Supporter {
     fullName: string;
     gender: "مرد" | "زن";
     status: "فعال" | "غیرفعال";
-    score: number;
+    score: number; // 0-5
     username: string;
     password: string;
 }
