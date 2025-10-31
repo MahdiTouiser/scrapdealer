@@ -81,7 +81,7 @@ const pieData = [
 export default function DashboardPage() {
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
-            <PageTitle title={fa.adminDashboard} />
+            <PageTitle title={fa.mainPage} />
 
             <Grid container spacing={2} sx={{ mb: 3 }}>
                 <Grid size={3}>

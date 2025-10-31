@@ -4,6 +4,7 @@ import {
   Category,
   Dashboard,
   History,
+  Home,
   LocationOn,
   ReceiptLong,
   Security,
@@ -20,11 +21,12 @@ export const MENU_SECTIONS: MenuSection[] = [
     {
         section: fa.main,
         items: [
-            { text: fa.dashboard, icon: <Dashboard />, path: '/dashboard' },
+            { text: fa.mainPage, icon: <Home />, path: '/dashboard/main' },
+            { text: fa.dashboard, icon: <Dashboard />, path: '/dashboard/admin-dashboard' },
         ],
     },
     {
-        section: 'مدیریت فروشندگان',
+        section: fa.sellersManagement,
         collapsible: true,
         items: [
             { text: 'فروشندگان خرد', icon: <Store />, path: '/sellers/retail' },
@@ -33,7 +35,7 @@ export const MENU_SECTIONS: MenuSection[] = [
         ],
     },
     {
-        section: 'مدیریت خریداران',
+        section: fa.buyersManagement,
         collapsible: true,
         items: [
             { text: 'خریداران خرد', icon: <ShoppingCart />, path: '/buyers/retail' },

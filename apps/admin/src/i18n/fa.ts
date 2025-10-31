@@ -45,6 +45,9 @@ const fa = {
   fixedLocationBuyers: ' خریداران  مکان ثابت ',
   reviewedRequests: 'درخواست های بررسی شده',
   newRequests: 'درخواست های جدید',
+  sellersManagement: 'مدیریت فروشندگان',
+  buyersManagement: 'مدیریت خریداران',  
+  
 };
 
 export default fa;
