@@ -4,4 +4,3 @@ dist
 .expo
 ios
 android
-.env*
