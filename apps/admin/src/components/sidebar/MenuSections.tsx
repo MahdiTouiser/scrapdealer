@@ -43,6 +43,14 @@ export const MENU_SECTIONS: MenuSection[] = [
         ],
     },
     {
+        section: 'درخواست‌های ادمین',
+        collapsible: true,
+        items: [
+            { text: 'درخواست‌های جدید', icon: <AdminPanelSettings />, path: '/admin-requests/new' },
+            { text: 'درخواست‌های بررسی شده', icon: <History />, path: '/admin-requests/reviewed' },
+        ],
+    },
+    {
         section: 'پشتیبان‌ها',
         collapsible: true,
         items: [
