@@ -23,7 +23,7 @@ interface UseApiOptions<TVariables> {
 }
 
 async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
-    const baseUrl = process.env['NEXT_PUBLIC_API_BASE'];
+    const baseUrl = process.env['NEXT_PUBLIC_API_BASE_URL'];
 
     const response = await fetch(`${baseUrl}${url}`, {
         headers: { 'Content-Type': 'application/json' },

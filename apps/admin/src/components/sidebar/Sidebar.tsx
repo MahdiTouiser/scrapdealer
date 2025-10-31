@@ -1,42 +1,42 @@
 'use client';
 
 import React, {
-    useEffect,
-    useState,
+  useEffect,
+  useState,
 } from 'react';
 
 import Link from 'next/link';
 import {
-    usePathname,
-    useRouter,
+  usePathname,
+  useRouter,
 } from 'next/navigation';
 import toast from 'react-hot-toast';
 
 import fa from '@/i18n/fa';
 import {
-    ChevronLeft,
-    ChevronRight,
-    ExpandLess,
-    ExpandMore,
-    Logout,
-    Recycling,
+  ChevronLeft,
+  ChevronRight,
+  ExpandLess,
+  ExpandMore,
+  Logout,
+  Recycling,
 } from '@mui/icons-material';
 import {
-    Box,
-    Collapse,
-    Divider,
-    Drawer,
-    IconButton,
-    List,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Tooltip,
-    Typography,
+  Box,
+  Collapse,
+  Divider,
+  Drawer,
+  IconButton,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Tooltip,
+  Typography,
 } from '@mui/material';
 import {
-    keyframes,
-    useTheme,
+  keyframes,
+  useTheme,
 } from '@mui/material/styles';
 
 import ThemeToggle from '../common/ToggleTheme';
@@ -65,11 +65,32 @@ const Sidebar: React.FC = () => {
     const pathname = usePathname();
 
     useEffect(() => {
-        const selected =
-            MENU_SECTIONS.flatMap((section) => section.items).find((item) => item.path === pathname)?.text ??
-            fa.dashboard;
+        const normalizedPath = pathname?.replace(/\/$/, '') || '/';
+
+        let selected = fa.dashboard;
+        let sectionToExpand = '';
+
+        for (const section of MENU_SECTIONS) {
+            for (const item of section.items) {
+                if (item.path.replace(/\/$/, '') === normalizedPath) {
+                    selected = item.text;
+                    sectionToExpand = section.section;
+                    break;
+                }
+            }
+            if (sectionToExpand) break;
+        }
+
         setSelectedItem(selected);
+
+        if (sectionToExpand) {
+            setExpandedSections((prev) => ({
+                ...prev,
+                [sectionToExpand]: true,
+            }));
+        }
     }, [pathname]);
+
 
     const handleDrawerToggle = () => setOpen((prev) => !prev);
     const handleSectionToggle = (section: string) => {
@@ -250,7 +271,7 @@ const Sidebar: React.FC = () => {
                                         </ListItemButton>
                                     )}
 
-                                    <Collapse in={open && expandedSections[section.section]} timeout="auto" unmountOnExit>
+                                    <Collapse in={expandedSections[section.section] || !open} timeout="auto" unmountOnExit>
                                         <List disablePadding>
                                             {section.items.map((item) => (
                                                 <MenuItem

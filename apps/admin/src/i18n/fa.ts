@@ -42,6 +42,12 @@ const fa = {
   seeBuyersVerifications: 'در این بخش می‌توانید مدارک و وضعیت حساب خریداران را مشاهده، بررسی و تأیید کنید.',
   seeSellersVerifications: 'در این بخش می‌توانید مدارک و وضعیت حساب فروشندگان را مشاهده، بررسی و تأیید کنید.',
   transactions: 'تراکنش ها',
+  fixedLocationBuyers: ' خریداران  مکان ثابت ',
+  reviewedRequests: 'درخواست های بررسی شده',
+  newRequests: 'درخواست های جدید',
+  sellersManagement: 'مدیریت فروشندگان',
+  buyersManagement: 'مدیریت خریداران',  
+  
 };
 
 export default fa;
