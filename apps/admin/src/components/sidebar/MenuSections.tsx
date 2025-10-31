@@ -1,16 +1,17 @@
 import fa from '@/i18n/fa';
 import {
-    AdminPanelSettings,
-    Category,
-    Dashboard,
-    History,
-    ReceiptLong,
-    Security,
-    Settings,
-    ShoppingCart,
-    Store,
-    SupportAgent,
-    VerifiedUser,
+  AdminPanelSettings,
+  Category,
+  Dashboard,
+  History,
+  LocationOn,
+  ReceiptLong,
+  Security,
+  Settings,
+  ShoppingCart,
+  Store,
+  SupportAgent,
+  VerifiedUser,
 } from '@mui/icons-material';
 
 import { MenuSection } from '../types';
@@ -37,6 +38,7 @@ export const MENU_SECTIONS: MenuSection[] = [
         items: [
             { text: 'خریداران خرد', icon: <ShoppingCart />, path: '/buyers/retail' },
             { text: 'خریداران عمده', icon: <ShoppingCart />, path: '/buyers/whole' },
+            { text: 'خریداران مکان ثابت', icon: <LocationOn />, path: '/buyers/fixed-location' },
             { text: 'احراز هویت خریداران', icon: <VerifiedUser />, path: '/buyers/verification' },
         ],
     },
