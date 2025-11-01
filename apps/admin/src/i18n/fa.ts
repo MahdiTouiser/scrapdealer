@@ -48,6 +48,8 @@ const fa = {
   sellersManagement: 'مدیریت فروشندگان',
   buyersManagement: 'مدیریت خریداران',
   settings: 'تنظیمات سیستم',
+  adminRequests: 'درخواست ها',
+  financialManagement: 'مدیریت مالی',
 };
 
 export default fa;
