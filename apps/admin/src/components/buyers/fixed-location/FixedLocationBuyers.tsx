@@ -1,38 +1,39 @@
 'use client';
 
 import React, {
-  useMemo,
-  useState,
+    useMemo,
+    useState,
 } from 'react';
 
 import {
-  ColDef,
-  ICellRendererParams,
+    ColDef,
+    ICellRendererParams,
 } from 'ag-grid-community';
 
 import DataGrid from '@/components/DataGrid';
 import StarIcon from '@mui/icons-material/Star';
 import {
-  Box,
-  Chip,
-  Typography,
+    Box,
+    Chip,
+    Typography,
 } from '@mui/material';
 
 interface FixedBuyer {
     id: number;
-    fullName: string;         
-    shopName: string;       
-    shopAddress: string;    
-    phone: string;          
-    wasteType: string;       
-    rating: number;        
+    fullName: string;
+    shopName: string;
+    shopAddress: string;
+    phone: string;
+    wasteType: string;
+    rating: number;
 }
 
 const initialData: FixedBuyer[] = [
     { id: 1, fullName: 'علی رضایی', shopName: 'مغازه الف', shopAddress: 'تهران، میدان آزادی', phone: '09123456789', wasteType: 'کاغذ', rating: 4.5 },
-    { id: 2, fullName: 'مریم احمدی', shopName: 'مغازه ب', shopAddress: 'اصفهان، خیابان انقلاب', phone: '09129876543', wasteType: 'پلاستیک', rating: 3.8 },
-    { id: 3, fullName: 'حسین کریمی', shopName: 'مغازه ج', shopAddress: 'مشهد، بلوار شهید', phone: '09121112222', wasteType: 'فلز', rating: 4.9 },
+    { id: 2, fullName: 'مریم احمدی', shopName: 'مغازه ب', shopAddress: 'تهران، خیابان انقلاب', phone: '09129876543', wasteType: 'پلاستیک', rating: 3.8 },
+    { id: 3, fullName: 'حسین کریمی', shopName: 'مغازه ج', shopAddress: 'تهران، بلوار کشاورز', phone: '09121112222', wasteType: 'فلز', rating: 4.9 },
 ];
+
 
 const FixedLocationBuyersTable: React.FC = () => {
     const [rowData] = useState<FixedBuyer[]>(initialData);
