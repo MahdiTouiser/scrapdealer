@@ -36,18 +36,18 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            echo "🔄 Pull latest code on server..."
+            echo "🔄 Pulling latest code on server..."
             cd ~/scrapdealer
             git pull origin main
 
-            echo "📦 Install production dependencies..."
+            echo "📦 Installing production dependencies..."
             pnpm install --frozen-lockfile
 
-            echo "🏗️ Build admin app on server..."
+            echo "🏗️ Building admin app on server..."
             cd apps/admin
             pnpm build
 
-            echo "🚀 Restart admin app with PM2..."
+            echo "🚀 Restarting admin app with PM2..."
             pm2 restart scrapdealer-admin || pm2 start pnpm --name scrapdealer-admin -- start
 
             pm2 save
