@@ -1,16 +1,16 @@
 import fa from '@/i18n/fa';
 import {
-  AdminPanelSettings,
-  Dashboard,
-  History,
-  Home,
-  LocationOn,
-  ReceiptLong,
-  Settings,
-  ShoppingCart,
-  Store,
-  SupportAgent,
-  VerifiedUser,
+    AdminPanelSettings,
+    Dashboard,
+    History,
+    Home,
+    LocationOn,
+    ReceiptLong,
+    Settings,
+    ShoppingCart,
+    Store,
+    SupportAgent,
+    VerifiedUser,
 } from '@mui/icons-material';
 
 import { MenuSection } from '../types';
@@ -18,6 +18,7 @@ import { MenuSection } from '../types';
 export const MENU_SECTIONS: MenuSection[] = [
     {
         section: fa.main,
+        collapsible: true,
         items: [
             { text: fa.mainPage, icon: <Home />, path: '/dashboard/main' },
             { text: fa.dashboard, icon: <Dashboard />, path: '/dashboard/admin-dashboard' },
@@ -43,15 +44,7 @@ export const MENU_SECTIONS: MenuSection[] = [
         ],
     },
     {
-        section: 'درخواست‌های ادمین',
-        collapsible: true,
-        items: [
-            { text: 'درخواست‌های جدید', icon: <AdminPanelSettings />, path: '/admin-requests/new' },
-            { text: 'درخواست‌های بررسی شده', icon: <History />, path: '/admin-requests/reviewed' },
-        ],
-    },
-    {
-        section: 'پشتیبان‌ها',
+        section: fa.supports,
         collapsible: true,
         items: [
             { text: 'لیست پشتیبان‌ها', icon: <SupportAgent />, path: '/supports' },
@@ -60,14 +53,22 @@ export const MENU_SECTIONS: MenuSection[] = [
         ],
     },
     {
-        section: 'مدیریت مالی',
+        section: fa.adminRequests,
+        collapsible: true,
+        items: [
+            { text: 'درخواست‌های جدید', icon: <AdminPanelSettings />, path: '/admin-requests/new' },
+            { text: 'درخواست‌های بررسی شده', icon: <History />, path: '/admin-requests/reviewed' },
+        ],
+    },
+    {
+        section: fa.financialManagement,
         collapsible: true,
         items: [
             { text: 'تراکنش‌ها', icon: <ReceiptLong />, path: '/finance/transactions' },
         ],
     },
     {
-        section: 'تنظیمات سیستم',
+        section: fa.settings,
         collapsible: true,
         items: [
             { text: 'تنظیمات سیستم', icon: <Settings />, path: '/settings' },
