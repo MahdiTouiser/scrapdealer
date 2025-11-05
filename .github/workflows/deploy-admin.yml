@@ -1,0 +1,45 @@
+name: Deploy ScrapDealer Admin
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies (monorepo root)
+        run: pnpm install --frozen-lockfile
+
+      - name: Build admin app
+        working-directory: apps/admin
+        run: pnpm build
+
+      - name: Deploy admin to server via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ~/scrapdealer
+            git pull origin main
+            pnpm install --frozen-lockfile
+            cd apps/admin
+            pnpm build
+            pm2 restart scrapdealer-admin || pm2 start pnpm --name scrapdealer-admin -- start
+            pm2 save
