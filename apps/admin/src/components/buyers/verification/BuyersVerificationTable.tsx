@@ -112,7 +112,7 @@ const BuyersVerificationTable: React.FC = () => {
             field: 'id',
             headerName: 'شناسه',
             width: 90,
-            cellStyle: { fontWeight: 600, color: '#1976d2' },
+            cellStyle: { fontWeight: 600 },
         },
         {
             field: 'name',

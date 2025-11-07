@@ -4,6 +4,7 @@ import {
     createContext,
     ReactNode,
     useContext,
+    useEffect,
     useMemo,
     useState,
 } from 'react';
@@ -30,10 +31,39 @@ interface Props {
     children: ReactNode;
 }
 
+const getAppTheme = (mode: 'light' | 'dark') =>
+    createTheme({
+        direction: 'rtl',
+        palette: {
+            mode,
+            ...(mode === 'light'
+                ? {
+                    primary: { main: '#00c853' },
+                    secondary: { main: '#efefef' },
+                    background: { default: '#efefef', paper: '#ffffff' },
+                    text: { primary: '#000000', secondary: '#333333' },
+                }
+                : {
+                    primary: { main: '#efefef' },
+                    secondary: { main: '#00c853' },
+                    background: { default: '#000000', paper: '#121212' },
+                    text: { primary: '#efefef', secondary: '#b0b0b0' },
+                }),
+        },
+        typography: {
+            fontFamily: 'Vazirmatn, Inter, sans-serif',
+            button: { textTransform: 'none' },
+        },
+        shape: { borderRadius: 12 },
+    });
+
 export default function ThemeProvider({ children }: Props) {
-    const [mode, setMode] = useState<'light' | 'dark'>(
-        (localStorage.getItem('theme') as 'light' | 'dark') || 'light'
-    );
+    const [mode, setMode] = useState<'light' | 'dark'>('light');
+
+    useEffect(() => {
+        const saved = localStorage.getItem('theme') as 'light' | 'dark' | null;
+        if (saved) setMode(saved);
+    }, []);
 
     const toggleTheme = () => {
         setMode(prev => {
@@ -43,20 +73,7 @@ export default function ThemeProvider({ children }: Props) {
         });
     };
 
-    const theme = useMemo(
-        () =>
-            createTheme({
-                palette: {
-                    mode,
-                    ...(mode === 'light'
-                        ? { primary: { main: '#0288d1' }, secondary: { main: '#01579b' } }
-                        : { primary: { main: '#90caf9' }, secondary: { main: '#f48fb1' } }),
-                    background: { default: mode === 'light' ? '#f5f5f5' : '#121212' },
-                },
-                typography: { fontFamily: 'Vazirmatn, sans-serif' },
-            }),
-        [mode]
-    );
+    const theme = useMemo(() => getAppTheme(mode), [mode]);
 
     return (
         <ThemeContext.Provider value={{ mode, toggleTheme }}>

@@ -11,35 +11,33 @@ import {
     Box,
     Paper,
     Typography,
+    useTheme,
 } from '@mui/material';
 
 interface DateTimeCardProps {
     locale?: string;
-    color?: string;
 }
 
 const toPersianDigits = (value: string): string => {
     return value.replace(/\d/g, (digit) => '۰۱۲۳۴۵۶۷۸۹'[parseInt(digit, 10)]);
 };
 
-const DateTimeCard: React.FC<DateTimeCardProps> = ({
-    locale = 'fa-IR',
-    color = '#1976d2',
-}) => {
+const DateTimeCard: React.FC<DateTimeCardProps> = ({ locale = 'fa-IR' }) => {
+    const theme = useTheme();
     const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
     useEffect(() => {
         setCurrentTime(new Date());
-
-        const timer = setInterval(() => {
-            setCurrentTime(new Date());
-        }, 1000);
-
+        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
 
     if (!currentTime) {
-        return <Paper sx={{ py: 5, px: 4, borderRadius: 3, textAlign: 'center' }}>در حال بارگذاری...</Paper>;
+        return (
+            <Paper sx={{ py: 5, px: 4, borderRadius: 3, textAlign: 'center' }}>
+                در حال بارگذاری...
+            </Paper>
+        );
     }
 
     const formatTime = (date: Date) => {
@@ -62,6 +60,8 @@ const DateTimeCard: React.FC<DateTimeCardProps> = ({
     const formatDayOfWeek = (date: Date) => {
         return date.toLocaleDateString(locale, { weekday: 'long' });
     };
+
+    const mainColor = theme.palette.primary.main;
 
     return (
         <Paper
@@ -90,24 +90,18 @@ const DateTimeCard: React.FC<DateTimeCardProps> = ({
                     width: '100%',
                     height: 4,
                     borderRadius: '3px 3px 0 0',
-                    bgcolor: color,
+                    bgcolor: mainColor,
                 }}
             />
 
-            <Box
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1.2,
-                }}
-            >
-                <AccessTimeIcon sx={{ fontSize: '1.6rem', color: color }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                <AccessTimeIcon sx={{ fontSize: '1.6rem', color: mainColor }} />
                 <Typography
                     variant="h4"
                     sx={{
                         fontWeight: 700,
                         fontFamily: 'Vazirmatn, sans-serif',
-                        color: 'text.primary',
+                        color: theme.palette.text.primary,
                         letterSpacing: '0.03em',
                     }}
                 >
@@ -125,13 +119,13 @@ const DateTimeCard: React.FC<DateTimeCardProps> = ({
                 }}
             >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <CalendarTodayIcon sx={{ fontSize: '1rem', color: color }} />
+                    <CalendarTodayIcon sx={{ fontSize: '1rem', color: mainColor }} />
                     <Typography
                         variant="body2"
                         sx={{
                             fontWeight: 600,
                             fontFamily: 'Vazirmatn, sans-serif',
-                            color: color,
+                            color: mainColor,
                         }}
                     >
                         {formatDayOfWeek(currentTime)}
@@ -143,7 +137,7 @@ const DateTimeCard: React.FC<DateTimeCardProps> = ({
                     sx={{
                         fontWeight: 500,
                         fontFamily: 'Vazirmatn, sans-serif',
-                        color: 'text.secondary',
+                        color: theme.palette.text.secondary,
                     }}
                 >
                     {formatDate(currentTime)}

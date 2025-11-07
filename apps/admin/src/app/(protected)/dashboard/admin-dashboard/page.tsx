@@ -15,6 +15,8 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
+import { Item } from '../main/page';
+
 const AdminDashboard: React.FC = () => {
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
@@ -22,16 +24,25 @@ const AdminDashboard: React.FC = () => {
 
             <Grid container spacing={2} mb={3}>
                 <Grid size={3}>
-                    <KpiCard title="تعداد خریدها" value="142" />
+                    <Item>
+                        <KpiCard title="تعداد خریدها" value="142" />
+                    </Item>
                 </Grid>
                 <Grid size={3}>
-                    <KpiCard title="تعداد فروش‌ها" value="98" />
+                    <Item>
+                        <KpiCard title="تعداد فروش‌ها" value="98" />
+                    </Item>
                 </Grid>
                 <Grid size={3}>
-                    <KpiCard title="درصد کمیسیون فعلی" value="3%" />
+                    <Item>
+                        <KpiCard title="درصد کمیسیون فعلی" value="3%" />
+                    </Item>
+
                 </Grid>
                 <Grid size={3}>
-                    <KpiCard title="کاربران فعال" value="1,254" />
+                    <Item>
+                        <KpiCard title="کاربران فعال" value="1,254" />
+                    </Item>
                 </Grid>
             </Grid>
 

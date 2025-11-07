@@ -40,7 +40,7 @@ export default function ThemeContextProvider({ children }: { children: React.Rea
     }, []);
 
     const toggleMode = () => {
-        setMode((prev) => {
+        setMode(prev => {
             const newMode = prev === 'light' ? 'dark' : 'light';
             localStorage.setItem('themeMode', newMode);
             return newMode;
@@ -53,20 +53,24 @@ export default function ThemeContextProvider({ children }: { children: React.Rea
                 direction: 'rtl',
                 palette: {
                     mode,
-                    primary: { main: '#0288d1' },
-                    secondary: { main: '#01579b' },
-                    background: {
-                        default: mode === 'dark' ? '#121212' : '#fafafa',
-                        paper: mode === 'dark' ? '#1e1e1e' : '#fff',
-                    },
-                    text: {
-                        primary: mode === 'dark' ? '#ffffff' : '#111111',
-                        secondary: mode === 'dark' ? '#aaaaaa' : '#555555',
-                    },
+                    ...(mode === 'light'
+                        ? {
+                            primary: { main: '#00c853' },
+                            secondary: { main: '#efefef' },
+                            background: { default: '#efefef', paper: '#ffffff' },
+                            text: { primary: '#000000', secondary: '#333333' },
+                        }
+                        : {
+                            primary: { main: '#00c853' },
+                            secondary: { main: '#efefef' },
+                            background: { default: '#000000', paper: '#121212' },
+                            text: { primary: '#efefef', secondary: '#b0b0b0' },
+                        }),
                 },
                 typography: {
-                    fontFamily: 'Vazirmatn, sans-serif',
+                    fontFamily: 'Vazirmatn, Inter, sans-serif',
                 },
+                shape: { borderRadius: 12 },
             }),
         [mode]
     );

@@ -1,42 +1,41 @@
 'use client';
 
 import React, {
-  useEffect,
-  useState,
+    useEffect,
+    useState,
 } from 'react';
 
 import Link from 'next/link';
 import {
-  usePathname,
-  useRouter,
+    usePathname,
+    useRouter,
 } from 'next/navigation';
 import toast from 'react-hot-toast';
 
 import fa from '@/i18n/fa';
 import {
-  ChevronLeft,
-  ChevronRight,
-  ExpandLess,
-  ExpandMore,
-  Logout,
-  Recycling,
+    ChevronLeft,
+    ChevronRight,
+    ExpandLess,
+    ExpandMore,
+    Logout,
 } from '@mui/icons-material';
 import {
-  Box,
-  Collapse,
-  Divider,
-  Drawer,
-  IconButton,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Tooltip,
-  Typography,
+    Box,
+    Collapse,
+    Divider,
+    Drawer,
+    IconButton,
+    List,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Tooltip,
+    Typography,
 } from '@mui/material';
 import {
-  keyframes,
-  useTheme,
+    keyframes,
+    useTheme,
 } from '@mui/material/styles';
 
 import ThemeToggle from '../common/ToggleTheme';
@@ -60,14 +59,14 @@ const Sidebar: React.FC = () => {
         Object.fromEntries(MENU_SECTIONS.map((section) => [section.section, false]))
     );
 
-    const [selectedItem, setSelectedItem] = useState<string>(fa.dashboard);
+    const [selectedItem, setSelectedItem] = useState<string>(fa.adminDashboard);
     const router = useRouter();
     const pathname = usePathname();
 
     useEffect(() => {
         const normalizedPath = pathname?.replace(/\/$/, '') || '/';
 
-        let selected = fa.dashboard;
+        let selected = fa.adminDashboard;
         let sectionToExpand = '';
 
         for (const section of MENU_SECTIONS) {
@@ -141,17 +140,21 @@ const Sidebar: React.FC = () => {
                     <Box
                         sx={{
                             position: 'relative',
+                            width: 80,
+                            height: 80,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                             '&::before': {
                                 content: '""',
                                 position: 'absolute',
-                                width: '100%',
-                                height: '100%',
+                                inset: 0,
                                 borderRadius: '50%',
                                 background: `linear-gradient(
-          135deg, 
-          ${theme.palette.primary.main}, 
-          ${theme.palette.secondary.main}
-        )`,
+        135deg,
+        ${theme.palette.primary.main},
+        ${theme.palette.secondary.main}
+      )`,
                                 opacity: 0.15,
                                 animation: 'pulse 2.5s infinite',
                             },
@@ -161,14 +164,21 @@ const Sidebar: React.FC = () => {
                             },
                         }}
                     >
-                        <Recycling
+                        <Box
+                            component="img"
+                            src="/icon/logo.png"
+                            alt="Logo"
                             sx={{
-                                fontSize: 60,
-                                color: theme.palette.primary.main,
+                                position: 'relative',
+                                zIndex: 1,
+                                width: 60,
+                                height: 60,
+                                objectFit: 'contain',
                                 filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
                             }}
                         />
                     </Box>
+
 
                     {open && (
                         <Typography
@@ -176,11 +186,8 @@ const Sidebar: React.FC = () => {
                             sx={{
                                 mt: 1.5,
                                 fontWeight: 800,
-                                background: `linear-gradient(
-          135deg, 
-          ${theme.palette.primary.main}, 
-          ${theme.palette.secondary.main}
-        )`,
+                                backgroundColor: theme.palette.primary.main,
+                                color: theme.palette.text.primary,
                                 backgroundClip: 'text',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
@@ -212,7 +219,7 @@ const Sidebar: React.FC = () => {
                                 animation: `${slideIn} 0.3s ease-in`,
                             }}
                         >
-                            {fa.dashboard}
+                            {fa.adminDashboard}
                         </Typography>
                     )}
 

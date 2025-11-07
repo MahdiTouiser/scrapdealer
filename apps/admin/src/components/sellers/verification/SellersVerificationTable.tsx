@@ -74,8 +74,8 @@ const SellersVerificationTable = () => {
     };
 
     const columns: ColDef<Seller>[] = [
-        { field: 'id', headerName: 'شناسه', width: 90, cellStyle: { fontWeight: 600, color: '#1976d2' } },
-        { field: 'name', headerName: 'نام فروشنده', flex: 1, cellStyle: { fontWeight: 500 } },
+        { field: 'id', headerName: 'شناسه', width: 90, cellStyle: { fontWeight: 600 } },
+        { field: 'name', headerName: 'نام فروشنده', flex: 1 },
         { field: 'company', headerName: 'شرکت', flex: 1, cellStyle: { color: '#555' } },
         { field: 'phone', headerName: 'شماره تماس', flex: 1, cellStyle: { fontFamily: 'monospace' } },
         {

@@ -1,9 +1,10 @@
 import React from 'react';
 
 import {
-  Box,
-  Paper,
-  Typography,
+    Box,
+    Paper,
+    Typography,
+    useTheme,
 } from '@mui/material';
 
 interface KpiCardProps {
@@ -21,7 +22,8 @@ const toPersianDigits = (value: string | number): string => {
     );
 };
 
-const KpiCard: React.FC<KpiCardProps> = ({ title, value, color = '#1976d2' }) => {
+const KpiCard: React.FC<KpiCardProps> = ({ title, value, color }) => {
+    const theme = useTheme();
     const persianValue = toPersianDigits(value);
 
     return (
@@ -48,7 +50,7 @@ const KpiCard: React.FC<KpiCardProps> = ({ title, value, color = '#1976d2' }) =>
                     width: '100%',
                     height: 4,
                     borderRadius: '3px 3px 0 0',
-                    bgcolor: color,
+                    bgcolor: color || theme.palette.primary.main,
                 }}
             />
 
@@ -57,7 +59,7 @@ const KpiCard: React.FC<KpiCardProps> = ({ title, value, color = '#1976d2' }) =>
                 sx={{
                     mb: 1,
                     fontWeight: 500,
-                    color: 'text.secondary',
+                    color: theme.palette.text.secondary,
                 }}
             >
                 {title}
@@ -67,7 +69,7 @@ const KpiCard: React.FC<KpiCardProps> = ({ title, value, color = '#1976d2' }) =>
                 variant="h4"
                 sx={{
                     fontWeight: 700,
-                    color: 'text.primary',
+                    color: theme.palette.text.primary,
                 }}
             >
                 {persianValue}

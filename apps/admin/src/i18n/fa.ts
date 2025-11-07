@@ -23,7 +23,6 @@ const fa = {
   scrapDealer: 'ضایعات چی',
   returnToLoginPage: 'بازگشت به صفحه ورود',
   logout: 'خروج',
-  dashboard: 'داشبورد مدیریتی',
   mainPage: 'صفحه اصلی',
   main: 'اصلی',
   buyers: ' خریداران',
