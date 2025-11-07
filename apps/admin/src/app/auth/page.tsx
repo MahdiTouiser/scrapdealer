@@ -10,24 +10,23 @@ import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  AdminPanelSettings,
-  Recycling,
-  SupportAgent,
-  Visibility,
-  VisibilityOff,
+    AdminPanelSettings,
+    SupportAgent,
+    Visibility,
+    VisibilityOff,
 } from '@mui/icons-material';
 import {
-  Alert,
-  Box,
-  Button,
-  Container,
-  IconButton,
-  InputAdornment,
-  Paper,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
+    Alert,
+    Box,
+    Button,
+    Container,
+    IconButton,
+    InputAdornment,
+    Paper,
+    TextField,
+    ToggleButton,
+    ToggleButtonGroup,
+    Typography,
 } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { styled } from '@mui/material/styles';
@@ -69,9 +68,9 @@ const StyledTextField = styled(TextField)(() => ({
     },
 }));
 
-const LogoIcon = styled(Recycling)(({ theme }) => ({
-    fontSize: 48,
-    color: theme.palette.grey[700],
+const LogoIcon = styled('img')(({ theme }) => ({
+    width: 80,
+    height: 80,
     marginBottom: theme.spacing(1),
 }));
 
@@ -112,7 +111,7 @@ export default function LoginPage() {
         <StyledContainer maxWidth="sm">
             <StyledPaper elevation={3}>
                 <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
-                    <LogoIcon />
+                    <LogoIcon src="/icon/logo.png" alt="Logo" />
                     <Typography variant="h4" fontWeight={600} mb={0.5}>
                         {fa.scrapDealer}
                     </Typography>
@@ -135,6 +134,7 @@ export default function LoginPage() {
                         </ToggleButton>
                     </ToggleButtonGroup>
                 </Box>
+
 
                 <Box
                     component="form"
