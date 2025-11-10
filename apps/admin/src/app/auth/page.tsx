@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { AuthInterface } from '@/components/types';
+import { useAuth } from '@/contexts/AuthContext';
 import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -84,8 +85,9 @@ export default function LoginPage() {
         resolver: zodResolver(loginSchema),
     });
     const router = useRouter();
+    const { setAuth, setPermissions } = useAuth();
 
-    const [role, setRole] = useState<'Admin' | 'Support'>('Support');
+    const [role, setRole] = useState<'Admin' | 'Support'>('Admin');
     const [showPassword, setShowPassword] = useState(false);
 
     const { mutateAsync: login, loading } = useApi<{ data: AuthInterface }, LoginPayload>({
@@ -113,14 +115,15 @@ export default function LoginPage() {
             const response = await login(loginPayload);
 
             if (response.data) {
-                localStorage.setItem('auth_token', response.data.token);
-                localStorage.setItem('user_role', response.data.role);
+                setAuth(response.data.token, response.data.role);
 
                 if (role === 'Admin') {
                     const permissionsResult = await getPermissions();
                     console.log('Permissions:', permissionsResult);
-                }
 
+                    if (permissionsResult) setPermissions(permissionsResult.data || permissionsResult);
+
+                }
 
                 router.push('/dashboard/main');
                 router.refresh();
@@ -129,7 +132,6 @@ export default function LoginPage() {
             console.error('API Error:', error);
         }
     };
-
 
     return (
         <StyledContainer maxWidth="sm">
@@ -158,7 +160,6 @@ export default function LoginPage() {
                         </ToggleButton>
                     </ToggleButtonGroup>
                 </Box>
-
 
                 <Box
                     component="form"
