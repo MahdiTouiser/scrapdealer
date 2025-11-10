@@ -1,30 +1,31 @@
 'use client';
+
 import { useState } from 'react';
 
 import AddButton from '@/components/common/AddButton';
 import CustomFormModal, { FormField } from '@/components/common/CustomModal';
 import PageTitle from '@/components/common/PageTitle';
-import SupportsTable from '@/components/supports/SupportsTable';
+import SupportsTable, { Support } from '@/components/supports/SupportsTable';
+import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import { Box } from '@mui/material';
 
 const Supports = () => {
     const [open, setOpen] = useState(false);
 
+    const { data: supports, loading } = useApi<{
+        data: Support[];
+        totalCount: number;
+    }>({
+        key: ['get-supports'],
+        url: '/Supports',
+    });
+
     const formFields: FormField[] = [
-        { name: 'name', label: 'نام و نام خانوادگی', fieldType: 'text', required: true },
-        {
-            name: 'gender',
-            label: 'جنسیت',
-            fieldType: 'select',
-            required: true,
-            options: [
-                { label: 'مرد', value: 'male' },
-                { label: 'زن', value: 'female' },
-            ],
-        },
+        { name: 'firstName', label: 'نام', fieldType: 'text', required: true },
+        { name: 'lastName', label: 'نام خانوادگی', fieldType: 'text', required: true },
+        { name: 'phoneNumber', label: 'شماره تماس', fieldType: 'text', required: true },
         { name: 'username', label: 'نام کاربری', fieldType: 'text', required: true },
-        { name: 'password', label: 'رمز عبور', fieldType: 'text', required: true },
     ];
 
     const handleOpen = () => setOpen(true);
@@ -42,7 +43,7 @@ const Supports = () => {
                 <AddButton label="افزودن پشتیبان جدید" onClick={handleOpen} />
             </Box>
 
-            <SupportsTable />
+            <SupportsTable data={supports?.data} loading={loading} />
 
             <CustomFormModal
                 open={open}

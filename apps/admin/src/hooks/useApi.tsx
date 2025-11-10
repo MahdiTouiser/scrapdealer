@@ -1,10 +1,10 @@
 import toast from 'react-hot-toast';
 
 import {
-  QueryKey,
-  useMutation,
-  useQuery,
-  useQueryClient,
+    QueryKey,
+    useMutation,
+    useQuery,
+    useQueryClient,
 } from '@tanstack/react-query';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -22,7 +22,6 @@ interface UseApiOptions<TVariables> {
     onError?: string;
     enabled?: boolean;
 }
-
 async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
     const baseUrl = process.env['NEXT_PUBLIC_API_BASE_URL'];
     const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
@@ -58,14 +57,38 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
 
     if (response.status === 204) return null as T;
 
-    return response.json();
+    let jsonResponse = await response.json();
+
+    // 🧠 Normalize redundant "data" nesting:
+    // Case: { data: { data: [...], totalCount, ... } } → { data: [...], totalCount, ... }
+    if (
+        jsonResponse &&
+        typeof jsonResponse === 'object' &&
+        'data' in jsonResponse &&
+        jsonResponse.data &&
+        typeof jsonResponse.data === 'object' &&
+        'data' in jsonResponse.data
+    ) {
+        jsonResponse = jsonResponse.data;
+    }
+
+    while (
+        jsonResponse &&
+        typeof jsonResponse === 'object' &&
+        'data' in jsonResponse &&
+        Object.keys(jsonResponse).length === 1
+    ) {
+        jsonResponse = jsonResponse.data;
+    }
+
+    return jsonResponse as T;
 }
+
 
 export function useApi<TData = unknown, TVariables = void>({
     key,
     url,
     method = 'GET',
-    onSuccess = 'موفق',
     onError = 'خطا رخ داد',
     enabled = true,
 }: UseApiOptions<TVariables>) {
@@ -89,7 +112,6 @@ export function useApi<TData = unknown, TVariables = void>({
             });
         },
         onSuccess: () => {
-            toast.success(onSuccess);
             queryClient.invalidateQueries({ queryKey: key });
         },
         onError: (error) => {
@@ -98,17 +120,14 @@ export function useApi<TData = unknown, TVariables = void>({
     });
 
     const shouldUseMutation = method !== 'GET' || !enabled;
-
     const noop = () => { };
     const noopAsync = async () => undefined as unknown as TData;
 
     return {
         data: method === 'GET' ? query.data : undefined,
         refetch: method === 'GET' ? query.refetch : undefined,
-
         mutate: shouldUseMutation ? mutation.mutate : noop,
         mutateAsync: shouldUseMutation ? mutation.mutateAsync : noopAsync,
-
         loading: method === 'GET' && enabled ? query.isLoading : mutation.isPending,
         error: method === 'GET' && enabled ? query.error : mutation.error,
     };

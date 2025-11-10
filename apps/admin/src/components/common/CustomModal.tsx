@@ -1,28 +1,28 @@
 'use client';
 import {
-  Controller,
-  FieldValues,
-  SubmitHandler,
-  useForm,
+    Controller,
+    FieldValues,
+    SubmitHandler,
+    useForm,
 } from 'react-hook-form';
 
 import CloseIcon from '@mui/icons-material/Close';
 import {
-  alpha,
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Fade,
-  FormControlLabel,
-  IconButton,
-  MenuItem,
-  Stack,
-  Switch,
-  TextField,
-  useTheme,
+    alpha,
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Fade,
+    FormControlLabel,
+    IconButton,
+    MenuItem,
+    Stack,
+    Switch,
+    TextField,
+    useTheme,
 } from '@mui/material';
 
 export type FieldType = 'text' | 'email' | 'select' | 'toggle';
@@ -75,27 +75,31 @@ const CustomFormModal = ({
             onClose={handleClose}
             fullWidth
             maxWidth="sm"
-            TransitionComponent={Fade}
-            TransitionProps={{ timeout: 300 }}
-            PaperProps={{
-                sx: {
-                    borderRadius: 4,
-                    padding: 0,
-                    boxShadow: theme.shadows[24],
-                    background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.98)} 0%, ${alpha(theme.palette.background.paper, 0.95)} 100%)`,
-                    backdropFilter: 'blur(20px)',
-                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                    overflow: 'hidden',
-                },
+            slots={{
+                transition: Fade,
             }}
-            BackdropProps={{
-                sx: {
-                    backgroundColor: alpha(theme.palette.common.black, 0.6),
-                    backdropFilter: 'blur(8px)',
+            slotProps={{
+                transition: { timeout: 300 },
+                paper: {
+                    sx: {
+                        borderRadius: 4,
+                        padding: 0,
+                        boxShadow: theme.shadows[24],
+                        background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.98)} 0%, ${alpha(theme.palette.background.paper, 0.95)} 100%)`,
+                        backdropFilter: 'blur(20px)',
+                        border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                        overflow: 'hidden',
+                    },
+                },
+                backdrop: {
+                    sx: {
+                        backgroundColor: alpha(theme.palette.common.black, 0.6),
+                        backdropFilter: 'blur(8px)',
+                    },
                 },
             }}
         >
-            {/* Header with gradient background */}
+
             <Box
                 sx={{
                     background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,

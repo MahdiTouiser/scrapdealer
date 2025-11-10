@@ -182,19 +182,22 @@ export default function LoginPage() {
                         {...register('password')}
                         error={!!errors.password}
                         helperText={errors.password?.message}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        onClick={() => setShowPassword(prev => !prev)}
-                                        edge="end"
-                                    >
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
+                        slotProps={{
+                            input: {
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={() => setShowPassword(prev => !prev)}
+                                            edge="end"
+                                        >
+                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            },
                         }}
                     />
+
 
                     {errors.root && (
                         <Alert severity="error" sx={{ borderRadius: 2 }}>
