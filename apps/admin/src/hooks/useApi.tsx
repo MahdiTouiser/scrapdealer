@@ -22,20 +22,14 @@ interface UseApiOptions<TVariables> {
     onError?: string;
     enabled?: boolean;
 }
+
 async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
     const baseUrl = process.env['NEXT_PUBLIC_API_BASE_URL'];
     const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-
-    const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-    };
-
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
-    const response = await fetch(`${baseUrl}${url}`, {
-        headers,
-        ...options,
-    });
+    const response = await fetch(`${baseUrl}${url}`, { headers, ...options });
 
     if (response.status === 401) {
         if (typeof window !== 'undefined') {
@@ -48,47 +42,51 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
     }
 
     if (!response.ok) {
-        const error: ApiError = {
-            message: `خطا: ${response.status}`,
-            status: response.status,
-        };
+        // Try to parse error message from response
+        let errorMessage = `خطا: ${response.status}`;
+        try {
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                const errorData = await response.json();
+                errorMessage = errorData.message || errorData.error || errorMessage;
+            } else {
+                const textError = await response.text();
+                if (textError) errorMessage = textError;
+            }
+        } catch (e) {
+            // If parsing fails, use default error message
+        }
+        const error: ApiError = { message: errorMessage, status: response.status };
         throw error;
     }
 
     if (response.status === 204) return null as T;
 
-    let jsonResponse = await response.json();
+    // Check content type before parsing
+    const contentType = response.headers.get('content-type');
 
-    // 🧠 Normalize redundant "data" nesting:
-    // Case: { data: { data: [...], totalCount, ... } } → { data: [...], totalCount, ... }
-    if (
-        jsonResponse &&
-        typeof jsonResponse === 'object' &&
-        'data' in jsonResponse &&
-        jsonResponse.data &&
-        typeof jsonResponse.data === 'object' &&
-        'data' in jsonResponse.data
-    ) {
-        jsonResponse = jsonResponse.data;
+    // If response is not JSON, return text or null
+    if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        return (text || null) as T;
     }
 
-    while (
-        jsonResponse &&
-        typeof jsonResponse === 'object' &&
-        'data' in jsonResponse &&
-        Object.keys(jsonResponse).length === 1
-    ) {
+    let jsonResponse = await response.json();
+
+    // Normalize redundant data nesting
+    if (jsonResponse?.data?.data) jsonResponse = jsonResponse.data;
+    while (jsonResponse && typeof jsonResponse === 'object' && 'data' in jsonResponse && Object.keys(jsonResponse).length === 1) {
         jsonResponse = jsonResponse.data;
     }
 
     return jsonResponse as T;
 }
 
-
 export function useApi<TData = unknown, TVariables = void>({
     key,
     url,
     method = 'GET',
+    onSuccess,
     onError = 'خطا رخ داد',
     enabled = true,
 }: UseApiOptions<TVariables>) {
@@ -111,12 +109,6 @@ export function useApi<TData = unknown, TVariables = void>({
                 body: data ? JSON.stringify(data) : undefined,
             });
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: key });
-        },
-        onError: (error) => {
-            toast.error(error.message || onError);
-        },
     });
 
     const shouldUseMutation = method !== 'GET' || !enabled;
@@ -126,7 +118,23 @@ export function useApi<TData = unknown, TVariables = void>({
     return {
         data: method === 'GET' ? query.data : undefined,
         refetch: method === 'GET' ? query.refetch : undefined,
-        mutate: shouldUseMutation ? mutation.mutate : noop,
+        mutate: shouldUseMutation
+            ? (variables?: TVariables, callbacks?: { onSuccess?: (data: TData) => void; onError?: (err: any) => void }) =>
+                mutation.mutate(variables, {
+                    onSuccess: (data) => {
+                        queryClient.invalidateQueries({ queryKey: key });
+                        // Show success toast if message is provided
+                        if (onSuccess) {
+                            toast.success(onSuccess);
+                        }
+                        callbacks?.onSuccess?.(data);
+                    },
+                    onError: (err) => {
+                        toast.error(err.message || onError);
+                        callbacks?.onError?.(err);
+                    },
+                })
+            : noop,
         mutateAsync: shouldUseMutation ? mutation.mutateAsync : noopAsync,
         loading: method === 'GET' && enabled ? query.isLoading : mutation.isPending,
         error: method === 'GET' && enabled ? query.error : mutation.error,
