@@ -1,33 +1,37 @@
 'use client';
 
 import React, {
-  useMemo,
-  useState,
+    useMemo,
+    useState,
 } from 'react';
 
 import {
-  ColDef,
-  ICellRendererParams,
+    ColDef,
+    ICellRendererParams,
 } from 'ag-grid-community';
 
 import DataGrid from '@/components/DataGrid';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import {
-  Box,
-  Chip,
-  Typography,
+    Box,
+    Button,
+    Chip,
+    Stack,
+    Tooltip,
+    Typography,
 } from '@mui/material';
 
 interface AdminRequest {
     id: number;
-    requesterName: string; // نام درخواست دهنده
-    requestType: string;   // نوع درخواست
-    date: string;          // تاریخ ارسال
+    requesterName: string;
+    requestType: string;
+    date: string;
     status: 'در انتظار' | 'در حال بررسی' | 'تایید شده' | 'رد شده';
-    details: string;       // توضیحات یا دلیل درخواست
+    details: string;
 }
 
 const mockData: AdminRequest[] = [
@@ -66,11 +70,14 @@ const mockData: AdminRequest[] = [
 ];
 
 const NewAdminRequestsTable: React.FC = () => {
-    const [rowData] = useState<AdminRequest[]>(mockData);
+    const [rowData, setRowData] = useState<AdminRequest[]>(mockData);
 
     const StatusRenderer = (params: ICellRendererParams<AdminRequest>) => {
         const status = params.value as AdminRequest['status'];
-        const statusStyles: Record<AdminRequest['status'], { color: 'default' | 'success' | 'warning' | 'error' | 'info'; icon: React.ReactNode }> = {
+        const statusStyles: Record<
+            AdminRequest['status'],
+            { color: 'default' | 'success' | 'warning' | 'error' | 'info'; icon: React.ReactNode }
+        > = {
             'در انتظار': { color: 'info', icon: <HourglassBottomIcon sx={{ fontSize: 18 }} /> },
             'در حال بررسی': { color: 'warning', icon: <AccessTimeIcon sx={{ fontSize: 18 }} /> },
             'تایید شده': { color: 'success', icon: <CheckCircleIcon sx={{ fontSize: 18 }} /> },
@@ -84,13 +91,32 @@ const NewAdminRequestsTable: React.FC = () => {
                 label={
                     <Box display="flex" alignItems="center" gap={0.5}>
                         {icon}
-                        <Typography variant="body2" fontWeight={600}>{status}</Typography>
+                        <Typography variant="body2" fontWeight={600}>
+                            {status}
+                        </Typography>
                     </Box>
                 }
                 color={color}
                 size="small"
                 variant="filled"
             />
+        );
+    };
+
+
+    const handleApprove = (id: number) => {
+        setRowData(prev =>
+            prev.map(r =>
+                r.id === id ? { ...r, status: 'تایید شده' } : r
+            )
+        );
+    };
+
+    const handleReject = (id: number) => {
+        setRowData(prev =>
+            prev.map(r =>
+                r.id === id ? { ...r, status: 'رد شده' } : r
+            )
         );
     };
 
@@ -101,18 +127,70 @@ const NewAdminRequestsTable: React.FC = () => {
             { field: 'date', headerName: 'تاریخ ارسال', width: 130 },
             { field: 'status', headerName: 'وضعیت', width: 160, cellRenderer: StatusRenderer },
             { field: 'details', headerName: 'توضیحات', flex: 2 },
+            {
+                headerName: 'اقدامات',
+                minWidth: 180,
+                cellRenderer: (params: ICellRendererParams<AdminRequest>) => {
+                    const request = params.data;
+                    const isApproved = request.status === 'تایید شده';
+                    const isRejected = request.status === 'رد شده';
+
+                    return (
+                        <Stack
+                            direction="row"
+                            spacing={1}
+                            justifyContent="center"
+                            alignItems="center"
+                            height="100%"
+                        >
+
+
+                            <Tooltip title="تأیید درخواست" arrow>
+                                <Button
+                                    variant="contained"
+                                    color="success"
+                                    size="small"
+                                    onClick={() => handleApprove(request.id)}
+                                    disabled={isApproved}
+                                    sx={{
+                                        minWidth: 0,
+                                        p: 1,
+                                        borderRadius: '8px',
+                                        opacity: isApproved ? 0.6 : 1,
+                                        '&:hover': { transform: 'translateY(-1px)' },
+                                    }}
+                                >
+                                    <CheckCircleIcon fontSize="small" />
+                                </Button>
+                            </Tooltip>
+
+                            <Tooltip title="رد درخواست" arrow>
+                                <Button
+                                    variant="outlined"
+                                    color="error"
+                                    size="small"
+                                    onClick={() => handleReject(request.id)}
+                                    disabled={isRejected}
+                                    sx={{
+                                        minWidth: 0,
+                                        p: 1,
+                                        borderRadius: '8px',
+                                        opacity: isRejected ? 0.6 : 1,
+                                        '&:hover': { transform: 'translateY(-1px)' },
+                                    }}
+                                >
+                                    <CancelIcon fontSize="small" />
+                                </Button>
+                            </Tooltip>
+                        </Stack>
+                    );
+                },
+            },
         ],
         []
     );
 
-    return (
-        <DataGrid<AdminRequest>
-            rowData={rowData}
-            columnDefs={columnDefs}
-            rtl
-            width="100%"
-        />
-    );
+    return <DataGrid<AdminRequest> rowData={rowData} columnDefs={columnDefs} rtl width="100%" />;
 };
 
 export default NewAdminRequestsTable;

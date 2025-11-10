@@ -20,15 +20,33 @@ interface UseApiOptions<TVariables> {
     method?: HttpMethod;
     onSuccess?: string;
     onError?: string;
+    enabled?: boolean;
 }
 
 async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
     const baseUrl = process.env['NEXT_PUBLIC_API_BASE_URL'];
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+
+    const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+    };
+
+    if (token) headers['Authorization'] = `Bearer ${token}`;
 
     const response = await fetch(`${baseUrl}${url}`, {
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         ...options,
     });
+
+    if (response.status === 401) {
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user_role');
+            toast.error('دسترسی منقضی شده، لطفاً دوباره وارد شوید');
+            window.location.href = '/';
+        }
+        throw { message: 'Unauthorized', status: 401 } as ApiError;
+    }
 
     if (!response.ok) {
         const error: ApiError = {
@@ -43,12 +61,13 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
     return response.json();
 }
 
-export function useApi<TData = unknown, TVariables = unknown>({
+export function useApi<TData = unknown, TVariables = void>({
     key,
     url,
     method = 'GET',
     onSuccess = 'موفق',
     onError = 'خطا رخ داد',
+    enabled = true,
 }: UseApiOptions<TVariables>) {
     const queryClient = useQueryClient();
 
@@ -58,15 +77,15 @@ export function useApi<TData = unknown, TVariables = unknown>({
             const endpoint = typeof url === 'function' ? url() : url;
             return fetchApi<TData>(endpoint);
         },
-        enabled: method === 'GET',
+        enabled: method === 'GET' && enabled,
     });
 
     const mutation = useMutation<TData, ApiError, TVariables>({
-        mutationFn: async (data: TVariables) => {
+        mutationFn: async (data?: TVariables) => {
             const endpoint = typeof url === 'function' ? url(data) : url;
             return fetchApi<TData>(endpoint, {
                 method,
-                body: JSON.stringify(data),
+                body: data ? JSON.stringify(data) : undefined,
             });
         },
         onSuccess: () => {
@@ -78,6 +97,8 @@ export function useApi<TData = unknown, TVariables = unknown>({
         },
     });
 
+    const shouldUseMutation = method !== 'GET' || !enabled;
+
     const noop = () => { };
     const noopAsync = async () => undefined as unknown as TData;
 
@@ -85,10 +106,10 @@ export function useApi<TData = unknown, TVariables = unknown>({
         data: method === 'GET' ? query.data : undefined,
         refetch: method === 'GET' ? query.refetch : undefined,
 
-        mutate: method === 'GET' ? noop : mutation.mutate,
-        mutateAsync: method === 'GET' ? noopAsync : mutation.mutateAsync,
+        mutate: shouldUseMutation ? mutation.mutate : noop,
+        mutateAsync: shouldUseMutation ? mutation.mutateAsync : noopAsync,
 
-        loading: method === 'GET' ? query.isLoading : mutation.isPending,
-        error: method === 'GET' ? query.error : mutation.error,
+        loading: method === 'GET' && enabled ? query.isLoading : mutation.isPending,
+        error: method === 'GET' && enabled ? query.error : mutation.error,
     };
 }

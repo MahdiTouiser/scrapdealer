@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { AuthInterface } from '@/components/types';
 import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -37,6 +38,10 @@ const loginSchema = z.object({
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
+
+type LoginPayload = LoginFormData & {
+    role: 'Admin' | 'Support';
+};
 
 const StyledContainer = styled(Container)(({ theme }) => ({
     minHeight: '100vh',
@@ -80,10 +85,10 @@ export default function LoginPage() {
     });
     const router = useRouter();
 
-    const [role, setRole] = useState<'admin' | 'supporter'>('supporter');
+    const [role, setRole] = useState<'Admin' | 'Support'>('Support');
     const [showPassword, setShowPassword] = useState(false);
 
-    const { mutateAsync: login, loading } = useApi<{ data: string }, LoginFormData>({
+    const { mutateAsync: login, loading } = useApi<{ data: AuthInterface }, LoginPayload>({
         key: ['login'],
         url: '/Authentication/CredentialLogin',
         method: 'POST',
@@ -91,21 +96,40 @@ export default function LoginPage() {
         onError: 'ورود ناموفق بود',
     });
 
+    const { mutateAsync: getPermissions } = useApi<any>({
+        key: ['get-permissions'],
+        url: '/Permissions?pageIndex=0&pageSize=100',
+        method: 'GET',
+        enabled: false,
+    });
+
     const onSubmit = async (data: LoginFormData) => {
         try {
-            const response = await login(data);
+            const loginPayload: LoginPayload = {
+                ...data,
+                role: role,
+            };
+
+            const response = await login(loginPayload);
 
             if (response.data) {
-                localStorage.setItem('auth_token', response.data);
-                localStorage.setItem('user_role', role);
+                localStorage.setItem('auth_token', response.data.token);
+                localStorage.setItem('user_role', response.data.role);
 
-                router.push(role === 'admin' ? '/dashboard/main' : '/supporter/dashboard');
+                if (role === 'Admin') {
+                    const permissionsResult = await getPermissions();
+                    console.log('Permissions:', permissionsResult);
+                }
+
+
+                router.push('/dashboard/main');
                 router.refresh();
             }
         } catch (error) {
             console.error('API Error:', error);
         }
     };
+
 
     return (
         <StyledContainer maxWidth="sm">
@@ -126,10 +150,10 @@ export default function LoginPage() {
                         onChange={(_, value) => value && setRole(value)}
                         sx={{ mb: 3 }}
                     >
-                        <ToggleButton value="supporter" sx={{ px: 3, py: 1 }}>
+                        <ToggleButton value="Support" sx={{ px: 3, py: 1 }}>
                             <SupportAgent sx={{ mr: 1 }} /> ورود پشتیبان
                         </ToggleButton>
-                        <ToggleButton value="admin" sx={{ px: 3, py: 1 }}>
+                        <ToggleButton value="Admin" sx={{ px: 3, py: 1 }}>
                             <AdminPanelSettings sx={{ mr: 1 }} /> ورود ادمین
                         </ToggleButton>
                     </ToggleButtonGroup>
