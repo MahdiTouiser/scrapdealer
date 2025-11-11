@@ -6,28 +6,29 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { AuthInterface } from '@/components/types';
+import { useAuth } from '@/contexts/AuthContext';
 import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  AdminPanelSettings,
-  Recycling,
-  SupportAgent,
-  Visibility,
-  VisibilityOff,
+    AdminPanelSettings,
+    SupportAgent,
+    Visibility,
+    VisibilityOff,
 } from '@mui/icons-material';
 import {
-  Alert,
-  Box,
-  Button,
-  Container,
-  IconButton,
-  InputAdornment,
-  Paper,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
+    Alert,
+    Box,
+    Button,
+    Container,
+    IconButton,
+    InputAdornment,
+    Paper,
+    TextField,
+    ToggleButton,
+    ToggleButtonGroup,
+    Typography,
 } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { styled } from '@mui/material/styles';
@@ -38,6 +39,10 @@ const loginSchema = z.object({
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
+
+type LoginPayload = LoginFormData & {
+    role: 'Admin' | 'Support';
+};
 
 const StyledContainer = styled(Container)(({ theme }) => ({
     minHeight: '100vh',
@@ -69,9 +74,9 @@ const StyledTextField = styled(TextField)(() => ({
     },
 }));
 
-const LogoIcon = styled(Recycling)(({ theme }) => ({
-    fontSize: 48,
-    color: theme.palette.grey[700],
+const LogoIcon = styled('img')(({ theme }) => ({
+    width: 80,
+    height: 80,
     marginBottom: theme.spacing(1),
 }));
 
@@ -80,11 +85,12 @@ export default function LoginPage() {
         resolver: zodResolver(loginSchema),
     });
     const router = useRouter();
+    const { setAuth, setPermissions } = useAuth();
 
-    const [role, setRole] = useState<'admin' | 'supporter'>('supporter');
+    const [role, setRole] = useState<'Admin' | 'Support'>('Admin');
     const [showPassword, setShowPassword] = useState(false);
 
-    const { mutateAsync: login, loading } = useApi<{ data: string }, LoginFormData>({
+    const { mutateAsync: login, loading } = useApi<AuthInterface, LoginPayload>({
         key: ['login'],
         url: '/Authentication/CredentialLogin',
         method: 'POST',
@@ -92,15 +98,33 @@ export default function LoginPage() {
         onError: 'ورود ناموفق بود',
     });
 
+    const { mutateAsync: getPermissions } = useApi<any>({
+        key: ['get-permissions'],
+        url: '/Permissions?pageIndex=0&pageSize=100',
+        method: 'GET',
+        enabled: false,
+    });
+
     const onSubmit = async (data: LoginFormData) => {
         try {
-            const response = await login(data);
+            const loginPayload: LoginPayload = {
+                ...data,
+                role: role,
+            };
 
-            if (response.data) {
-                localStorage.setItem('auth_token', response.data);
-                localStorage.setItem('user_role', role);
+            const response = await login(loginPayload);
+            if (response) {
+                setAuth(response.token, response.role);
 
-                router.push(role === 'admin' ? '/dashboard/main' : '/supporter/dashboard');
+                if (role === 'Admin') {
+                    const permissionsResult = await getPermissions();
+                    console.log('Permissions:', permissionsResult);
+
+                    if (permissionsResult) setPermissions(permissionsResult.data || permissionsResult);
+
+                }
+
+                router.push('/dashboard/main');
                 router.refresh();
             }
         } catch (error) {
@@ -112,7 +136,7 @@ export default function LoginPage() {
         <StyledContainer maxWidth="sm">
             <StyledPaper elevation={3}>
                 <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
-                    <LogoIcon />
+                    <LogoIcon src="/icon/logo.png" alt="Logo" />
                     <Typography variant="h4" fontWeight={600} mb={0.5}>
                         {fa.scrapDealer}
                     </Typography>
@@ -127,10 +151,10 @@ export default function LoginPage() {
                         onChange={(_, value) => value && setRole(value)}
                         sx={{ mb: 3 }}
                     >
-                        <ToggleButton value="supporter" sx={{ px: 3, py: 1 }}>
+                        <ToggleButton value="Support" sx={{ px: 3, py: 1 }}>
                             <SupportAgent sx={{ mr: 1 }} /> ورود پشتیبان
                         </ToggleButton>
-                        <ToggleButton value="admin" sx={{ px: 3, py: 1 }}>
+                        <ToggleButton value="Admin" sx={{ px: 3, py: 1 }}>
                             <AdminPanelSettings sx={{ mr: 1 }} /> ورود ادمین
                         </ToggleButton>
                     </ToggleButtonGroup>
@@ -157,19 +181,22 @@ export default function LoginPage() {
                         {...register('password')}
                         error={!!errors.password}
                         helperText={errors.password?.message}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        onClick={() => setShowPassword(prev => !prev)}
-                                        edge="end"
-                                    >
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
+                        slotProps={{
+                            input: {
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={() => setShowPassword(prev => !prev)}
+                                            edge="end"
+                                        >
+                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            },
                         }}
                     />
+
 
                     {errors.root && (
                         <Alert severity="error" sx={{ borderRadius: 2 }}>

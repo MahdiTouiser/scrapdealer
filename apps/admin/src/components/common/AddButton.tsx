@@ -3,13 +3,14 @@
 import React from 'react';
 
 import AddIcon from '@mui/icons-material/Add';
-import { Button } from '@mui/material';
-import { colors } from '@scrapdealer/tokens/src/colors';
+import {
+    Button,
+    useTheme,
+} from '@mui/material';
 
 interface AddButtonProps {
     label?: string;
     onClick?: () => void;
-    color?: keyof typeof colors | string;
     icon?: React.ReactNode;
     fullWidth?: boolean;
     disabled?: boolean;
@@ -18,15 +19,14 @@ interface AddButtonProps {
 const AddButton: React.FC<AddButtonProps> = ({
     label = 'افزودن',
     onClick,
-    color = 'primary',
     icon = <AddIcon />,
     fullWidth = false,
     disabled = false,
 }) => {
-    const bgColor =
-        typeof color === 'string' && color in colors
-            ? (colors)[color][500]
-            : color;
+    const theme = useTheme();
+    const bgColor = theme.palette.primary.main;
+
+    const textColor = theme.palette.text.primary;
 
     return (
         <Button
@@ -44,7 +44,7 @@ const AddButton: React.FC<AddButtonProps> = ({
                 textAlign: 'center',
                 direction: 'rtl',
                 backgroundColor: bgColor,
-                color: '#fff',
+                color: textColor,
                 boxShadow: '0 3px 8px rgba(0,0,0,0.1)',
                 gap: 1,
                 '&:hover': {
@@ -55,7 +55,6 @@ const AddButton: React.FC<AddButtonProps> = ({
         >
             {label}
         </Button>
-
     );
 };
 

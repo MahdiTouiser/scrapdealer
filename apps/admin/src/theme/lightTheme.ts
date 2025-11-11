@@ -4,18 +4,19 @@ export const lightTheme = createTheme({
   direction: 'rtl',
   palette: {
     mode: 'light',
-    primary: { main: '#0288d1' },
-    secondary: { main: '#01579b' },
+    primary: { main: '#00c853' },
+    secondary: { main: '#efefef' },
     background: {
-      default: '#f5f6fa',
+      default: '#efefef',
       paper: '#ffffff',
     },
     text: {
-      primary: '#1e1e1e',
-      secondary: '#555555',
+      primary: '#000000',
+      secondary: '#333333',
     },
   },
   typography: {
     fontFamily: 'Vazirmatn, sans-serif',
   },
+  shape: { borderRadius: 12 },
 });

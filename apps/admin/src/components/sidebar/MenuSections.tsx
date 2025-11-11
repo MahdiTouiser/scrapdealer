@@ -21,7 +21,7 @@ export const MENU_SECTIONS: MenuSection[] = [
         collapsible: true,
         items: [
             { text: fa.mainPage, icon: <Home />, path: '/dashboard/main' },
-            { text: fa.dashboard, icon: <Dashboard />, path: '/dashboard/admin-dashboard' },
+            { text: fa.adminDashboard, icon: <Dashboard />, path: '/dashboard/admin-dashboard' },
         ],
     },
     {
