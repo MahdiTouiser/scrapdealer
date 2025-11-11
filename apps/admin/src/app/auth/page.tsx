@@ -90,7 +90,7 @@ export default function LoginPage() {
     const [role, setRole] = useState<'Admin' | 'Support'>('Admin');
     const [showPassword, setShowPassword] = useState(false);
 
-    const { mutateAsync: login, loading } = useApi<{ data: AuthInterface }, LoginPayload>({
+    const { mutateAsync: login, loading } = useApi<AuthInterface, LoginPayload>({
         key: ['login'],
         url: '/Authentication/CredentialLogin',
         method: 'POST',
@@ -113,9 +113,8 @@ export default function LoginPage() {
             };
 
             const response = await login(loginPayload);
-
-            if (response.data) {
-                setAuth(response.data.token, response.data.role);
+            if (response) {
+                setAuth(response.token, response.role);
 
                 if (role === 'Admin') {
                     const permissionsResult = await getPermissions();

@@ -42,19 +42,19 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
     }
 
     if (!response.ok) {
-        // Try to parse error message from response
         let errorMessage = `خطا: ${response.status}`;
         try {
             const contentType = response.headers.get('content-type');
             if (contentType && contentType.includes('application/json')) {
                 const errorData = await response.json();
-                errorMessage = errorData.message || errorData.error || errorMessage;
+
+                errorMessage =
+                    errorData.message || errorData.error || errorData.Message || errorData.Error || errorMessage;
             } else {
                 const textError = await response.text();
                 if (textError) errorMessage = textError;
             }
         } catch (e) {
-            // If parsing fails, use default error message
         }
         const error: ApiError = { message: errorMessage, status: response.status };
         throw error;
@@ -62,10 +62,8 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
 
     if (response.status === 204) return null as T;
 
-    // Check content type before parsing
     const contentType = response.headers.get('content-type');
 
-    // If response is not JSON, return text or null
     if (!contentType || !contentType.includes('application/json')) {
         const text = await response.text();
         return (text || null) as T;
@@ -73,7 +71,6 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
 
     let jsonResponse = await response.json();
 
-    // Normalize redundant data nesting
     if (jsonResponse?.data?.data) jsonResponse = jsonResponse.data;
     while (jsonResponse && typeof jsonResponse === 'object' && 'data' in jsonResponse && Object.keys(jsonResponse).length === 1) {
         jsonResponse = jsonResponse.data;
@@ -106,8 +103,12 @@ export function useApi<TData = unknown, TVariables = void>({
             const endpoint = typeof url === 'function' ? url(data) : url;
             return fetchApi<TData>(endpoint, {
                 method,
-                body: data ? JSON.stringify(data) : undefined,
+                body:
+                    data && method !== 'GET' && method !== 'DELETE'
+                        ? JSON.stringify(data)
+                        : undefined,
             });
+
         },
     });
 
@@ -123,7 +124,6 @@ export function useApi<TData = unknown, TVariables = void>({
                 mutation.mutate(variables, {
                     onSuccess: (data) => {
                         queryClient.invalidateQueries({ queryKey: key });
-                        // Show success toast if message is provided
                         if (onSuccess) {
                             toast.success(onSuccess);
                         }
