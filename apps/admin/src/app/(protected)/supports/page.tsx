@@ -139,7 +139,6 @@ const Supports = () => {
         });
     };
 
-    // Prepare default values for the form
     const getDefaultValues = () => {
         if (editMode && editingSupport) {
             return {
@@ -147,7 +146,7 @@ const Supports = () => {
                 lastName: editingSupport.lastName || '',
                 phoneNumber: editingSupport.phoneNumber || '',
                 username: editingSupport.username || '',
-                password: '', // Don't pre-fill password in edit mode
+                password: '',
             };
         }
         return {};

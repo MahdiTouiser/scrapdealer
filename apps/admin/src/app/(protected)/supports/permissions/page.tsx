@@ -1,32 +1,43 @@
 "use client";
 
-import { useState } from 'react';
+import {
+    useMemo,
+    useState,
+} from 'react';
 
 import PageTitle from '@/components/common/PageTitle';
-import PermissionsTreeGrid
-  from '@/components/supports/permissions/PermissionsTreeGrid';
+import PermissionsTreeGrid from '@/components/supports/permissions/PermissionsTreeGrid';
+import { useApi } from '@/hooks/useApi'; // make sure this path is correct
 import fa from '@/i18n/fa';
 import {
-  AdminPanelSettingsOutlined,
-  CheckCircleOutline,
-  PersonOutline,
-  RefreshOutlined,
-  SaveOutlined,
+    AdminPanelSettingsOutlined,
+    CheckCircleOutline,
+    PersonOutline,
+    RefreshOutlined,
+    SaveOutlined,
 } from '@mui/icons-material';
 import {
-  alpha,
-  Avatar,
-  Box,
-  Button,
-  Chip,
-  Divider,
-  Grid,
-  IconButton,
-  Paper,
-  Tooltip,
-  Typography,
-  useTheme,
+    alpha,
+    Avatar,
+    Box,
+    Button,
+    Chip,
+    Divider,
+    Grid,
+    IconButton,
+    Paper,
+    Tooltip,
+    Typography,
+    useTheme,
 } from '@mui/material';
+
+interface Support {
+    id: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+}
 
 interface User {
     id: string;
@@ -36,49 +47,27 @@ interface User {
     status: 'active' | 'inactive';
 }
 
-const mockUsers: User[] = [
-    {
-        id: '1',
-        name: 'محمد رضایی',
-        email: 'rezaei@example.com',
-        status: 'active',
-    },
-    {
-        id: '2',
-        name: 'فاطمه احمدی',
-        email: 'ahmadi@example.com',
-        status: 'active',
-    },
-    {
-        id: '3',
-        name: 'علی کریمی',
-        email: 'karimi@example.com',
-        status: 'active',
-    },
-    {
-        id: '4',
-        name: 'زهرا موسوی',
-        email: 'mousavi@example.com',
-        status: 'active',
-    },
-    {
-        id: '5',
-        name: 'حسین نوری',
-        email: 'nouri@example.com',
-        status: 'active',
-    },
-    {
-        id: '6',
-        name: 'مریم جعفری',
-        email: 'jafari@example.com',
-        status: 'inactive',
-    },
-];
-
 const Permissions = () => {
     const theme = useTheme();
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [hasChanges, setHasChanges] = useState(false);
+
+    // Fetch supports from API
+    const { data: supportsData, loading } = useApi<{ data: Support[]; totalCount: number }>({
+        key: ['get-supports'],
+        url: '/Supports',
+    });
+
+    // Map API response to User type
+    const users: User[] = useMemo(() => {
+        if (!supportsData?.data) return [];
+        return supportsData.data.map((support) => ({
+            id: support.id,
+            name: `${support.firstName} ${support.lastName}`,
+            email: `${support.username}@example.com`, // adapt if your API provides email
+            status: 'active', // default to active; modify if your API gives status
+        }));
+    }, [supportsData]);
 
     const handleUserSelect = (user: User) => {
         setSelectedUser(user);
@@ -95,13 +84,8 @@ const Permissions = () => {
         setHasChanges(false);
     };
 
-    const getInitials = (name: string) => {
-        return name
-            .split(' ')
-            .map((n) => n[0])
-            .join('')
-            .substring(0, 2);
-    };
+    const getInitials = (name: string) =>
+        name.split(' ').map((n) => n[0]).join('').substring(0, 2);
 
     const getAvatarColor = (name: string) => {
         const colors = [
@@ -136,14 +120,7 @@ const Permissions = () => {
                             )} 0%, ${alpha(theme.palette.background.default, 0.5)} 100%)`,
                         }}
                     >
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1.5,
-                                mb: 3,
-                            }}
-                        >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
                             <AdminPanelSettingsOutlined
                                 sx={{ fontSize: 28, color: theme.palette.primary.main }}
                             />
@@ -171,105 +148,107 @@ const Permissions = () => {
                         </Typography>
 
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                            {mockUsers.map((user) => (
-                                <Paper
-                                    key={user.id}
-                                    elevation={0}
-                                    sx={{
-                                        p: 2.5,
-                                        borderRadius: 2.5,
-                                        border: `2px solid ${selectedUser?.id === user.id
-                                            ? theme.palette.primary.main
-                                            : theme.palette.divider
-                                            }`,
-                                        cursor: 'pointer',
-                                        transition: 'all 0.3s ease',
-                                        background:
-                                            selectedUser?.id === user.id
-                                                ? alpha(theme.palette.primary.main, 0.08)
-                                                : theme.palette.background.paper,
-                                        '&:hover': {
-                                            borderColor: theme.palette.primary.main,
-                                            transform: 'translateX(-4px)',
-                                            boxShadow: `0 4px 12px ${alpha(
-                                                theme.palette.primary.main,
-                                                0.15
-                                            )}`,
-                                        },
-                                    }}
-                                    onClick={() => handleUserSelect(user)}
-                                >
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                        <Avatar
-                                            sx={{
-                                                width: 48,
-                                                height: 48,
-                                                bgcolor: getAvatarColor(user.name),
-                                                fontWeight: 700,
-                                                fontSize: '1.1rem',
-                                                fontFamily: 'IRANSans, Vazirmatn, sans-serif',
-                                            }}
-                                        >
-                                            {getInitials(user.name)}
-                                        </Avatar>
-                                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                                            <Typography
-                                                variant="subtitle1"
+                            {loading ? (
+                                <Typography>در حال بارگذاری...</Typography>
+                            ) : users.length === 0 ? (
+                                <Typography>کاربری یافت نشد</Typography>
+                            ) : (
+                                users.map((user) => (
+                                    <Paper
+                                        key={user.id}
+                                        elevation={0}
+                                        sx={{
+                                            p: 2.5,
+                                            borderRadius: 2.5,
+                                            border: `2px solid ${selectedUser?.id === user.id
+                                                ? theme.palette.primary.main
+                                                : theme.palette.divider
+                                                }`,
+                                            cursor: 'pointer',
+                                            transition: 'all 0.3s ease',
+                                            background:
+                                                selectedUser?.id === user.id
+                                                    ? alpha(theme.palette.primary.main, 0.08)
+                                                    : theme.palette.background.paper,
+                                            '&:hover': {
+                                                borderColor: theme.palette.primary.main,
+                                                transform: 'translateX(-4px)',
+                                                boxShadow: `0 4px 12px ${alpha(
+                                                    theme.palette.primary.main,
+                                                    0.15
+                                                )}`,
+                                            },
+                                        }}
+                                        onClick={() => handleUserSelect(user)}
+                                    >
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                            <Avatar
                                                 sx={{
-                                                    fontWeight: 600,
+                                                    width: 48,
+                                                    height: 48,
+                                                    bgcolor: getAvatarColor(user.name),
+                                                    fontWeight: 700,
+                                                    fontSize: '1.1rem',
                                                     fontFamily: 'IRANSans, Vazirmatn, sans-serif',
-                                                    color: theme.palette.text.primary,
-                                                    mb: 0.5,
                                                 }}
                                             >
-                                                {user.name}
-                                            </Typography>
-                                            <Box
-                                                sx={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: 1,
-                                                    flexWrap: 'wrap',
-                                                }}
-                                            >
-
-                                                <Chip
-                                                    label={
-                                                        user.status === 'active' ? 'فعال' : 'غیرفعال'
-                                                    }
-                                                    size="small"
-                                                    icon={
-                                                        user.status === 'active' ? (
-                                                            <CheckCircleOutline sx={{ fontSize: 14 }} />
-                                                        ) : undefined
-                                                    }
+                                                {getInitials(user.name)}
+                                            </Avatar>
+                                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                                                <Typography
+                                                    variant="subtitle1"
                                                     sx={{
-                                                        fontSize: '0.75rem',
-                                                        height: 24,
+                                                        fontWeight: 600,
                                                         fontFamily: 'IRANSans, Vazirmatn, sans-serif',
-                                                        backgroundColor:
-                                                            user.status === 'active'
-                                                                ? alpha(theme.palette.success.main, 0.1)
-                                                                : alpha(theme.palette.error.main, 0.1),
-                                                        color:
-                                                            user.status === 'active'
-                                                                ? theme.palette.success.dark
-                                                                : theme.palette.error.dark,
+                                                        color: theme.palette.text.primary,
+                                                        mb: 0.5,
                                                     }}
-                                                />
+                                                >
+                                                    {user.name}
+                                                </Typography>
+                                                <Box
+                                                    sx={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: 1,
+                                                        flexWrap: 'wrap',
+                                                    }}
+                                                >
+                                                    <Chip
+                                                        label={
+                                                            user.status === 'active' ? 'فعال' : 'غیرفعال'
+                                                        }
+                                                        size="small"
+                                                        icon={
+                                                            user.status === 'active' ? (
+                                                                <CheckCircleOutline sx={{ fontSize: 14 }} />
+                                                            ) : undefined
+                                                        }
+                                                        sx={{
+                                                            fontSize: '0.75rem',
+                                                            height: 24,
+                                                            fontFamily: 'IRANSans, Vazirmatn, sans-serif',
+                                                            backgroundColor:
+                                                                user.status === 'active'
+                                                                    ? alpha(theme.palette.success.main, 0.1)
+                                                                    : alpha(theme.palette.error.main, 0.1),
+                                                            color:
+                                                                user.status === 'active'
+                                                                    ? theme.palette.success.dark
+                                                                    : theme.palette.error.dark,
+                                                        }}
+                                                    />
+                                                </Box>
                                             </Box>
+                                            {selectedUser?.id === user.id && (
+                                                <CheckCircleOutline
+                                                    sx={{ color: theme.palette.primary.main, fontSize: 24 }}
+                                                />
+                                            )}
                                         </Box>
-                                        {selectedUser?.id === user.id && (
-                                            <CheckCircleOutline
-                                                sx={{
-                                                    color: theme.palette.primary.main,
-                                                    fontSize: 24,
-                                                }}
-                                            />
-                                        )}
-                                    </Box>
-                                </Paper>
-                            ))}
+                                    </Paper>
+                                ))
+                            )}
                         </Box>
                     </Paper>
                 </Grid>
@@ -353,10 +332,7 @@ const Permissions = () => {
                                                     border: `2px solid ${theme.palette.divider}`,
                                                     backgroundColor: theme.palette.background.paper,
                                                     '&:hover': {
-                                                        backgroundColor: alpha(
-                                                            theme.palette.error.main,
-                                                            0.08
-                                                        ),
+                                                        backgroundColor: alpha(theme.palette.error.main, 0.08),
                                                         borderColor: theme.palette.error.main,
                                                     },
                                                 }}
@@ -376,17 +352,11 @@ const Permissions = () => {
                                                 fontWeight: 600,
                                                 fontFamily: 'IRANSans, Vazirmatn, sans-serif',
                                                 textTransform: 'none',
-                                                boxShadow: `0 4px 14px 0 ${alpha(
-                                                    theme.palette.primary.main,
-                                                    0.4
-                                                )}`,
+                                                boxShadow: `0 4px 14px 0 ${alpha(theme.palette.primary.main, 0.4)}`,
                                                 background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
                                                 transition: 'all 0.3s ease',
                                                 '&:hover': {
-                                                    boxShadow: `0 6px 20px 0 ${alpha(
-                                                        theme.palette.primary.main,
-                                                        0.5
-                                                    )}`,
+                                                    boxShadow: `0 6px 20px 0 ${alpha(theme.palette.primary.main, 0.5)}`,
                                                     transform: 'translateY(-2px)',
                                                 },
                                                 '&:disabled': {
@@ -418,11 +388,7 @@ const Permissions = () => {
                             }}
                         >
                             <PersonOutline
-                                sx={{
-                                    fontSize: 80,
-                                    color: theme.palette.text.disabled,
-                                    mb: 2,
-                                }}
+                                sx={{ fontSize: 80, color: theme.palette.text.disabled, mb: 2 }}
                             />
                             <Typography
                                 variant="h6"
