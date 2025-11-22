@@ -1,16 +1,16 @@
 "use client";
 
 import React, {
-    useCallback,
-    useState,
+  useCallback,
+  useState,
 } from 'react';
 
 import type { ColDef } from 'ag-grid-community';
 
 import DataGrid from '@/components/DataGrid';
 import {
-    Box,
-    Switch,
+  Box,
+  Switch,
 } from '@mui/material';
 
 interface WholeSeller {

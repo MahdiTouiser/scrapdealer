@@ -5,11 +5,11 @@ import { useState } from 'react';
 import AddButton from '@/components/common/AddButton';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import CustomFormModal, {
-    FormField,
+  FormField,
 } from '@/components/common/CustomFormModal';
 import PageTitle from '@/components/common/PageTitle';
 import WholeSellersTable, {
-    WholeSeller,
+  WholeSeller,
 } from '@/components/sellers/whole/WholeSellersTable';
 import fa from '@/i18n/fa';
 import { Box } from '@mui/material';
@@ -20,7 +20,7 @@ const WholeSellers = () => {
     const [editingSeller, setEditingSeller] = useState<WholeSeller | null>(null);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
-    const [rowData, setRowData] = useState<WholeSeller[]>([]); // initial empty array
+    const [rowData, setRowData] = useState<WholeSeller[]>([]); 
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => {

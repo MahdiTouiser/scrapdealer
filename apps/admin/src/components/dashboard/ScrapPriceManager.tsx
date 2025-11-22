@@ -27,32 +27,67 @@ import {
 interface Scrap {
     id: number;
     name: string;
-    price: number;
+    priceMin: number;
+    priceMax: number;
+    image?: string; // URL or base64 string
 }
 
 const ScrapPriceManager: React.FC = () => {
     const [scraps, setScraps] = useState<Scrap[]>([
-        { id: 1, name: 'آهن', price: 25000 },
-        { id: 2, name: 'مس', price: 120000 },
+        { id: 1, name: 'آهن', priceMin: 24000, priceMax: 26000 },
+        { id: 2, name: 'مس', priceMin: 115000, priceMax: 125000 },
     ]);
 
-    const [newScrap, setNewScrap] = useState({ name: '', price: '' });
+    const [newScrap, setNewScrap] = useState({
+        name: '',
+        priceMin: '',
+        priceMax: '',
+        image: null as File | null,
+    });
 
     const handleAdd = () => {
-        if (!newScrap.name || !newScrap.price) return;
-        setScraps(prev => [
-            ...prev,
-            { id: Date.now(), name: newScrap.name, price: Number(newScrap.price) },
-        ]);
-        setNewScrap({ name: '', price: '' });
+        if (!newScrap.name || !newScrap.priceMin || !newScrap.priceMax) return;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            setScraps(prev => [
+                ...prev,
+                {
+                    id: Date.now(),
+                    name: newScrap.name,
+                    priceMin: Number(newScrap.priceMin),
+                    priceMax: Number(newScrap.priceMax),
+                    image: reader.result as string,
+                },
+            ]);
+        };
+        if (newScrap.image) {
+            reader.readAsDataURL(newScrap.image);
+        } else {
+            setScraps(prev => [
+                ...prev,
+                {
+                    id: Date.now(),
+                    name: newScrap.name,
+                    priceMin: Number(newScrap.priceMin),
+                    priceMax: Number(newScrap.priceMax),
+                },
+            ]);
+        }
+
+        setNewScrap({ name: '', priceMin: '', priceMax: '', image: null });
     };
 
-    const handlePriceChange = (id: number, price: number) => {
-        setScraps(scraps.map(s => (s.id === id ? { ...s, price } : s)));
+    const handlePriceChange = (id: number, field: 'priceMin' | 'priceMax', value: number) => {
+        setScraps(scraps.map(s => (s.id === id ? { ...s, [field]: value } : s)));
     };
 
     const handleDelete = (id: number) => {
         setScraps(scraps.filter(s => s.id !== id));
+    };
+
+    const handleImageChange = (file: File | null) => {
+        setNewScrap(prev => ({ ...prev, image: file }));
     };
 
     return (
@@ -61,37 +96,23 @@ const ScrapPriceManager: React.FC = () => {
             sx={{
                 p: 3,
                 borderRadius: 4,
-                background: theme =>
-                    theme.palette.mode === 'dark'
-                        ? theme.palette.grey[900]
-                        : theme.palette.background.paper,
+                background: theme => (theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.background.paper),
                 boxShadow: theme =>
-                    theme.palette.mode === 'dark'
-                        ? '0 0 12px rgba(255,255,255,0.05)'
-                        : '0 4px 20px rgba(0,0,0,0.05)',
+                    theme.palette.mode === 'dark' ? '0 0 12px rgba(255,255,255,0.05)' : '0 4px 20px rgba(0,0,0,0.05)',
                 transition: 'all 0.3s ease',
             }}
         >
             <Box sx={{ mb: 3 }}>
-                <Typography
-                    variant="h6"
-                    sx={{
-                        fontWeight: 700,
-                        mb: 1,
-                    }}
-                >
+                <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
                     مدیریت قیمت ضایعات
                 </Typography>
-                <Typography
-                    variant="body2"
-                    color="text.secondary"
-                >
-                    در این بخش می‌توانید نوع ضایعات و قیمت هر کدام را مدیریت کنید.
+                <Typography variant="body2" color="text.secondary">
+                    در این بخش می‌توانید نوع ضایعات، محدوده قیمت و تصویر هر کدام را مدیریت کنید.
                 </Typography>
             </Box>
 
             <Grid container spacing={2} alignItems="center" sx={{ mb: 3 }}>
-                <Grid size={6}>
+                <Grid size={3}>
                     <TextField
                         fullWidth
                         label="نام ضایعه"
@@ -101,16 +122,38 @@ const ScrapPriceManager: React.FC = () => {
                         variant="outlined"
                     />
                 </Grid>
-                <Grid size={6}>
+                <Grid size={2}>
                     <TextField
                         fullWidth
-                        label="قیمت (تومان)"
+                        label="قیمت حداقل"
                         type="number"
-                        value={newScrap.price}
-                        onChange={e => setNewScrap({ ...newScrap, price: e.target.value })}
+                        value={newScrap.priceMin}
+                        onChange={e => setNewScrap({ ...newScrap, priceMin: e.target.value })}
                         size="small"
                         variant="outlined"
                     />
+                </Grid>
+                <Grid size={2}>
+                    <TextField
+                        fullWidth
+                        label="قیمت حداکثر"
+                        type="number"
+                        value={newScrap.priceMax}
+                        onChange={e => setNewScrap({ ...newScrap, priceMax: e.target.value })}
+                        size="small"
+                        variant="outlined"
+                    />
+                </Grid>
+                <Grid size={3}>
+                    <Button
+                        component="label"
+                        fullWidth
+                        variant="outlined"
+                        sx={{ height: '40px', textTransform: 'none' }}
+                    >
+                        آپلود تصویر
+                        <input type="file" hidden accept="image/*" onChange={e => handleImageChange(e.target.files?.[0] ?? null)} />
+                    </Button>
                 </Grid>
                 <Grid size={2}>
                     <Button
@@ -119,12 +162,7 @@ const ScrapPriceManager: React.FC = () => {
                         color="primary"
                         startIcon={<AddCircleOutlineRoundedIcon />}
                         onClick={handleAdd}
-                        sx={{
-                            height: '40px',
-                            borderRadius: 2,
-                            textTransform: 'none',
-                            fontWeight: 600,
-                        }}
+                        sx={{ height: '40px', borderRadius: 2, textTransform: 'none', fontWeight: 600 }}
                     >
                         افزودن
                     </Button>
@@ -138,16 +176,15 @@ const ScrapPriceManager: React.FC = () => {
                     borderRadius: 3,
                     overflow: 'hidden',
                     boxShadow: theme =>
-                        theme.palette.mode === 'dark'
-                            ? '0 0 10px rgba(255,255,255,0.05)'
-                            : '0 2px 10px rgba(0,0,0,0.05)',
+                        theme.palette.mode === 'dark' ? '0 0 10px rgba(255,255,255,0.05)' : '0 2px 10px rgba(0,0,0,0.05)',
                 }}
             >
                 <Table size="small">
                     <TableHead>
                         <TableRow sx={{ backgroundColor: theme => theme.palette.action.hover }}>
+                            <TableCell sx={{ fontWeight: 600 }}>تصویر</TableCell>
                             <TableCell sx={{ fontWeight: 600 }}>نام ضایعه</TableCell>
-                            <TableCell sx={{ fontWeight: 600 }}>قیمت (تومان)</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>محدوده قیمت (تومان)</TableCell>
                             <TableCell align="center" sx={{ fontWeight: 600 }}>
                                 عملیات
                             </TableCell>
@@ -162,25 +199,35 @@ const ScrapPriceManager: React.FC = () => {
                                     transition: 'all 0.2s',
                                     '&:hover': {
                                         backgroundColor: theme =>
-                                            theme.palette.mode === 'dark'
-                                                ? 'rgba(255,255,255,0.05)'
-                                                : 'rgba(0,0,0,0.02)',
+                                            theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
                                     },
                                 }}
                             >
+                                <TableCell>
+                                    {scrap.image ? <img src={scrap.image} alt={scrap.name} style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }} /> : '–'}
+                                </TableCell>
                                 <TableCell>{scrap.name}</TableCell>
                                 <TableCell>
-                                    <TextField
-                                        size="small"
-                                        type="number"
-                                        value={scrap.price}
-                                        onChange={e => handlePriceChange(scrap.id, +e.target.value)}
-                                        variant="outlined"
-                                        sx={{ width: 140 }}
-                                        InputProps={{
-                                            endAdornment: <Typography sx={{ mr: 1 }}>تومان</Typography>,
-                                        }}
-                                    />
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        <TextField
+                                            size="small"
+                                            type="number"
+                                            value={scrap.priceMin}
+                                            onChange={e => handlePriceChange(scrap.id, 'priceMin', +e.target.value)}
+                                            variant="outlined"
+                                            sx={{ width: 80 }}
+                                        />
+                                        <Typography>-</Typography>
+                                        <TextField
+                                            size="small"
+                                            type="number"
+                                            value={scrap.priceMax}
+                                            onChange={e => handlePriceChange(scrap.id, 'priceMax', +e.target.value)}
+                                            variant="outlined"
+                                            sx={{ width: 80 }}
+                                        />
+                                        <Typography>تومان</Typography>
+                                    </Stack>
                                 </TableCell>
                                 <TableCell align="center">
                                     <Stack direction="row" justifyContent="center" spacing={1}>
@@ -201,7 +248,7 @@ const ScrapPriceManager: React.FC = () => {
 
                         {scraps.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={3} align="center">
+                                <TableCell colSpan={4} align="center">
                                     <Typography color="text.secondary">هیچ ضایعه‌ای ثبت نشده است.</Typography>
                                 </TableCell>
                             </TableRow>
