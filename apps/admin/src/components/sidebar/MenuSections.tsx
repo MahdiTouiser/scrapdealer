@@ -28,8 +28,7 @@ export const MENU_SECTIONS: MenuSection[] = [
         section: fa.sellersManagement,
         collapsible: true,
         items: [
-            { text: 'فروشندگان خرد', icon: <Store />, path: '/sellers/retail' },
-            { text: 'فروشندگان عمده', icon: <Store />, path: '/sellers/whole' },
+            { text: 'فروشندگان ', icon: <Store />, path: '/sellers' },
             { text: 'احراز هویت فروشندگان', icon: <VerifiedUser />, path: '/sellers/verification' },
         ],
     },
