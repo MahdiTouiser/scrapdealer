@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 
 import PageTitle from '@/components/common/PageTitle';
-import TransactionsTable, {
+import TransactionsTable from '@/components/dashboard/TransactionsTable';
+import {
     Transaction,
 } from '@/components/finance/transactions/TransactionsTable';
 import fa from '@/i18n/fa';
