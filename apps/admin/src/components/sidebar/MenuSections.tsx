@@ -68,6 +68,14 @@ export const MENU_SECTIONS: MenuSection[] = [
         ],
     },
     {
+        section: 'پرسش‌ها و پاسخ‌ها',
+        collapsible: true,
+        items: [
+            { text: 'سوالات کاربران', icon: <AdminPanelSettings />, path: '/questions' },
+            { text: 'پاسخ‌های ثبت شده', icon: <History />, path: '/questions/answers' },
+        ],
+    },
+    {
         section: fa.settings,
         collapsible: true,
         items: [

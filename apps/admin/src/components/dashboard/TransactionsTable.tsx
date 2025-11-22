@@ -114,7 +114,7 @@ const TransactionsTable: React.FC = () => {
                     { label: 'خرید / فروش', value: `${summary.buyTransactions} / ${summary.sellTransactions}`, color: theme.palette.mode === 'dark' ? '#90caf9' : '#2e7d32' },
                     { label: 'تراکنش‌های موفق', value: summary.completedTransactions, color: theme.palette.mode === 'dark' ? '#ce93d8' : '#7b1fa2' }
                 ].map((card, i) => (
-                    <Grid item xs={12} sm={6} md={3} key={i}>
+                    <Grid xs={12} sm={6} md={3} key={i}>
                         <Paper sx={{ p: 3, borderRadius: 2, border: `1px solid ${theme.palette.divider}`, bgcolor: theme.palette.background.paper }}>
                             <Typography variant="body2" color="text.secondary" mb={1}>{card.label}</Typography>
                             <Typography variant="h5" fontWeight={700} color={card.color}>{card.value}</Typography>
