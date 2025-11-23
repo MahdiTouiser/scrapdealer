@@ -47,6 +47,7 @@ const fa = {
   settings: 'تنظیمات سیستم',
   adminRequests: 'درخواست ها',
   financialManagement: 'مدیریت مالی',
+  invoices: 'فاکتور ها',
 };
 
 export default fa;

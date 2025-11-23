@@ -2,6 +2,7 @@ import fa from '@/i18n/fa';
 import {
     AdminPanelSettings,
     Dashboard,
+    Description,
     History,
     Home,
     LocationOn,
@@ -64,6 +65,8 @@ export const MENU_SECTIONS: MenuSection[] = [
         collapsible: true,
         items: [
             { text: 'تراکنش‌ها', icon: <ReceiptLong />, path: '/finance/transactions' },
+            { text: 'فاکتورها', icon: <Description />, path: '/finance/invoices' },
+
         ],
     },
     {

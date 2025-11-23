@@ -2,6 +2,7 @@
 
 import React, {
     useCallback,
+    useEffect,
     useState,
 } from 'react';
 
@@ -24,41 +25,53 @@ export interface Seller {
     city: string;
     province: string;
     active: boolean;
+    salesCount: number;
 }
-
 
 const SellersTable: React.FC<{
     data?: Seller[];
     onEdit?: (seller: Seller) => void;
     onDelete?: (id: string) => void;
 }> = ({ data = [], onEdit, onDelete }) => {
-    const [rowData, setRowData] = useState<Seller[]>(data);
+    const [rowData, setRowData] = useState<Seller[]>([]);
+
+    useEffect(() => {
+        const sorted = [...data].sort((a, b) => b.salesCount - a.salesCount);
+        setRowData(sorted);
+    }, [data]);
 
     const handleStatusToggle = useCallback(
         (id: string) => {
-            setRowData((prev) =>
-                prev.map((item) =>
+            setRowData(prev =>
+                prev.map(item =>
                     item.id === id ? { ...item, active: !item.active } : item
                 )
             );
         },
-        [setRowData]
+        []
     );
 
     const [columnDefs] = useState<ColDef<Seller>[]>([
-        { field: "id", headerName: "شناسه", maxWidth: 100 },
-        { field: "firstName", headerName: "نام", flex: 1 },
-        { field: "lastName", headerName: "نام خانوادگی", flex: 1 },
-        { field: "shopName", headerName: "نام مغازه", flex: 1 },
-        { field: "phone", headerName: "شماره تماس", flex: 1 },
-        { field: "email", headerName: "ایمیل", flex: 1 },
-        { field: "nationalCode", headerName: "کد ملی", flex: 1 },
-        { field: "city", headerName: "شهر", flex: 1 },
-        { field: "province", headerName: "استان", flex: 1 },
+        { field: 'id', headerName: 'شناسه', maxWidth: 100 },
+        { field: 'firstName', headerName: 'نام', flex: 1 },
+        { field: 'lastName', headerName: 'نام خانوادگی', flex: 1 },
+        { field: 'shopName', headerName: 'نام مغازه', flex: 1 },
+        { field: 'phone', headerName: 'شماره تماس', flex: 1 },
+        { field: 'email', headerName: 'ایمیل', flex: 1 },
+        { field: 'nationalCode', headerName: 'کد ملی', flex: 1 },
+        { field: 'city', headerName: 'شهر', flex: 1 },
+        { field: 'province', headerName: 'استان', flex: 1 },
         {
-            field: "active",
-            headerName: "وضعیت",
-            cellRenderer: (params) => (
+            field: 'salesCount',
+            headerName: 'تعداد فروش',
+            flex: 1,
+            sortable: true,
+            sort: 'desc',
+        },
+        {
+            field: 'active',
+            headerName: 'وضعیت',
+            cellRenderer: params => (
                 <Box display="flex" justifyContent="center" alignItems="center">
                     <Switch
                         checked={params.value}
@@ -67,12 +80,12 @@ const SellersTable: React.FC<{
                     />
                 </Box>
             ),
-            cellStyle: { textAlign: "center" },
+            cellStyle: { textAlign: 'center' },
             maxWidth: 150,
         },
         {
-            headerName: "عملیات",
-            cellRenderer: (params) => (
+            headerName: 'عملیات',
+            cellRenderer: params => (
                 <Box display="flex" gap={1}>
                     <button
                         onClick={() => onEdit?.(params.data)}
