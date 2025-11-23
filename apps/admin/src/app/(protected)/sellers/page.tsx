@@ -9,6 +9,7 @@ import CustomFormModal, {
 } from '@/components/common/CustomFormModal';
 import PageTitle from '@/components/common/PageTitle';
 import SellersTable, { Seller } from '@/components/sellers/SellersTable';
+import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import { Box } from '@mui/material';
 
@@ -18,7 +19,74 @@ const Sellers = () => {
     const [editingSeller, setEditingSeller] = useState<Seller | null>(null);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
-    const [rowData, setRowData] = useState<Seller[]>([]);
+
+    const { data: sellers, loading, refetch: refetchSellers } = useApi<{ data: Seller[]; totalCount: number }>({
+        key: ['get-sellers'],
+        url: '/Sellers/Admin/Get',
+    });
+
+    const { mutate: addSeller, loading: adding } = useApi<void, Omit<Seller, 'id'>>({
+        key: ['add-seller'],
+        url: '/Sellers',
+        method: 'POST',
+        onSuccess: 'فروشنده با موفقیت اضافه شد',
+        onError: 'افزودن فروشنده با خطا مواجه شد',
+    });
+
+    const { mutate: updateSeller, loading: updating } = useApi<void, Seller>({
+        key: ['update-seller'],
+        url: (data) => `/Sellers/${data?.id}`,
+        method: 'PUT',
+        onSuccess: 'فروشنده با موفقیت ویرایش شد',
+        onError: 'ویرایش فروشنده با خطا مواجه شد',
+    });
+
+    const { mutate: deleteSeller, loading: deleting } = useApi<void, string>({
+        key: ['delete-seller'],
+        url: (id) => `/Sellers/${id}`,
+        method: 'DELETE',
+        onSuccess: 'فروشنده با موفقیت حذف شد',
+        onError: 'حذف فروشنده با خطا مواجه شد',
+    });
+
+    const { mutateAsync: fetchSellerById, loading: fetching } = useApi<Seller, string>({
+        key: ['get-seller-by-id'],
+        url: (id) => `/Sellers/${id}`,
+        method: 'GET',
+        enabled: false,
+    });
+
+    const formFields: FormField[] = [
+        { name: 'firstName', label: 'نام', fieldType: 'text', required: true },
+        { name: 'lastName', label: 'نام خانوادگی', fieldType: 'text', required: true },
+        { name: 'nationalCode', label: 'کد ملی', fieldType: 'text', required: true },
+        { name: 'city', label: 'شهر', fieldType: 'text', required: true },
+        { name: 'province', label: 'استان', fieldType: 'text', required: true },
+        { name: 'postalCode', label: 'کد پستی', fieldType: 'text', required: true },
+        { name: 'addressDescription', label: 'آدرس', fieldType: 'text', required: true },
+        { name: 'email', label: 'ایمیل', fieldType: 'text', required: true },
+        {
+            name: 'gender',
+            label: 'جنسیت',
+            fieldType: 'select',
+            required: true,
+            options: [
+                { label: 'مرد', value: 'Male' },
+                { label: 'زن', value: 'Female' },
+            ],
+        },
+        {
+            name: 'personType',
+            label: 'نوع شخص',
+            fieldType: 'select',
+            required: true,
+            options: [
+                { label: 'حقیقی', value: 'real' },
+                { label: 'حقوقی', value: 'legal' },
+            ],
+        },
+    ];
+
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => {
@@ -27,25 +95,35 @@ const Sellers = () => {
         setEditingSeller(null);
     };
 
-    const handleAddSeller = (data: Omit<Seller, 'id'>) => {
-        const newSeller: Seller = {
-            ...data,
-            id: rowData.length ? (Math.max(...rowData.map(s => parseInt(s.id))) + 1).toString() : '1',
-        };
-        setRowData(prev => [...prev, newSeller]);
-        handleClose();
+    const handleAddSeller = async (data: Omit<Seller, 'id'>) => {
+        await addSeller(data, {
+            onSuccess: () => {
+                handleClose();
+                refetchSellers();
+            },
+        });
     };
 
-    const handleEdit = (seller: Seller) => {
-        setEditMode(true);
-        setEditingSeller(seller);
-        handleOpen();
+    const handleEdit = async (id: string) => {
+        try {
+            setEditMode(true);
+            const seller = await fetchSellerById(id);
+            setEditingSeller(seller);
+            handleOpen();
+        } catch (err) {
+            console.error('Failed to fetch seller:', err);
+        }
     };
 
-    const handleUpdateSeller = (data: Omit<Seller, 'id'>) => {
+    const handleUpdateSeller = async (data: Omit<Seller, 'id'>) => {
         if (!editingSeller) return;
-        setRowData(prev => prev.map(s => s.id === editingSeller.id ? { ...s, ...data } : s));
-        handleClose();
+        const body: Seller = { ...editingSeller, ...data };
+        await updateSeller(body, {
+            onSuccess: () => {
+                handleClose();
+                refetchSellers();
+            },
+        });
     };
 
     const handleDelete = (id: string) => {
@@ -53,23 +131,17 @@ const Sellers = () => {
         setConfirmOpen(true);
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (!selectedId) return;
-        setRowData(prev => prev.filter(s => s.id !== selectedId));
-        setConfirmOpen(false);
-        setSelectedId(null);
+        await deleteSeller(selectedId, {
+            onSuccess: () => {
+                setConfirmOpen(false);
+                setSelectedId(null);
+                refetchSellers();
+            },
+            onError: () => setConfirmOpen(false),
+        });
     };
-
-    const formFields: FormField[] = [
-        { name: 'firstName', label: 'نام', fieldType: 'text', required: true },
-        { name: 'lastName', label: 'نام خانوادگی', fieldType: 'text', required: true },
-        { name: 'nationalCode', label: 'کد ملی', fieldType: 'text', required: true },
-        { name: 'phone', label: 'شماره تماس', fieldType: 'phone', required: true },
-        { name: 'email', label: 'ایمیل', fieldType: 'text', required: true },
-        { name: 'shopName', label: 'نام مغازه', fieldType: 'text', required: true },
-        { name: 'city', label: 'شهر', fieldType: 'text', required: true },
-        { name: 'province', label: 'استان', fieldType: 'text', required: true },
-    ];
 
     const getDefaultValues = () => {
         if (editMode && editingSeller) {
@@ -77,11 +149,13 @@ const Sellers = () => {
                 firstName: editingSeller.firstName || '',
                 lastName: editingSeller.lastName || '',
                 nationalCode: editingSeller.nationalCode || '',
-                phone: editingSeller.phone || '',
-                email: editingSeller.email || '',
-                shopName: editingSeller.shopName || '',
                 city: editingSeller.city || '',
                 province: editingSeller.province || '',
+                postalCode: editingSeller.postalCode || '',
+                addressDescription: editingSeller.addressDescription || '',
+                email: editingSeller.email || '',
+                gender: editingSeller.gender || 'Male',
+                personType: editingSeller.personType || 'real',
             };
         }
         return {};
@@ -90,13 +164,13 @@ const Sellers = () => {
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
             <PageTitle title={fa.sellers} />
-
             <Box display="flex" justifyContent="flex-start" mb={2}>
                 <AddButton label="افزودن فروشنده جدید" onClick={handleOpen} />
             </Box>
 
             <SellersTable
-                data={rowData}
+                data={sellers?.data || []}
+                loading={loading}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
             />
@@ -110,6 +184,7 @@ const Sellers = () => {
                 onSubmit={editMode ? handleUpdateSeller : handleAddSeller}
                 submitLabel={editMode ? 'ویرایش' : 'افزودن'}
                 cancelLabel="لغو"
+                submitLoading={adding || updating || fetching}
             />
 
             <ConfirmationModal
@@ -119,6 +194,7 @@ const Sellers = () => {
                 message="آیا از حذف این فروشنده اطمینان دارید؟"
                 confirmLabel="حذف"
                 cancelLabel="لغو"
+                loading={deleting}
             />
         </Box>
     );

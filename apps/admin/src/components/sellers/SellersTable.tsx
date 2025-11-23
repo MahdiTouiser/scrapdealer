@@ -14,6 +14,8 @@ import {
     Switch,
 } from '@mui/material';
 
+import Loading from '../common/Loading';
+
 export interface Seller {
     id: string;
     firstName: string;
@@ -24,15 +26,21 @@ export interface Seller {
     shopName: string;
     city: string;
     province: string;
+    postalCode?: string;
+    addressDescription?: string;
+    gender?: 'Male' | 'Female';
+    personType?: 'real' | 'legal';
     active: boolean;
     salesCount: number;
 }
 
+
 const SellersTable: React.FC<{
     data?: Seller[];
-    onEdit?: (seller: Seller) => void;
+    loading: boolean
+    onEdit?: (id: string) => void;
     onDelete?: (id: string) => void;
-}> = ({ data = [], onEdit, onDelete }) => {
+}> = ({ data = [], onEdit, onDelete, loading }) => {
     const [rowData, setRowData] = useState<Seller[]>([]);
 
     useEffect(() => {
@@ -40,16 +48,13 @@ const SellersTable: React.FC<{
         setRowData(sorted);
     }, [data]);
 
-    const handleStatusToggle = useCallback(
-        (id: string) => {
-            setRowData(prev =>
-                prev.map(item =>
-                    item.id === id ? { ...item, active: !item.active } : item
-                )
-            );
-        },
-        []
-    );
+    const handleStatusToggle = useCallback((id: string) => {
+        setRowData(prev =>
+            prev.map(item =>
+                item.id === id ? { ...item, active: !item.active } : item
+            )
+        );
+    }, []);
 
     const [columnDefs] = useState<ColDef<Seller>[]>([
         { field: 'id', headerName: 'شناسه', maxWidth: 100 },
@@ -88,7 +93,7 @@ const SellersTable: React.FC<{
             cellRenderer: params => (
                 <Box display="flex" gap={1}>
                     <button
-                        onClick={() => onEdit?.(params.data)}
+                        onClick={() => onEdit?.(params.data.id)}
                         className="text-blue-500"
                     >
                         ویرایش
@@ -104,6 +109,14 @@ const SellersTable: React.FC<{
             maxWidth: 150,
         },
     ]);
+
+    if (loading) {
+        return (
+            <Box mt={6}>
+                <Loading />
+            </Box>
+        );
+    }
 
     return <DataGrid<Seller> rowData={rowData} columnDefs={columnDefs} />;
 };
