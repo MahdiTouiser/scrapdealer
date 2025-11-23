@@ -5,7 +5,11 @@ import ClientProviders from './ClientProviders';
 export const metadata = {
   title: 'ضایعات چی',
   description: 'ScrapDealer admin platform',
+  icons: {
+    icon: '/icon/logo.png',
+  },
 };
+
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

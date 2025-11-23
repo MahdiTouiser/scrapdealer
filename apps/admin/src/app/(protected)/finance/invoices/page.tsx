@@ -3,19 +3,20 @@
 import React from 'react';
 
 import PageTitle from '@/components/common/PageTitle';
-import TransactionsTable from '@/components/dashboard/TransactionsTable';
+import InvoicesTable from '@/components/finance/invoices/InvoicesTable';
 import fa from '@/i18n/fa';
 import { Box } from '@mui/material';
 
-const TransactionsPage: React.FC = () => {
+const Invoices: React.FC = () => {
+
 
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
-            <PageTitle title={fa.transactions}
+            <PageTitle title={fa.invoices}
             />
-            <TransactionsTable />
+            <InvoicesTable />
         </Box>
     );
 };
 
-export default TransactionsPage;
+export default Invoices;

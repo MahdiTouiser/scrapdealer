@@ -35,8 +35,6 @@ const fa = {
   activity: 'پیگیری فعالیت ها',
   wholeBuyers: 'خریداران عمده',
   retailBuyers: 'خریداران خرد',
-  retailSellers: 'فروشندگان خرد',
-  wholeSellers: 'فروشندگان عمده',
   verificationBuyers: 'احراز هویت خریداران',
   seeBuyersVerifications: 'در این بخش می‌توانید مدارک و وضعیت حساب خریداران را مشاهده، بررسی و تأیید کنید.',
   seeSellersVerifications: 'در این بخش می‌توانید مدارک و وضعیت حساب فروشندگان را مشاهده، بررسی و تأیید کنید.',
@@ -49,6 +47,7 @@ const fa = {
   settings: 'تنظیمات سیستم',
   adminRequests: 'درخواست ها',
   financialManagement: 'مدیریت مالی',
+  invoices: 'فاکتور ها',
 };
 
 export default fa;

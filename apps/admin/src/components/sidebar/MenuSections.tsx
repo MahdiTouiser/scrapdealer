@@ -2,6 +2,7 @@ import fa from '@/i18n/fa';
 import {
     AdminPanelSettings,
     Dashboard,
+    Description,
     History,
     Home,
     LocationOn,
@@ -28,8 +29,7 @@ export const MENU_SECTIONS: MenuSection[] = [
         section: fa.sellersManagement,
         collapsible: true,
         items: [
-            { text: 'فروشندگان خرد', icon: <Store />, path: '/sellers/retail' },
-            { text: 'فروشندگان عمده', icon: <Store />, path: '/sellers/whole' },
+            { text: 'فروشندگان ', icon: <Store />, path: '/sellers' },
             { text: 'احراز هویت فروشندگان', icon: <VerifiedUser />, path: '/sellers/verification' },
         ],
     },
@@ -65,6 +65,16 @@ export const MENU_SECTIONS: MenuSection[] = [
         collapsible: true,
         items: [
             { text: 'تراکنش‌ها', icon: <ReceiptLong />, path: '/finance/transactions' },
+            { text: 'فاکتورها', icon: <Description />, path: '/finance/invoices' },
+
+        ],
+    },
+    {
+        section: 'پرسش‌ها و پاسخ‌ها',
+        collapsible: true,
+        items: [
+            { text: 'سوالات کاربران', icon: <AdminPanelSettings />, path: '/questions' },
+            { text: 'پاسخ‌های ثبت شده', icon: <History />, path: '/questions/answers' },
         ],
     },
     {
