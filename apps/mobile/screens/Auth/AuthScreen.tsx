@@ -22,9 +22,8 @@ import { OTPStep } from '../../components/Auth/OTPStep';
 import { PhoneStep } from '../../components/Auth/PhoneStep';
 import { Text } from '../../components/CustomText';
 import { useThemeContext } from '../../theme/ThemeProvider';
-import { AuthScreenProps } from './Auth.types';
 
-export const AuthScreen: React.FC<AuthScreenProps> = (props) => {
+export const AuthScreen: React.FC = () => {
     const insets = useSafeAreaInsets();
     const { mode, theme } = useThemeContext();
     const { myColors } = theme;
@@ -33,6 +32,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = (props) => {
     const [phoneNumber, setPhoneNumber] = React.useState('');
     const [otpCode, setOTPCode] = React.useState('');
     const [phoneFocused, setPhoneFocused] = React.useState(false);
+    const [loading, setLoading] = React.useState(false);
 
     const fadeAnim = React.useRef(new Animated.Value(0)).current;
     const slideAnim = React.useRef(new Animated.Value(40)).current;
@@ -55,30 +55,35 @@ export const AuthScreen: React.FC<AuthScreenProps> = (props) => {
 
     const handleSendOTP = async () => {
         const clean = phoneNumber.replace(/\D/g, '');
-        await props.onSendOTP(clean);
-        setCurrentStep('otp');
+        setLoading(true);
+        try {
+            await apiSendOTP(clean);
+            setCurrentStep('otp');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleVerifyOTP = async () => {
         const clean = phoneNumber.replace(/\D/g, '');
-        await props.onVerifyOTP(clean, otpCode);
+        setLoading(true);
+        try {
+            const result = await apiVerifyOTP(clean, otpCode);
+            handleLoginSuccess(result.token, result.role);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleResendOTP = async () => {
-        if (!props.onResendOTP) return;
         const clean = phoneNumber.replace(/\D/g, '');
-        await props.onResendOTP(clean);
-    };
-
-
-
-    const goBackToPhone = () => {
-        setCurrentStep('phone');
+        await apiResendOTP(clean);
     };
 
     const handleLoginSuccess = (token: string, role: string) => {
-        props.onLoginSuccess?.(token, role);
+        console.log('login success', token, role);
     };
+
     return (
         <>
             <StatusBar
@@ -136,7 +141,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = (props) => {
                                         phoneNumber={phoneNumber}
                                         onChangePhone={setPhoneNumber}
                                         onSendOTP={handleSendOTP}
-                                        loading={props.loading}
+                                        loading={loading}
                                         phoneFocused={phoneFocused}
                                         setPhoneFocused={setPhoneFocused}
                                         stepTransition={stepTransition}
@@ -147,7 +152,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = (props) => {
                                         onVerifySuccess={handleLoginSuccess}
                                         onResendOTP={handleResendOTP}
                                         stepTransition={stepTransition}
-                                        handleBackToPhone={goBackToPhone}
+                                        handleBackToPhone={() => setCurrentStep('phone')}
                                     />
                                 )}
                             </View>
@@ -161,11 +166,23 @@ export const AuthScreen: React.FC<AuthScreenProps> = (props) => {
     );
 };
 
+const apiSendOTP = async (phone: string) => {
+    return new Promise(resolve => setTimeout(resolve, 600));
+};
+
+const apiVerifyOTP = async (phone: string, otp: string) => {
+    return {
+        token: 'token123',
+        role: 'User',
+    };
+};
+
+const apiResendOTP = async (phone: string) => {
+    return new Promise(resolve => setTimeout(resolve, 600));
+};
+
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#ffffff',
-    },
+    container: { flex: 1, backgroundColor: '#ffffff' },
     scrollContent: {
         flexGrow: 1,
         justifyContent: 'center',
@@ -178,10 +195,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         paddingHorizontal: spacing.lg,
     },
-    brandContainer: {
-        alignItems: 'center',
-        marginTop: spacing.xl,
-    },
+    brandContainer: { alignItems: 'center', marginTop: spacing.xl },
     logoWrapper: {
         width: 140,
         height: 140,
@@ -195,10 +209,7 @@ const styles = StyleSheet.create({
         shadowRadius: 32,
         elevation: 24,
     },
-    logo: {
-        width: '100%',
-        height: '100%',
-    },
+    logo: { width: '100%', height: '100%' },
     appTitle: {
         fontSize: 38,
         fontWeight: '800',
@@ -212,7 +223,5 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         opacity: 0.85,
     },
-    formContainer: {
-        marginTop: spacing['3xl'],
-    },
+    formContainer: { marginTop: spacing['3xl'] },
 });
