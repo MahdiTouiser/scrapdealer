@@ -1,4 +1,3 @@
-// components/Auth/PhoneStep.tsx
 import React from 'react';
 
 import {
@@ -62,20 +61,18 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({
     const cleanPhone = phoneNumber.replace(/\D/g, '');
     const isValid = cleanPhone.length >= 10;
 
-    const handleSend = () => {
+    const handleSend = async () => {
         if (!isValid || sendingOtp) return;
 
         const irPhone = cleanPhone.startsWith('0') ? cleanPhone.slice(1) : cleanPhone;
         const finalPhone = `0${irPhone}`;
 
-        sendOtp(
-            { phone: finalPhone },
-            {
-                onSuccess: () => {
-                    onSendOTP();
-                },
-            }
-        );
+        try {
+            await sendOtp({ phone: finalPhone });
+            onSendOTP();
+        } catch (err: any) {
+            console.log('OTP send failed:', err);
+        }
     };
 
     return (
@@ -204,7 +201,7 @@ const styles = StyleSheet.create({
         backgroundColor: colors.light.primary,
     },
     buttonDisabled: {
-        backgroundColor: '#cccccc',
+        backgroundColor: '#585858ff',
     },
     buttonContent: {
         paddingVertical: 8,

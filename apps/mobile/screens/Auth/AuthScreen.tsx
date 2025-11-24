@@ -1,4 +1,3 @@
-// screens/Auth/Auth/AuthScreen.tsx
 import React from 'react';
 
 import {
@@ -71,11 +70,15 @@ export const AuthScreen: React.FC<AuthScreenProps> = (props) => {
         await props.onResendOTP(clean);
     };
 
-    const handleBack = () => {
+
+
+    const goBackToPhone = () => {
         setCurrentStep('phone');
-        setOTPCode('');
     };
 
+    const handleLoginSuccess = (token: string, role: string) => {
+        props.onLoginSuccess?.(token, role);
+    };
     return (
         <>
             <StatusBar
@@ -104,7 +107,6 @@ export const AuthScreen: React.FC<AuthScreenProps> = (props) => {
                                 },
                             ]}
                         >
-                            {/* Logo + Title */}
                             <View style={styles.brandContainer}>
                                 <View style={styles.logoWrapper}>
                                     <Image
@@ -122,14 +124,12 @@ export const AuthScreen: React.FC<AuthScreenProps> = (props) => {
                                 </Text>
                             </View>
 
-                            {/* Header */}
                             <AuthHeader
                                 step={currentStep}
                                 phoneNumber={phoneNumber}
                                 stepTransition={stepTransition}
                             />
 
-                            {/* Form */}
                             <View style={styles.formContainer}>
                                 {currentStep === 'phone' ? (
                                     <PhoneStep
@@ -137,21 +137,17 @@ export const AuthScreen: React.FC<AuthScreenProps> = (props) => {
                                         onChangePhone={setPhoneNumber}
                                         onSendOTP={handleSendOTP}
                                         loading={props.loading}
-                                        error={props.error}
                                         phoneFocused={phoneFocused}
                                         setPhoneFocused={setPhoneFocused}
                                         stepTransition={stepTransition}
                                     />
                                 ) : (
                                     <OTPStep
-                                        otpCode={otpCode}
-                                        setOTPCode={setOTPCode}
-                                        onVerifyOTP={handleVerifyOTP}
+                                        phoneNumber={phoneNumber}
+                                        onVerifySuccess={handleLoginSuccess}
                                         onResendOTP={handleResendOTP}
-                                        loading={props.loading}
-                                        error={props.error}
                                         stepTransition={stepTransition}
-                                        handleBackToPhone={handleBack}
+                                        handleBackToPhone={goBackToPhone}
                                     />
                                 )}
                             </View>
