@@ -105,6 +105,13 @@ export default function LoginPage() {
         enabled: false,
     });
 
+    const { mutateAsync: getPermissionsSupport } = useApi<any>({
+        key: ['get-permissions-support'],
+        url: '/Permissions/Support?pageIndex=0&pageSize=100',
+        method: 'GET',
+        enabled: false,
+    });
+
     const onSubmit = async (data: LoginFormData) => {
         try {
             const loginPayload: LoginPayload = {
@@ -113,6 +120,7 @@ export default function LoginPage() {
             };
 
             const response = await login(loginPayload);
+            debugger
             if (response) {
                 setAuth(response.token, response.role);
 
@@ -122,6 +130,11 @@ export default function LoginPage() {
 
                     if (permissionsResult) setPermissions(permissionsResult.data || permissionsResult);
 
+                } else {
+                    const permissionsResult = await getPermissionsSupport();
+                    console.log('Permissions:', permissionsResult);
+
+                    if (permissionsResult) setPermissions(permissionsResult.data || permissionsResult);
                 }
 
                 router.push('/dashboard/main');
@@ -136,7 +149,7 @@ export default function LoginPage() {
         <StyledContainer maxWidth="sm">
             <StyledPaper elevation={3}>
                 <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
-                    <LogoIcon src="/icon/logo.png" alt="Logo" />
+                    <LogoIcon src="/icons/logo.png" alt="Logo" />
                     <Typography variant="h4" fontWeight={600} mb={0.5}>
                         {fa.scrapDealer}
                     </Typography>

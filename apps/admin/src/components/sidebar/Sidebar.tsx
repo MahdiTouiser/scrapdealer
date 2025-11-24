@@ -167,7 +167,7 @@ const Sidebar: React.FC = () => {
                     >
                         <Box
                             component="img"
-                            src="/icon/logo.png"
+                            src="/icons/logo.png"
                             alt="Logo"
                             sx={{
                                 position: 'relative',
