@@ -180,6 +180,9 @@ importers:
       react-native-safe-area-context:
         specifier: ^5.4.0
         version: 5.4.0(react-native@0.79.6(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.1.0))(react@19.1.0)
+      react-native-toast-message:
+        specifier: ^2.3.3
+        version: 2.3.3(react-native@0.79.6(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.1.0))(react@19.1.0)
       react-native-vector-icons:
         specifier: ^10.3.0
         version: 10.3.0
@@ -4385,6 +4388,12 @@ packages:
 
   react-native-safe-area-context@5.4.0:
     resolution: {integrity: sha512-JaEThVyJcLhA+vU0NU8bZ0a1ih6GiF4faZ+ArZLqpYbL6j7R3caRqj+mE3lEtKCuHgwjLg3bCxLL1GPUJZVqUA==}
+    peerDependencies:
+      react: '*'
+      react-native: '*'
+
+  react-native-toast-message@2.3.3:
+    resolution: {integrity: sha512-4IIUHwUPvKHu4gjD0Vj2aGQzqPATiblL1ey8tOqsxOWRPGGu52iIbL8M/mCz4uyqecvPdIcMY38AfwRuUADfQQ==}
     peerDependencies:
       react: '*'
       react-native: '*'
@@ -10109,6 +10118,11 @@ snapshots:
       use-latest-callback: 0.2.4(react@19.1.0)
 
   react-native-safe-area-context@5.4.0(react-native@0.79.6(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.1.0))(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+      react-native: 0.79.6(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.1.0)
+
+  react-native-toast-message@2.3.3(react-native@0.79.6(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.1.0))(react@19.1.0):
     dependencies:
       react: 19.1.0
       react-native: 0.79.6(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.1.0)

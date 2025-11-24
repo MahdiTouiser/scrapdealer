@@ -1,7 +1,9 @@
+// screens/Auth/Auth/AuthScreen.tsx
 import React from 'react';
 
 import {
     Animated,
+    Image,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
@@ -11,17 +13,22 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { spacing } from '@scrapdealer/tokens';
+import {
+    spacing,
+    typography,
+} from '@scrapdealer/tokens';
 
 import { AuthHeader } from '../../components/Auth/AuthHeader';
 import { OTPStep } from '../../components/Auth/OTPStep';
 import { PhoneStep } from '../../components/Auth/PhoneStep';
+import { Text } from '../../components/CustomText';
 import { useThemeContext } from '../../theme/ThemeProvider';
 import { AuthScreenProps } from './Auth.types';
 
 export const AuthScreen: React.FC<AuthScreenProps> = (props) => {
     const insets = useSafeAreaInsets();
     const { mode, theme } = useThemeContext();
+    const { myColors } = theme;
 
     const [currentStep, setCurrentStep] = React.useState<'phone' | 'otp'>('phone');
     const [phoneNumber, setPhoneNumber] = React.useState('');
@@ -34,15 +41,15 @@ export const AuthScreen: React.FC<AuthScreenProps> = (props) => {
 
     React.useEffect(() => {
         Animated.parallel([
-            Animated.timing(fadeAnim, { toValue: 1, duration: 900, useNativeDriver: true }),
-            Animated.timing(slideAnim, { toValue: 0, duration: 800, delay: 100, useNativeDriver: true }),
+            Animated.timing(fadeAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
+            Animated.timing(slideAnim, { toValue: 0, duration: 900, delay: 100, useNativeDriver: true }),
         ]).start();
     }, []);
 
     React.useEffect(() => {
         Animated.timing(stepTransition, {
             toValue: currentStep === 'otp' ? 1 : 0,
-            duration: 450,
+            duration: 500,
             useNativeDriver: true,
         }).start();
     }, [currentStep]);
@@ -80,7 +87,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = (props) => {
                 <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     style={{ flex: 1 }}
-                    keyboardVerticalOffset={insets.top + 20}
+                    keyboardVerticalOffset={insets.top + 30}
                 >
                     <ScrollView
                         contentContainerStyle={styles.scrollContent}
@@ -97,12 +104,32 @@ export const AuthScreen: React.FC<AuthScreenProps> = (props) => {
                                 },
                             ]}
                         >
+                            {/* Logo + Title */}
+                            <View style={styles.brandContainer}>
+                                <View style={styles.logoWrapper}>
+                                    <Image
+                                        source={require('../../public/icons/logo.png')}
+                                        style={styles.logo}
+                                        resizeMode="contain"
+                                    />
+                                </View>
+
+                                <Text style={[styles.appTitle, { color: myColors.textPrimary }]}>
+                                    ضایعات چی
+                                </Text>
+                                <Text style={[styles.appSubtitle, { color: myColors.textSecondary }]}>
+                                    خرید و فروش هوشمند ضایعات
+                                </Text>
+                            </View>
+
+                            {/* Header */}
                             <AuthHeader
                                 step={currentStep}
                                 phoneNumber={phoneNumber}
                                 stepTransition={stepTransition}
                             />
 
+                            {/* Form */}
                             <View style={styles.formContainer}>
                                 {currentStep === 'phone' ? (
                                     <PhoneStep
@@ -148,13 +175,46 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingHorizontal: spacing.xl,
         paddingTop: spacing.xl,
-        paddingBottom: spacing['3xl'],
     },
     contentWrapper: {
         width: '100%',
-        maxWidth: 420,
+        maxWidth: 440,
         alignSelf: 'center',
         paddingHorizontal: spacing.lg,
+    },
+    brandContainer: {
+        alignItems: 'center',
+        marginTop: spacing.xl,
+    },
+    logoWrapper: {
+        width: 140,
+        height: 140,
+        backgroundColor: 'rgba(0,0,0,0.05)',
+        borderRadius: 36,
+        padding: 24,
+        marginBottom: spacing.xl,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 12 },
+        shadowOpacity: 0.18,
+        shadowRadius: 32,
+        elevation: 24,
+    },
+    logo: {
+        width: '100%',
+        height: '100%',
+    },
+    appTitle: {
+        fontSize: 38,
+        fontWeight: '800',
+        letterSpacing: -0.8,
+        textAlign: 'center',
+        marginBottom: spacing.sm,
+    },
+    appSubtitle: {
+        fontSize: typography.body1.size,
+        textAlign: 'center',
+        fontWeight: '500',
+        opacity: 0.85,
     },
     formContainer: {
         marginTop: spacing['3xl'],

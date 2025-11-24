@@ -14,12 +14,14 @@ import {
 } from 'react-native-paper';
 
 import {
+    colors,
     radii,
     spacing,
     typography,
 } from '@scrapdealer/tokens';
 
-import { Text } from '../../components/CustomText'; // Your Vazirmatn Text
+import { Text } from '../../components/CustomText';
+import { useApi } from '../../hooks/useApi';
 import { useThemeContext } from '../../theme/ThemeProvider';
 
 interface PhoneStepProps {
@@ -37,16 +39,44 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({
     phoneNumber,
     onChangePhone,
     onSendOTP,
-    loading,
+    loading = false,
     error,
     phoneFocused,
     setPhoneFocused,
     stepTransition,
 }) => {
     const { theme } = useThemeContext();
-    const { colors, myColors } = theme;
+    const { myColors, colors } = theme;
 
-    const isValid = phoneNumber.replace(/\D/g, '').length >= 10;
+    const { mutate: sendOtp, isPending: sendingOtp } = useApi<
+        { success: boolean; message?: string },
+        { phone: string }
+    >({
+        key: ['send-otp'],
+        url: '/Authentication/OtpRequest',
+        method: 'POST',
+        onSuccess: 'کد تأیید با موفقیت ارسال شد',
+        onError: 'ارسال کد ناموفق بود',
+    });
+
+    const cleanPhone = phoneNumber.replace(/\D/g, '');
+    const isValid = cleanPhone.length >= 10;
+
+    const handleSend = () => {
+        if (!isValid || sendingOtp) return;
+
+        const irPhone = cleanPhone.startsWith('0') ? cleanPhone.slice(1) : cleanPhone;
+        const finalPhone = `0${irPhone}`;
+
+        sendOtp(
+            { phone: finalPhone },
+            {
+                onSuccess: () => {
+                    onSendOTP();
+                },
+            }
+        );
+    };
 
     return (
         <Animated.View
@@ -65,24 +95,21 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({
                 },
             ]}
         >
-            {/* Floating Label */}
             <Text style={[styles.label, { color: myColors.textSecondary }]}>
                 شماره موبایل
             </Text>
 
-            {/* Input Container */}
-            <View style={[
-                styles.inputWrapper,
-                phoneFocused && styles.inputWrapperFocused,
-                { borderColor: phoneFocused ? colors.primary : myColors.textSecondary + '40' }
-            ]}>
+            <View
+                style={[
+                    styles.inputWrapper,
+                    phoneFocused && styles.inputWrapperFocused,
+                    { borderColor: phoneFocused ? colors.primary : myColors.textSecondary + '40' },
+                ]}
+            >
                 <Text style={styles.countryCode}>+98</Text>
 
                 <RNTextInput
-                    style={[
-                        styles.input,
-                        { color: myColors.textPrimary, fontFamily: 'Vazirmatn' } // Vazirmatn via fontFamily
-                    ]}
+                    style={[styles.input, { color: myColors.textPrimary, fontFamily: 'Vazirmatn' }]}
                     value={phoneNumber}
                     onChangeText={onChangePhone}
                     onFocus={() => setPhoneFocused(true)}
@@ -92,31 +119,29 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({
                     placeholder="912 345 6789"
                     placeholderTextColor={myColors.textSecondary + '60'}
                     textAlign="left"
-                    editable={!loading}
+                    editable={!sendingOtp}
                 />
             </View>
 
-            {/* Error */}
-            {error && (
+            {(error || sendingOtp) && (
                 <HelperText type="error" visible={!!error} style={styles.errorText}>
-                    {error}
+                    {error || (sendingOtp ? 'در حال ارسال...' : '')}
                 </HelperText>
             )}
 
-            {/* Button */}
             <Button
                 mode="contained"
-                onPress={onSendOTP}
-                loading={loading}
-                disabled={!isValid || loading}
+                onPress={handleSend}
+                loading={sendingOtp}
+                disabled={!isValid || sendingOtp}
                 contentStyle={styles.buttonContent}
                 style={[
                     styles.button,
-                    (!isValid || loading) && styles.buttonDisabled
+                    (!isValid || sendingOtp) && styles.buttonDisabled,
                 ]}
                 labelStyle={{ fontFamily: 'Vazirmatn', fontWeight: '600' }}
             >
-                {loading ? 'در حال ارسال...' : 'ارسال کد تایید'}
+                ارسال کد تایید
             </Button>
         </Animated.View>
     );
@@ -142,7 +167,11 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(120,120,128,0.06)',
         marginBottom: spacing.lg,
         ...Platform.select({
-            ios: { shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 } },
+            ios: {
+                shadowOpacity: 0.08,
+                shadowRadius: 12,
+                shadowOffset: { width: 0, height: 4 },
+            },
             android: { elevation: 6 },
         }),
     },
@@ -172,7 +201,7 @@ const styles = StyleSheet.create({
     button: {
         borderRadius: radii.xl,
         marginTop: spacing.xl,
-        backgroundColor: '#000000', // or theme.colors.primary
+        backgroundColor: colors.light.primary,
     },
     buttonDisabled: {
         backgroundColor: '#cccccc',
