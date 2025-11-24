@@ -1,7 +1,7 @@
 import Toast from 'react-native-toast-message';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { QueryKey, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { QueryKey, useMutation, useQuery } from '@tanstack/react-query';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
@@ -74,8 +74,6 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
 }
 
 export function useApi<TData = unknown, TVariables = void>({ key, url, method = 'GET', onSuccess, onError = 'خطا در ارتباط با سرور', enabled = true }: UseApiOptions<TVariables>) {
-  const queryClient = useQueryClient();
-
   const query = useQuery<TData, ApiError>({
     queryKey: key,
     queryFn: () => fetchApi<TData>(typeof url === 'function' ? url() : url),
@@ -104,7 +102,6 @@ export function useApi<TData = unknown, TVariables = void>({ key, url, method = 
       ? (variables?: TVariables, options?: { onSuccess?: (data: TData) => void }) => {
           mutation.mutate(variables as TVariables, {
             onSuccess: (data) => {
-              queryClient.invalidateQueries({ queryKey: key });
               if (onSuccess) {
                 Toast.show({ type: 'success', text1: onSuccess });
               }

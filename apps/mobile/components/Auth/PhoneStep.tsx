@@ -38,7 +38,6 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({
     phoneNumber,
     onChangePhone,
     onSendOTP,
-    loading = false,
     error,
     phoneFocused,
     setPhoneFocused,

@@ -32,7 +32,6 @@ export const AuthScreen: React.FC = () => {
     const [phoneNumber, setPhoneNumber] = React.useState('');
     const [otpCode, setOTPCode] = React.useState('');
     const [phoneFocused, setPhoneFocused] = React.useState(false);
-    const [loading, setLoading] = React.useState(false);
 
     const fadeAnim = React.useRef(new Animated.Value(0)).current;
     const slideAnim = React.useRef(new Animated.Value(40)).current;
@@ -53,36 +52,18 @@ export const AuthScreen: React.FC = () => {
         }).start();
     }, [currentStep]);
 
-    const handleSendOTP = async () => {
-        const clean = phoneNumber.replace(/\D/g, '');
-        setLoading(true);
-        try {
-            await apiSendOTP(clean);
-            setCurrentStep('otp');
-        } finally {
-            setLoading(false);
-        }
+    const handleSendOTP = () => {
+        setCurrentStep('otp');
     };
 
-    const handleVerifyOTP = async () => {
-        const clean = phoneNumber.replace(/\D/g, '');
-        setLoading(true);
-        try {
-            const result = await apiVerifyOTP(clean, otpCode);
-            handleLoginSuccess(result.token, result.role);
-        } finally {
-            setLoading(false);
-        }
-    };
+
 
     const handleResendOTP = async () => {
         const clean = phoneNumber.replace(/\D/g, '');
         await apiResendOTP(clean);
     };
 
-    const handleLoginSuccess = (token: string, role: string) => {
-        console.log('login success', token, role);
-    };
+
 
     return (
         <>
@@ -141,7 +122,6 @@ export const AuthScreen: React.FC = () => {
                                         phoneNumber={phoneNumber}
                                         onChangePhone={setPhoneNumber}
                                         onSendOTP={handleSendOTP}
-                                        loading={loading}
                                         phoneFocused={phoneFocused}
                                         setPhoneFocused={setPhoneFocused}
                                         stepTransition={stepTransition}
@@ -149,7 +129,6 @@ export const AuthScreen: React.FC = () => {
                                 ) : (
                                     <OTPStep
                                         phoneNumber={phoneNumber}
-                                        onVerifySuccess={handleLoginSuccess}
                                         onResendOTP={handleResendOTP}
                                         stepTransition={stepTransition}
                                         handleBackToPhone={() => setCurrentStep('phone')}

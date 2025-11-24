@@ -1,4 +1,3 @@
-// components/Auth/OTPStep.tsx
 import React from 'react';
 
 import {
@@ -21,107 +20,89 @@ import {
 } from '@scrapdealer/tokens';
 
 import { Text } from '../../components/CustomText';
-import { useApi } from '../../hooks/useApi';
+import { useAuth } from '../../contexts/AuthContext';
 import { useCountdown } from '../../hooks/useCountDown';
+import { useVerifyOTP } from '../../hooks/useVerifyOTP';
 import { useThemeContext } from '../../theme/ThemeProvider';
 
-const useVerifyOTP = () => {
-    return useApi<
-        { token: string; role: string },
-        { phone: string; code: string }
-    >({
-        key: ['verify-otp'],
-        url: '/Authentication/OtpLogin',
-        method: 'POST',
-        onSuccess: 'ورود موفقیت‌آمیز بود',
-        onError: 'کد تأیید اشتباه است',
-        enabled: false,
-    });
-};
-
 interface OTPStepProps {
-    phoneNumber: string;
-    onVerifySuccess: (token: string, role: string) => void;
-    onResendOTP?: () => Promise<void>;
-    error?: string;
-    stepTransition: Animated.Value;
-    handleBackToPhone: () => void;
+    phoneNumber: string
+    onResendOTP?: () => Promise<void>
+    error?: string
+    stepTransition: Animated.Value
+    handleBackToPhone: () => void
 }
 
 export const OTPStep: React.FC<OTPStepProps> = ({
     phoneNumber,
-    onVerifySuccess,
     onResendOTP,
     error: externalError,
     stepTransition,
     handleBackToPhone,
 }) => {
-    const { theme } = useThemeContext();
-    const { myColors, colors } = theme;
-
-    const [otpCode, setOTPCode] = React.useState('');
-    const inputRefs = React.useRef<(RNTextInput | null)[]>([]);
-
-    const { countdown, restart } = useCountdown(120);
-    const { mutate: verifyOtp, isPending: verifying } = useVerifyOTP();
+    const { theme } = useThemeContext()
+    const { myColors, colors } = theme
+    const { signIn } = useAuth()
+    const [otpCode, setOTPCode] = React.useState('')
+    const inputRefs = React.useRef<(RNTextInput | null)[]>([])
+    const { countdown, restart } = useCountdown(120)
+    const { mutate: verifyOtp, isPending: verifying } = useVerifyOTP()
 
     React.useEffect(() => {
         if (otpCode.length === 6 && !verifying) {
-            handleVerify();
+            handleVerify()
         }
-    }, [otpCode, verifying]);
+    }, [otpCode, verifying])
 
     const handleVerify = () => {
-        const cleanPhone = phoneNumber.replace(/\D/g, '');
-        const finalPhone = cleanPhone.startsWith('0') ? cleanPhone : `0${cleanPhone}`;
+        const cleanPhone = phoneNumber.replace(/\D/g, '')
+        const finalPhone = cleanPhone.startsWith('0') ? cleanPhone : `0${cleanPhone}`
 
         verifyOtp(
             { phone: finalPhone, code: 'Scr@pDea1eR!!73138' },
             {
-                onSuccess: (data) => {
-                    onVerifySuccess(data.token, data.role);
+                onSuccess: async (res) => {
+                    await signIn(res.token, res.refreshToken)
                 },
             }
-        );
-    };
+        )
+    }
 
     const handleChange = (text: string, index: number) => {
-        if (!/^\d*$/.test(text)) return;
-
-        const newCode = otpCode.split('');
+        if (!/^\d*$/.test(text)) return
+        const newCode = otpCode.split('')
         if (text) {
-            newCode[index] = text;
+            newCode[index] = text
         } else {
-            newCode[index] = '';
+            newCode[index] = ''
         }
-        const joined = newCode.join('').slice(0, 6);
-        setOTPCode(joined);
-
+        const joined = newCode.join('').slice(0, 6)
+        setOTPCode(joined)
         if (text && index < 5) {
-            inputRefs.current[index + 1]?.focus();
+            inputRefs.current[index + 1]?.focus()
         }
-    };
+    }
 
     const handleKeyPress = ({ nativeEvent }: any, index: number) => {
         if (nativeEvent.key === 'Backspace' && !otpCode[index] && index > 0) {
-            inputRefs.current[index - 1]?.focus();
+            inputRefs.current[index - 1]?.focus()
         }
-    };
+    }
 
     const handleResend = async () => {
         if (onResendOTP) {
-            await onResendOTP();
-            restart();
-            setOTPCode('');
-            inputRefs.current[0]?.focus();
+            await onResendOTP()
+            restart()
+            setOTPCode('')
+            inputRefs.current[0]?.focus()
         }
-    };
+    }
 
     const formatTime = (sec: number) => {
-        const m = Math.floor(sec / 60);
-        const s = (sec % 60).toString().padStart(2, '0');
-        return `${m}:${s}`;
-    };
+        const m = Math.floor(sec / 60)
+        const s = (sec % 60).toString().padStart(2, '0')
+        return `${m}:${s}`
+    }
 
     return (
         <Animated.View
@@ -143,9 +124,7 @@ export const OTPStep: React.FC<OTPStepProps> = ({
                 },
             ]}
         >
-            <Text style={[styles.title, { color: myColors.textPrimary }]}>
-                کد تأیید را وارد کنید
-            </Text>
+            <Text style={[styles.title, { color: myColors.textPrimary }]}>کد تأیید را وارد کنید</Text>
             <Text style={[styles.subtitle, { color: myColors.textSecondary }]}>
                 کد ۶ رقمی ارسال‌شده به {phoneNumber} را وارد کنید
             </Text>
@@ -189,9 +168,7 @@ export const OTPStep: React.FC<OTPStepProps> = ({
                     </Text>
                 ) : (
                     <TouchableOpacity onPress={handleResend} disabled={verifying}>
-                        <Text style={[styles.resendLink, { color: colors.primary }]}>
-                            ارسال مجدد کد تأیید
-                        </Text>
+                        <Text style={[styles.resendLink, { color: colors.primary }]}>ارسال مجدد کد تأیید</Text>
                     </TouchableOpacity>
                 )}
             </View>
@@ -212,8 +189,8 @@ export const OTPStep: React.FC<OTPStepProps> = ({
                 تأیید و ورود
             </Button>
         </Animated.View>
-    );
-};
+    )
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -304,4 +281,4 @@ const styles = StyleSheet.create({
     buttonContent: {
         paddingVertical: 12,
     },
-});
+})

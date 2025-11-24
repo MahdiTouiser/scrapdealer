@@ -7,12 +7,14 @@ import * as Font from 'expo-font';
 import { PaperProvider } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 
+import { NavigationContainer } from '@react-navigation/native';
 import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
 
-import { AuthScreen } from './screens/Auth/AuthScreen';
+import { AuthProvider } from './contexts/AuthContext';
+import { RootNavigator } from './navigation/RootNavigator';
 import { ThemeProvider } from './theme/ThemeProvider';
 
 const queryClient = new QueryClient({
@@ -20,35 +22,37 @@ const queryClient = new QueryClient({
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000,
+      staleTime: 5 * 60 * 1000
     },
     mutations: {
-      retry: 1,
-    },
-  },
-});
+      retry: 1
+    }
+  }
+})
 
 export default function App() {
-  const [fontLoaded, setFontLoaded] = useState(false);
+  const [fontLoaded, setFontLoaded] = useState(false)
 
   useEffect(() => {
     Font.loadAsync({
-      Vazirmatn: require('./public/fonts/Vazirmatn-Regular.ttf'),
-    }).then(() => setFontLoaded(true));
-  }, []);
+      Vazirmatn: require('./public/fonts/Vazirmatn-Regular.ttf')
+    }).then(() => setFontLoaded(true))
+  }, [])
 
-  if (!fontLoaded) {
-    return null;
-  }
+  if (!fontLoaded) return null
 
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <PaperProvider>
-          <AuthScreen />
-          <Toast />
+          <AuthProvider>
+            <NavigationContainer>
+              <RootNavigator />
+            </NavigationContainer>
+            <Toast />
+          </AuthProvider>
         </PaperProvider>
       </ThemeProvider>
     </QueryClientProvider>
-  );
+  )
 }
