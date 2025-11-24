@@ -6,7 +6,7 @@ export const metadata = {
   title: 'ضایعات چی',
   description: 'ScrapDealer admin platform',
   icons: {
-    icon: '/icon/logo.png',
+    icon: '/icons/logo.png',
   },
 };
 
