@@ -153,6 +153,9 @@ importers:
       expo:
         specifier: ~53.0.24
         version: 53.0.24(@babel/core@7.28.4)(react-native@0.79.6(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.1.0))(react@19.1.0)
+      expo-font:
+        specifier: ~13.3.2
+        version: 13.3.2(expo@53.0.24(@babel/core@7.28.4)(react-native@0.79.6(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.1.0))(react@19.1.0))(react@19.1.0)
       expo-linear-gradient:
         specifier: ^14.1.5
         version: 14.1.5(expo@53.0.24(@babel/core@7.28.4)(react-native@0.79.6(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.1.0))(react@19.1.0))(react-native@0.79.6(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.1.0))(react@19.1.0)
