@@ -1,19 +1,20 @@
 'use client';
 
 import React, {
-    useCallback,
-    useEffect,
-    useState,
+  useCallback,
+  useEffect,
+  useState,
 } from 'react';
 
 import type { ColDef } from 'ag-grid-community';
 
 import DataGrid from '@/components/DataGrid';
 import {
-    Box,
-    Switch,
+  Box,
+  Switch,
 } from '@mui/material';
 
+import ActionsCell from '../common/ActionCell';
 import Loading from '../common/Loading';
 
 export interface Seller {
@@ -57,7 +58,6 @@ const SellersTable: React.FC<{
     }, []);
 
     const [columnDefs] = useState<ColDef<Seller>[]>([
-        { field: 'id', headerName: 'شناسه', maxWidth: 100 },
         { field: 'firstName', headerName: 'نام', flex: 1 },
         { field: 'lastName', headerName: 'نام خانوادگی', flex: 1 },
         { field: 'shopName', headerName: 'نام مغازه', flex: 1 },
@@ -90,22 +90,8 @@ const SellersTable: React.FC<{
         },
         {
             headerName: 'عملیات',
-            cellRenderer: params => (
-                <Box display="flex" gap={1}>
-                    <button
-                        onClick={() => onEdit?.(params.data.id)}
-                        className="text-blue-500"
-                    >
-                        ویرایش
-                    </button>
-                    <button
-                        onClick={() => onDelete?.(params.data.id)}
-                        className="text-red-500"
-                    >
-                        حذف
-                    </button>
-                </Box>
-            ),
+            cellRenderer: ActionsCell,
+            cellRendererParams: { onEdit, onDelete },
             maxWidth: 150,
         },
     ]);
