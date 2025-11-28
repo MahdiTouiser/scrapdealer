@@ -1,13 +1,13 @@
 'use client';
 
 import type {
-    ColDef,
-    GridOptions,
-    IDetailCellRendererParams,
+  ColDef,
+  GridOptions,
+  IDetailCellRendererParams,
 } from 'ag-grid-community';
 import {
-    AllCommunityModule,
-    ModuleRegistry,
+  AllCommunityModule,
+  ModuleRegistry,
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 
@@ -65,6 +65,10 @@ function DataGrid<T>({
         isFullWidthRow,
         fullWidthCellRenderer,
         getRowStyle,
+
+        localeText: {
+            noRowsToShow: 'داده‌ای برای نمایش وجود ندارد',
+        },
     };
 
     const containerStyle = {

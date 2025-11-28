@@ -144,11 +144,26 @@ export function useApi<TData = unknown, TVariables = void>({
         }
         : async () => undefined as unknown as TData
 
+    const fetchManually = method === 'GET' && !enabled
+        ? async (vars?: TVariables) => {
+            try {
+                const endpoint = typeof url === 'function' ? url(vars) : url
+                const data = await fetchApi<TData>(endpoint)
+                if (onSuccess) toast.success(onSuccess)
+                return data
+            } catch (err: any) {
+                toast.error(err.message || onError)
+                throw err
+            }
+        }
+        : undefined
+
     return {
         data: method === 'GET' ? query.data : undefined,
         refetch: method === 'GET' ? query.refetch : undefined,
         mutate,
         mutateAsync,
+        fetchManually,
         loading: method === 'GET' && enabled ? query.isLoading : mutation.isPending,
         error: method === 'GET' && enabled ? query.error : mutation.error,
     }

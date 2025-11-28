@@ -48,6 +48,9 @@ const fa = {
   adminRequests: 'درخواست ها',
   financialManagement: 'مدیریت مالی',
   invoices: 'فاکتور ها',
+  news: 'اخبار',
+  addNews: 'افزودن خبر',
+  editNews: 'ویرایش خبر',
 };
 
 export default fa;
