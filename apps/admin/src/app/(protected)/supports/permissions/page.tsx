@@ -1,34 +1,35 @@
 "use client";
 
 import {
-    useMemo,
-    useState,
+  useMemo,
+  useState,
 } from 'react';
 
 import PageTitle from '@/components/common/PageTitle';
-import PermissionsTreeGrid from '@/components/supports/permissions/PermissionsTreeGrid';
+import PermissionsTreeGrid
+  from '@/components/supports/permissions/PermissionsTreeGrid';
 import { useApi } from '@/hooks/useApi'; // make sure this path is correct
 import fa from '@/i18n/fa';
 import {
-    AdminPanelSettingsOutlined,
-    CheckCircleOutline,
-    PersonOutline,
-    RefreshOutlined,
-    SaveOutlined,
+  AdminPanelSettingsOutlined,
+  CheckCircleOutline,
+  PersonOutline,
+  RefreshOutlined,
+  SaveOutlined,
 } from '@mui/icons-material';
 import {
-    alpha,
-    Avatar,
-    Box,
-    Button,
-    Chip,
-    Divider,
-    Grid,
-    IconButton,
-    Paper,
-    Tooltip,
-    Typography,
-    useTheme,
+  alpha,
+  Avatar,
+  Box,
+  Button,
+  Chip,
+  Divider,
+  Grid,
+  IconButton,
+  Paper,
+  Tooltip,
+  Typography,
+  useTheme,
 } from '@mui/material';
 
 interface Support {
@@ -52,20 +53,18 @@ const Permissions = () => {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [hasChanges, setHasChanges] = useState(false);
 
-    // Fetch supports from API
     const { data: supportsData, loading } = useApi<{ data: Support[]; totalCount: number }>({
         key: ['get-supports'],
         url: '/Supports',
     });
-
     // Map API response to User type
     const users: User[] = useMemo(() => {
         if (!supportsData?.data) return [];
         return supportsData.data.map((support) => ({
             id: support.id,
             name: `${support.firstName} ${support.lastName}`,
-            email: `${support.username}@example.com`, // adapt if your API provides email
-            status: 'active', // default to active; modify if your API gives status
+            email: `${support.username}@example.com`, 
+            status: 'active', 
         }));
     }, [supportsData]);
 
