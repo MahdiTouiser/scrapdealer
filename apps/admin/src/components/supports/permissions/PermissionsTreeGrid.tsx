@@ -1,9 +1,9 @@
 "use client";
-
 import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 
@@ -18,10 +18,7 @@ import {
 
 import DataGrid from '@/components/DataGrid';
 import { useApi } from '@/hooks/useApi';
-import {
-  generatePermissionTreeData,
-  PermissionNode,
-} from '@/utils/permissionsTreeData';
+import fa from '@/i18n/fa';
 import {
   ChevronLeft,
   DescriptionOutlined,
@@ -40,52 +37,110 @@ import {
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-interface ExpandedPermissionNode extends PermissionNode {
-    expanded?: boolean;
+interface ExpandedPermissionNode {
+    id: string;
+    name: string;
+    parent?: string;
     level?: number;
+    expanded?: boolean;
     accessible: boolean;
+    isSection?: boolean;
 }
 
 interface PermissionsTreeGridProps {
     userId?: string;
-    onPermissionsChange?: () => void;
+    onPermissionsChange?: (permissions: string[]) => void;
 }
+
+const translatePermissionPart = (part: string, index: number) => {
+    if (index === 1) {
+        switch (part) {
+            case 'SaleOrders': return fa.mainPage;
+            case 'News': return fa.news;
+            case 'Buyers': return fa.buyers;
+            case 'Sellers': return fa.sellers;
+            case 'Categories': return fa.categories;
+            case 'SubCategories': return fa.categories;
+            case 'Users': return 'کاربران';
+            default: return part;
+        }
+    } else if (index === 2) {
+        switch (part) {
+            case 'ToggleActivation': return 'فعال/غیرفعال';
+            case 'Verification': return fa.verificationBuyers;
+            case 'ViewAll': return 'مشاهده همه';
+            case 'Review': return 'بررسی';
+            case 'Create': return fa.addNews;
+            case 'Update': return fa.editNews;
+            case 'Delete': return 'حذف';
+            case 'State': return 'وضعیت';
+            case 'Verify': return 'تایید';
+            default: return part;
+        }
+    }
+    return part;
+};
 
 const PermissionsTreeGrid: React.FC<PermissionsTreeGridProps> = ({ userId, onPermissionsChange }) => {
     const theme = useTheme();
-
     const { data: permissionsData, loading: loadingPermissions } = useApi<{ data: string[] }>({
         key: ['get-permissions', userId],
         url: userId ? `/Permissions?pageIndex=0&pageSize=100&userId=${userId}` : null,
     });
 
-    const [allData, setAllData] = useState<ExpandedPermissionNode[]>(() =>
-        generatePermissionTreeData(false).map(node => ({
-            ...node,
-            expanded: true,
-            level: node.parent ? 1 : 0,
-            accessible: false,
-        }))
-    );
+    const [allData, setAllData] = useState<ExpandedPermissionNode[]>([]);
+    const isInitialLoad = useRef(true);
+
+    const buildTreeFromApi = useCallback((permissions: string[]): ExpandedPermissionNode[] => {
+        const nodes: ExpandedPermissionNode[] = [];
+        permissions.forEach(permission => {
+            const parts = permission.split('.');
+            parts.forEach((part, index) => {
+                const id = parts.slice(0, index + 1).join('.');
+                if (!nodes.find(n => n.id === id)) {
+                    nodes.push({
+                        id,
+                        name: translatePermissionPart(part, index),
+                        parent: index === 0 ? undefined : parts.slice(0, index).join('.'),
+                        expanded: true,
+                        level: index,
+                        accessible: index === parts.length - 1,
+                        isSection: index !== parts.length - 1,
+                    });
+                }
+            });
+        });
+        return nodes;
+    }, []);
 
     useEffect(() => {
-        if (!userId) return;
-        setAllData(
-            generatePermissionTreeData(false).map(node => ({
-                ...node,
-                expanded: true,
-                level: node.parent ? 1 : 0,
-                accessible: false,
-            }))
-        );
-    }, [userId, permissionsData]);
+        if (!permissionsData) return;
+        setAllData(buildTreeFromApi(permissionsData.data));
+        isInitialLoad.current = true;
+    }, [permissionsData, buildTreeFromApi]);
 
+    // Extract and notify parent of selected permissions whenever allData changes
+    // Skip on initial load to prevent triggering hasChanges
+    useEffect(() => {
+        if (!allData.length) return;
 
+        // Skip the notification on initial load
+        if (isInitialLoad.current) {
+            isInitialLoad.current = false;
+            return;
+        }
+
+        // Get only leaf nodes (actual permissions, not sections) that are accessible
+        const selectedPermissions = allData
+            .filter(node => !node.isSection && node.accessible)
+            .map(node => node.id);
+
+        onPermissionsChange?.(selectedPermissions);
+    }, [allData, onPermissionsChange]);
 
     const visibleRows = useMemo(() => {
         const visible: ExpandedPermissionNode[] = [];
         const rootNodes = allData.filter(n => !n.parent);
-
         const addVisibleNodes = (parentId: string | undefined, level: number) => {
             const children = allData.filter(n => n.parent === parentId);
             children.forEach(child => {
@@ -94,20 +149,16 @@ const PermissionsTreeGrid: React.FC<PermissionsTreeGridProps> = ({ userId, onPer
                 if (child.expanded && child.isSection) addVisibleNodes(child.id, level + 1);
             });
         };
-
         rootNodes.forEach(root => {
             root.level = 0;
             visible.push(root);
             if (root.expanded && root.isSection) addVisibleNodes(root.id, 1);
         });
-
         return visible;
     }, [allData]);
 
     const toggleExpansion = useCallback((nodeId: string) => {
-        setAllData(prev => prev.map(node =>
-            node.id === nodeId ? { ...node, expanded: !node.expanded } : node
-        ));
+        setAllData(prev => prev.map(node => node.id === nodeId ? { ...node, expanded: !node.expanded } : node));
     }, []);
 
     const toggleNode = useCallback((nodeId: string, value: boolean) => {
@@ -119,6 +170,7 @@ const PermissionsTreeGrid: React.FC<PermissionsTreeGridProps> = ({ userId, onPer
             node.accessible = value;
 
             if (node.isSection) {
+                // Update all children recursively
                 const updateChildren = (id: string, val: boolean) => {
                     const children = next.filter(n => n.parent === id);
                     children.forEach(c => {
@@ -128,30 +180,25 @@ const PermissionsTreeGrid: React.FC<PermissionsTreeGridProps> = ({ userId, onPer
                 };
                 updateChildren(nodeId, value);
             } else {
+                // Update parent status based on children
                 const parent = next.find(n => n.id === node.parent);
                 if (parent) {
-                    const siblings = next.filter(n => n.parent === parent.id);
+                    const siblings = next.filter(n => n.parent === parent.id && !n.isSection);
                     parent.accessible = siblings.every(s => s.accessible);
                 }
             }
 
             return next;
         });
-
-        onPermissionsChange?.();
-    }, [onPermissionsChange]);
+    }, []);
 
     const NameCellRenderer = useCallback((params: ICellRendererParams<ExpandedPermissionNode>) => {
         const node = params.data;
         if (!node) return null;
-
-        const hasChildren = node.isSection;
-        const level = node.level || 0;
-        const indent = level * 32;
-
+        const indent = (node.level || 0) * 32;
         return (
             <div style={{ display: 'flex', alignItems: 'center', paddingRight: `${indent}px`, gap: 8 }}>
-                {hasChildren ? (
+                {node.isSection ? (
                     <span
                         onClick={() => toggleExpansion(node.id)}
                         style={{
@@ -169,20 +216,14 @@ const PermissionsTreeGrid: React.FC<PermissionsTreeGridProps> = ({ userId, onPer
                         {node.expanded ? <ExpandMore sx={{ fontSize: 20, color: theme.palette.primary.main }} /> : <ChevronLeft sx={{ fontSize: 20, color: theme.palette.text.secondary }} />}
                     </span>
                 ) : <span style={{ width: 28 }} />}
-
                 <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    {hasChildren ? (
-                        <FolderOutlined sx={{ fontSize: 20, color: node.accessible ? theme.palette.primary.main : theme.palette.text.disabled }} />
-                    ) : (
-                        <DescriptionOutlined sx={{ fontSize: 18, color: node.accessible ? theme.palette.success.main : theme.palette.text.disabled }} />
-                    )}
+                    {node.isSection ? <FolderOutlined sx={{ fontSize: 20, color: node.accessible ? theme.palette.primary.main : theme.palette.text.disabled }} /> :
+                        <DescriptionOutlined sx={{ fontSize: 18, color: node.accessible ? theme.palette.success.main : theme.palette.text.disabled }} />}
                     <span style={{
-                        fontWeight: hasChildren ? 600 : 400,
-                        fontSize: hasChildren ? 14 : 13,
+                        fontWeight: node.isSection ? 600 : 400,
+                        fontSize: node.isSection ? 14 : 13,
                         color: node.accessible ? theme.palette.text.primary : theme.palette.text.disabled,
-                    }}>
-                        {node.name}
-                    </span>
+                    }}>{node.name}</span>
                 </span>
             </div>
         );
@@ -194,7 +235,7 @@ const PermissionsTreeGrid: React.FC<PermissionsTreeGridProps> = ({ userId, onPer
         return (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                 <Switch
-                    checked={Boolean(params.value)}
+                    checked={Boolean(node.accessible)}
                     onChange={(e) => toggleNode(node.id, e.target.checked)}
                     color="primary"
                     inputProps={{ "aria-label": `${node.name} دسترسی` }}
@@ -202,10 +243,7 @@ const PermissionsTreeGrid: React.FC<PermissionsTreeGridProps> = ({ userId, onPer
                         '& .MuiSwitch-switchBase': {
                             '&.Mui-checked': {
                                 color: theme.palette.success.main,
-                                '& + .MuiSwitch-track': {
-                                    backgroundColor: theme.palette.success.main,
-                                    opacity: 0.5,
-                                },
+                                '& + .MuiSwitch-track': { backgroundColor: theme.palette.success.main, opacity: 0.5 },
                             },
                         },
                         '& .MuiSwitch-track': { borderRadius: 12 },
@@ -216,21 +254,8 @@ const PermissionsTreeGrid: React.FC<PermissionsTreeGridProps> = ({ userId, onPer
     }, [toggleNode, theme]);
 
     const columnDefs = useMemo<ColDef<ExpandedPermissionNode>[]>(() => [
-        {
-            field: "name",
-            headerName: "بخش / صفحه",
-            cellRenderer: NameCellRenderer,
-            flex: 1,
-            minWidth: 240,
-            cellStyle: { display: 'flex', alignItems: 'center' },
-        },
-        {
-            field: "accessible",
-            headerName: "وضعیت دسترسی",
-            width: 160,
-            cellRenderer: SwitchCellRenderer,
-            cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
-        },
+        { field: "name", headerName: "بخش / صفحه", cellRenderer: NameCellRenderer, flex: 1, minWidth: 240, cellStyle: { display: 'flex', alignItems: 'center' } },
+        { field: "accessible", headerName: "وضعیت دسترسی", width: 160, cellRenderer: SwitchCellRenderer, cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'center' } },
     ], [NameCellRenderer, SwitchCellRenderer]);
 
     return (
@@ -243,20 +268,17 @@ const PermissionsTreeGrid: React.FC<PermissionsTreeGridProps> = ({ userId, onPer
                     </Typography>
                 </Paper>
             ) : (
-                <>
-                    <Paper elevation={0} sx={{ borderRadius: 3, overflow: 'hidden', border: `1px solid ${theme.palette.divider}`, boxShadow: `0 4px 20px ${alpha(theme.palette.common.black, 0.05)}` }}>
-                        <DataGrid<ExpandedPermissionNode>
-                            rowData={visibleRows}
-                            columnDefs={columnDefs}
-                            rtl
-                            width="100%"
-                        />
-                    </Paper>
-                </>
+                <Paper elevation={0} sx={{ borderRadius: 3, overflow: 'hidden', border: `1px solid ${theme.palette.divider}`, boxShadow: `0 4px 20px ${alpha(theme.palette.common.black, 0.05)}` }}>
+                    <DataGrid<ExpandedPermissionNode>
+                        rowData={visibleRows}
+                        columnDefs={columnDefs}
+                        rtl
+                        width="100%"
+                    />
+                </Paper>
             )}
         </Box>
     );
-
 };
 
 export default PermissionsTreeGrid;
