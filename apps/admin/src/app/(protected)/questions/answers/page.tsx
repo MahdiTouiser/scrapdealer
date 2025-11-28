@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import CustomFormModal, {
-    FormField,
+  FormField,
 } from '@/components/common/CustomFormModal';
 import PageTitle from '@/components/common/PageTitle';
 import DataGrid from '@/components/DataGrid';

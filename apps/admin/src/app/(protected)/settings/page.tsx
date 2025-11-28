@@ -3,7 +3,6 @@
 import React from 'react';
 
 import PageTitle from '@/components/common/PageTitle';
-import ScrapPriceManager from '@/components/dashboard/ScrapPriceManager';
 import NotificationToggle from '@/components/settings/NotificationToggle';
 import fa from '@/i18n/fa';
 import {
@@ -18,13 +17,6 @@ const SettingsPage: React.FC = () => {
 
             <PageTitle title={fa.settings}
             />
-            <Paper sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                    💰 مدیریت قیمت ضایعات
-                </Typography>
-                <ScrapPriceManager />
-            </Paper>
-
 
             <Paper sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
                 <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>

@@ -1,17 +1,17 @@
 import fa from '@/i18n/fa';
 import {
-    AdminPanelSettings,
-    Dashboard,
-    Description,
-    History,
-    Home,
-    LocationOn,
-    ReceiptLong,
-    Settings,
-    ShoppingCart,
-    Store,
-    SupportAgent,
-    VerifiedUser,
+  AdminPanelSettings,
+  Dashboard,
+  Description,
+  History,
+  Home,
+  LocationOn,
+  ReceiptLong,
+  Settings,
+  ShoppingCart,
+  Store,
+  SupportAgent,
+  VerifiedUser,
 } from '@mui/icons-material';
 
 import { MenuSection } from '../types';
@@ -77,6 +77,14 @@ export const MENU_SECTIONS: MenuSection[] = [
             { text: 'پاسخ‌های ثبت شده', icon: <History />, path: '/questions/answers' },
         ],
     },
+    {
+        section: 'اخبار',
+        collapsible: true,
+        items: [
+            { text: 'لیست اخبار', icon: <Description />, path: '/news' },
+        ],
+    },
+
     {
         section: fa.settings,
         collapsible: true,

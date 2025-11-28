@@ -4,13 +4,16 @@ import { useState } from 'react';
 import AddButton from '@/components/common/AddButton';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import CustomFormModal, {
-    FormField,
+  FormField,
 } from '@/components/common/CustomFormModal';
 import PageTitle from '@/components/common/PageTitle';
 import SupportsTable, { Support } from '@/components/supports/SupportsTable';
 import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
-import { Box } from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+} from '@mui/material';
 
 const Supports = () => {
     const [open, setOpen] = useState(false);
@@ -18,6 +21,7 @@ const Supports = () => {
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [editMode, setEditMode] = useState(false);
     const [editingSupport, setEditingSupport] = useState<Support | null>(null);
+    const [fetchingEdit, setFetchingEdit] = useState(false);
 
     const {
         data: supports,
@@ -71,7 +75,7 @@ const Supports = () => {
         onSuccess: 'پشتیبان با موفقیت حذف شد',
     });
 
-    const { mutateAsync: fetchSupportById, loading: fetching } = useApi<Support, string>({
+    const { fetchManually: fetchSupportById } = useApi<Support, string>({
         key: ['get-support-by-id'],
         url: (id) => `/Supports/${id}`,
         method: 'GET',
@@ -81,17 +85,22 @@ const Supports = () => {
     const formFields: FormField[] = [
         { name: 'firstName', label: 'نام', fieldType: 'text', required: true },
         { name: 'lastName', label: 'نام خانوادگی', fieldType: 'text', required: true },
-        { name: 'phoneNumber', label: 'شماره تماس', fieldType: 'text', required: true },
+        { name: 'phoneNumber', label: 'شماره تماس', fieldType: 'phone', required: true },
         { name: 'username', label: 'نام کاربری', fieldType: 'text', required: true },
         { name: 'password', label: 'رمز عبور', fieldType: 'password', required: !editMode },
     ];
 
-    const handleOpen = () => setOpen(true);
+    const handleOpenAdd = () => {
+        setEditMode(false);
+        setEditingSupport(null);
+        setOpen(true);
+    };
 
     const handleClose = () => {
         setOpen(false);
         setEditMode(false);
         setEditingSupport(null);
+        setFetchingEdit(false);
     };
 
     const handleAddSupporter = async (data: Record<string, any>) => {
@@ -112,13 +121,16 @@ const Supports = () => {
     };
 
     const handleEdit = async (id: string) => {
+        setEditMode(true);
+        setFetchingEdit(true);
+        setOpen(true);
         try {
-            setEditMode(true);
             const support = await fetchSupportById(id);
             setEditingSupport(support);
-            handleOpen();
         } catch (err) {
             console.error('Failed to fetch support:', err);
+        } finally {
+            setFetchingEdit(false);
         }
     };
 
@@ -140,23 +152,21 @@ const Supports = () => {
     };
 
     const getDefaultValues = () => {
-        if (editMode && editingSupport) {
-            return {
-                firstName: editingSupport.firstName || '',
-                lastName: editingSupport.lastName || '',
-                phoneNumber: editingSupport.phoneNumber || '',
-                username: editingSupport.username || '',
-                password: '',
-            };
-        }
-        return {};
+        if (!editMode || !editingSupport) return {};
+        return {
+            firstName: editingSupport.firstName || '',
+            lastName: editingSupport.lastName || '',
+            phoneNumber: editingSupport.phoneNumber || '',
+            username: editingSupport.username || '',
+            password: '',
+        };
     };
 
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
             <PageTitle title={fa.supports} />
             <Box display="flex" justifyContent="flex-start" mb={2}>
-                <AddButton label="افزودن پشتیبان جدید" onClick={handleOpen} />
+                <AddButton label="افزودن پشتیبان جدید" onClick={handleOpenAdd} />
             </Box>
 
             <SupportsTable
@@ -176,7 +186,7 @@ const Supports = () => {
                         const body = {
                             id: editingSupport.id,
                             Username: data['username'],
-                            Password: data['password'],
+                            Password: data['password'] || undefined,
                             FirstName: data['firstName'],
                             LastName: data['lastName'],
                             PhoneNumber: data['phoneNumber'],
@@ -191,13 +201,18 @@ const Supports = () => {
                     } else {
                         await handleAddSupporter(data);
                     }
-
                 }}
                 fields={formFields}
                 submitLabel={editMode ? 'ویرایش' : 'افزودن'}
                 cancelLabel="لغو"
-                submitLoading={adding || updating || fetching}
-            />
+                submitLoading={adding || updating}
+            >
+                {fetchingEdit && (
+                    <Box display="flex" justifyContent="center" alignItems="center" p={3}>
+                        <CircularProgress />
+                    </Box>
+                )}
+            </CustomFormModal>
 
             <ConfirmationModal
                 open={confirmOpen}

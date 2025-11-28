@@ -7,7 +7,6 @@ import AddCircleOutlineRoundedIcon
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import SaveAltRoundedIcon from '@mui/icons-material/SaveAltRounded';
 import {
-  Box,
   Button,
   Grid,
   IconButton,
@@ -29,7 +28,7 @@ interface Scrap {
     name: string;
     priceMin: number;
     priceMax: number;
-    image?: string; // URL or base64 string
+    image?: string;
 }
 
 const ScrapPriceManager: React.FC = () => {
@@ -102,15 +101,6 @@ const ScrapPriceManager: React.FC = () => {
                 transition: 'all 0.3s ease',
             }}
         >
-            <Box sx={{ mb: 3 }}>
-                <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-                    مدیریت قیمت ضایعات
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    در این بخش می‌توانید نوع ضایعات، محدوده قیمت و تصویر هر کدام را مدیریت کنید.
-                </Typography>
-            </Box>
-
             <Grid container spacing={2} alignItems="center" sx={{ mb: 3 }}>
                 <Grid size={3}>
                     <TextField
@@ -169,7 +159,6 @@ const ScrapPriceManager: React.FC = () => {
                 </Grid>
             </Grid>
 
-            {/* Table */}
             <TableContainer
                 component={Paper}
                 sx={{
@@ -191,7 +180,7 @@ const ScrapPriceManager: React.FC = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {scraps.map(scrap => (
+                        {scraps.map((scrap, index) => (
                             <TableRow
                                 key={scrap.id}
                                 hover
@@ -203,9 +192,8 @@ const ScrapPriceManager: React.FC = () => {
                                     },
                                 }}
                             >
-                                <TableCell>
-                                    {scrap.image ? <img src={scrap.image} alt={scrap.name} style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }} /> : '–'}
-                                </TableCell>
+                                <TableCell>{index + 1}</TableCell>
+
                                 <TableCell>{scrap.name}</TableCell>
                                 <TableCell>
                                     <Stack direction="row" spacing={1} alignItems="center">

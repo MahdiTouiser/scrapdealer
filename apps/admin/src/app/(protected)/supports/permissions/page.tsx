@@ -1,34 +1,32 @@
 "use client";
 
 import {
-    useMemo,
-    useState,
+  useCallback,
+  useMemo,
+  useState,
 } from 'react';
 
 import PageTitle from '@/components/common/PageTitle';
-import PermissionsTreeGrid from '@/components/supports/permissions/PermissionsTreeGrid';
-import { useApi } from '@/hooks/useApi'; // make sure this path is correct
+import PermissionsTreeGrid
+  from '@/components/supports/permissions/PermissionsTreeGrid';
+import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import {
-    AdminPanelSettingsOutlined,
-    CheckCircleOutline,
-    PersonOutline,
-    RefreshOutlined,
-    SaveOutlined,
+  AdminPanelSettingsOutlined,
+  CheckCircleOutline,
+  PersonOutline,
+  SaveOutlined,
 } from '@mui/icons-material';
 import {
-    alpha,
-    Avatar,
-    Box,
-    Button,
-    Chip,
-    Divider,
-    Grid,
-    IconButton,
-    Paper,
-    Tooltip,
-    Typography,
-    useTheme,
+  alpha,
+  Avatar,
+  Box,
+  Button,
+  Chip,
+  Grid,
+  Paper,
+  Typography,
+  useTheme,
 } from '@mui/material';
 
 interface Support {
@@ -43,7 +41,6 @@ interface User {
     id: string;
     name: string;
     avatar?: string;
-    email: string;
     status: 'active' | 'inactive';
 }
 
@@ -51,53 +48,56 @@ const Permissions = () => {
     const theme = useTheme();
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [hasChanges, setHasChanges] = useState(false);
+    const [currentPermissions, setCurrentPermissions] = useState<string[]>([]);
 
-    // Fetch supports from API
     const { data: supportsData, loading } = useApi<{ data: Support[]; totalCount: number }>({
         key: ['get-supports'],
         url: '/Supports',
     });
 
-    // Map API response to User type
+    const { mutate: savePermissions, loading: saving } = useApi<void, { Permissions: string[] }>({
+        key: ['save-permissions', selectedUser?.id],
+        url: `/Permissions`,
+        method: 'PUT',
+        onSuccess: 'دسترسی‌ها با موفقیت ذخیره شد',
+        onError: 'خطا در ذخیره دسترسی‌ها',
+    });
+
     const users: User[] = useMemo(() => {
         if (!supportsData?.data) return [];
         return supportsData.data.map((support) => ({
             id: support.id,
             name: `${support.firstName} ${support.lastName}`,
-            email: `${support.username}@example.com`, // adapt if your API provides email
-            status: 'active', // default to active; modify if your API gives status
+            status: 'active',
         }));
     }, [supportsData]);
 
     const handleUserSelect = (user: User) => {
         setSelectedUser(user);
         setHasChanges(false);
+        setCurrentPermissions([]);
     };
+
+    const handlePermissionsChange = useCallback((permissions: string[]) => {
+        setCurrentPermissions(permissions);
+        setHasChanges(true);
+    }, []);
 
     const handleSavePermissions = () => {
-        console.log('Saving permissions for user:', selectedUser?.id);
-        setHasChanges(false);
-    };
+        if (!selectedUser || !hasChanges) return;
 
-    const handleResetPermissions = () => {
-        console.log('Resetting permissions for user:', selectedUser?.id);
-        setHasChanges(false);
+        savePermissions(
+            { Permissions: currentPermissions },
+            {
+                onSuccess: () => {
+                    setHasChanges(false);
+                },
+            }
+        );
     };
 
     const getInitials = (name: string) =>
         name.split(' ').map((n) => n[0]).join('').substring(0, 2);
-
-    const getAvatarColor = (name: string) => {
-        const colors = [
-            theme.palette.primary.main,
-            theme.palette.secondary.main,
-            theme.palette.success.main,
-            theme.palette.info.main,
-            theme.palette.warning.main,
-        ];
-        const index = name.charCodeAt(0) % colors.length;
-        return colors[index];
-    };
 
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
@@ -186,7 +186,7 @@ const Permissions = () => {
                                                 sx={{
                                                     width: 48,
                                                     height: 48,
-                                                    bgcolor: getAvatarColor(user.name),
+                                                    bgcolor: theme.palette.primary.main,
                                                     fontWeight: 700,
                                                     fontSize: '1.1rem',
                                                     fontFamily: 'IRANSans, Vazirmatn, sans-serif',
@@ -283,12 +283,12 @@ const Permissions = () => {
                                             sx={{
                                                 width: 56,
                                                 height: 56,
-                                                bgcolor: getAvatarColor(selectedUser.name),
+                                                bgcolor: theme.palette.primary.main,
                                                 fontWeight: 700,
                                                 fontSize: '1.3rem',
                                                 fontFamily: 'IRANSans, Vazirmatn, sans-serif',
                                                 boxShadow: `0 4px 12px ${alpha(
-                                                    getAvatarColor(selectedUser.name),
+                                                    theme.palette.primary.main,
                                                     0.3
                                                 )}`,
                                             }}
@@ -307,44 +307,15 @@ const Permissions = () => {
                                             >
                                                 {selectedUser.name}
                                             </Typography>
-                                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                                                <Typography
-                                                    variant="body2"
-                                                    sx={{
-                                                        color: theme.palette.text.secondary,
-                                                        fontFamily: 'IRANSans, Vazirmatn, sans-serif',
-                                                    }}
-                                                >
-                                                    {selectedUser.email}
-                                                </Typography>
-                                                <Divider orientation="vertical" flexItem />
-                                            </Box>
                                         </Box>
                                     </Box>
 
                                     <Box sx={{ display: 'flex', gap: 1.5 }}>
-                                        <Tooltip title="بازنشانی تغییرات" arrow>
-                                            <IconButton
-                                                onClick={handleResetPermissions}
-                                                disabled={!hasChanges}
-                                                sx={{
-                                                    borderRadius: 2,
-                                                    border: `2px solid ${theme.palette.divider}`,
-                                                    backgroundColor: theme.palette.background.paper,
-                                                    '&:hover': {
-                                                        backgroundColor: alpha(theme.palette.error.main, 0.08),
-                                                        borderColor: theme.palette.error.main,
-                                                    },
-                                                }}
-                                            >
-                                                <RefreshOutlined />
-                                            </IconButton>
-                                        </Tooltip>
                                         <Button
                                             variant="contained"
                                             startIcon={<SaveOutlined />}
                                             onClick={handleSavePermissions}
-                                            disabled={!hasChanges}
+                                            disabled={!hasChanges || saving}
                                             sx={{
                                                 borderRadius: 2,
                                                 px: 3,
@@ -365,7 +336,7 @@ const Permissions = () => {
                                                 },
                                             }}
                                         >
-                                            ذخیره تغییرات
+                                            {saving ? 'در حال ذخیره...' : 'ذخیره تغییرات'}
                                         </Button>
                                     </Box>
                                 </Box>
@@ -373,7 +344,7 @@ const Permissions = () => {
 
                             <PermissionsTreeGrid
                                 userId={selectedUser.id}
-                                onPermissionsChange={() => setHasChanges(true)}
+                                onPermissionsChange={handlePermissionsChange}
                             />
                         </Box>
                     ) : (

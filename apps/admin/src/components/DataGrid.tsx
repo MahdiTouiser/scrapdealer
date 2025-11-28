@@ -1,13 +1,13 @@
 'use client';
 
 import type {
-    ColDef,
-    GridOptions,
-    IDetailCellRendererParams,
+  ColDef,
+  GridOptions,
+  IDetailCellRendererParams,
 } from 'ag-grid-community';
 import {
-    AllCommunityModule,
-    ModuleRegistry,
+  AllCommunityModule,
+  ModuleRegistry,
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 
@@ -59,13 +59,23 @@ function DataGrid<T>({
             sortable: true,
             filter: true,
             resizable: true,
+            headerStyle: {
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                textAlign: 'center',
+            },
         },
         getRowHeight: getRowHeight || (() => (masterDetail ? 50 : 55)),
         onRowClicked,
         isFullWidthRow,
         fullWidthCellRenderer,
         getRowStyle,
+        localeText: {
+            noRowsToShow: 'داده‌ای برای نمایش وجود ندارد',
+        },
     };
+
 
     const containerStyle = {
         height: 'calc(100vh - 300px)',

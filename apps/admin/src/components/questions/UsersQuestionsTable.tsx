@@ -6,8 +6,8 @@ import { ColDef } from 'ag-grid-community';
 
 import DataGrid from '@/components/DataGrid';
 import {
-    Box,
-    Chip,
+  Box,
+  Chip,
 } from '@mui/material';
 
 export interface UserQuestion {
@@ -26,7 +26,7 @@ interface Props {
     onDelete: (id: string) => void;
 }
 
-const UsersQuestionsTable: React.FC<Props> = ({ data, loading, onEdit, onDelete }) => {
+const UsersQuestionsTable: React.FC<Props> = ({ data, onEdit, onDelete }) => {
     const groupColorMap: Record<string, 'default' | 'success' | 'warning' | 'info'> = {
         buyers: 'success',
         sellers: 'warning',

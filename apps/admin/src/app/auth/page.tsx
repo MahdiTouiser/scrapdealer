@@ -12,23 +12,23 @@ import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-    AdminPanelSettings,
-    SupportAgent,
-    Visibility,
-    VisibilityOff,
+  AdminPanelSettings,
+  SupportAgent,
+  Visibility,
+  VisibilityOff,
 } from '@mui/icons-material';
 import {
-    Alert,
-    Box,
-    Button,
-    Container,
-    IconButton,
-    InputAdornment,
-    Paper,
-    TextField,
-    ToggleButton,
-    ToggleButtonGroup,
-    Typography,
+  Alert,
+  Box,
+  Button,
+  Container,
+  IconButton,
+  InputAdornment,
+  Paper,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
 } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { styled } from '@mui/material/styles';
@@ -120,7 +120,6 @@ export default function LoginPage() {
             };
 
             const response = await login(loginPayload);
-            debugger
             if (response) {
                 setAuth(response.token, response.role);
 

@@ -73,9 +73,8 @@ const totalIncome = [
 ];
 
 const pieData = [
-    { name: 'آهن', value: 45 },
+    { name: 'آهن', value: 65 },
     { name: 'مس', value: 35 },
-    { name: 'فولاد', value: 20 },
 ];
 
 const AdminDashboard = () => {
@@ -127,7 +126,7 @@ const AdminDashboard = () => {
             <Grid container spacing={2}>
                 <Grid size={3}>
                     <Item>
-                        <PieChartCard title="سهم فلزات در معاملات" data={pieData} />
+                        <PieChartCard title="سهم ضایعه در معاملات" data={pieData} />
                     </Item>
                 </Grid>
                 <Grid size={3}>
