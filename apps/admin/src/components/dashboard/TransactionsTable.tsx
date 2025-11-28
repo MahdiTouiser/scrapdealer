@@ -3,17 +3,17 @@
 import React, { useMemo } from 'react';
 
 import type {
-    ColDef,
-    ValueFormatterParams,
+  ColDef,
+  ValueFormatterParams,
 } from 'ag-grid-community';
 
 import DataGrid from '@/components/DataGrid';
 import {
-    Box,
-    Grid,
-    Paper,
-    Typography,
-    useTheme,
+  Box,
+  Grid,
+  Paper,
+  Typography,
+  useTheme,
 } from '@mui/material';
 
 interface Transaction {
@@ -102,11 +102,6 @@ const TransactionsTable: React.FC = () => {
 
     return (
         <Box sx={{ width: '100%', p: 3 }}>
-            <Box sx={{ mb: 3 }}>
-                <Typography variant="h4" fontWeight={700} mb={1}>مدیریت تراکنش‌های ضایعات</Typography>
-                <Typography color="text.secondary" variant="body2">مشاهده و مدیریت کلیه تراکنش‌های خرید و فروش ضایعات</Typography>
-            </Box>
-
             <Grid container spacing={2} mb={3}>
                 {[
                     { label: 'کل تراکنش‌ها', value: summary.totalTransactions, color: theme.palette.mode === 'dark' ? '#90caf9' : '#1976d2' },
