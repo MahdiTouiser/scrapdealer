@@ -8,7 +8,7 @@ import {
 import PageTitle from '@/components/common/PageTitle';
 import PermissionsTreeGrid
   from '@/components/supports/permissions/PermissionsTreeGrid';
-import { useApi } from '@/hooks/useApi'; // make sure this path is correct
+import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import {
   AdminPanelSettingsOutlined,
@@ -63,8 +63,8 @@ const Permissions = () => {
         return supportsData.data.map((support) => ({
             id: support.id,
             name: `${support.firstName} ${support.lastName}`,
-            email: `${support.username}@example.com`, 
-            status: 'active', 
+            email: `${support.username}@example.com`,
+            status: 'active',
         }));
     }, [supportsData]);
 
