@@ -159,7 +159,6 @@ const ScrapPriceManager: React.FC = () => {
                 </Grid>
             </Grid>
 
-            {/* Table */}
             <TableContainer
                 component={Paper}
                 sx={{
@@ -181,7 +180,7 @@ const ScrapPriceManager: React.FC = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {scraps.map(scrap => (
+                        {scraps.map((scrap, index) => (
                             <TableRow
                                 key={scrap.id}
                                 hover
@@ -193,9 +192,8 @@ const ScrapPriceManager: React.FC = () => {
                                     },
                                 }}
                             >
-                                <TableCell>
-                                    {scrap.image ? <img src={scrap.image} alt={scrap.name} style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }} /> : '–'}
-                                </TableCell>
+                                <TableCell>{index + 1}</TableCell>
+
                                 <TableCell>{scrap.name}</TableCell>
                                 <TableCell>
                                     <Stack direction="row" spacing={1} alignItems="center">

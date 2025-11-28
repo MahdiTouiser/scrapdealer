@@ -17,7 +17,7 @@ import {
 interface PieData {
     name: string;
     value: number;
-    [key: string]: any; // This fixes the error
+    [key: string]: any;
 }
 
 interface PieChartCardProps {
@@ -38,7 +38,7 @@ const PieChartCard: React.FC<PieChartCardProps> = ({
                 borderRadius: 3,
                 boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
                 bgcolor: 'background.paper',
-                direction: 'rtl', // Persian support
+                direction: 'rtl',
             }}
         >
             <Typography
