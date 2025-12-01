@@ -5,7 +5,6 @@ import {
   Description,
   History,
   Home,
-  LocationOn,
   ReceiptLong,
   Settings,
   ShoppingCart,
@@ -21,75 +20,71 @@ export const MENU_SECTIONS: MenuSection[] = [
         section: fa.main,
         collapsible: true,
         items: [
-            { text: fa.mainPage, icon: <Home />, path: '/dashboard/main' },
-            { text: fa.adminDashboard, icon: <Dashboard />, path: '/dashboard/admin-dashboard' },
+            { text: fa.mainPage, icon: <Home />, path: '/dashboard/main', key: 'Permissions.Menu.Dashboard' },
+            { text: fa.adminDashboard, icon: <Dashboard />, path: '/dashboard/admin-dashboard', key: 'Permissions.Menu.Dashboard' },
         ],
     },
     {
         section: fa.sellersManagement,
         collapsible: true,
         items: [
-            { text: 'فروشندگان ', icon: <Store />, path: '/sellers' },
-            { text: 'احراز هویت فروشندگان', icon: <VerifiedUser />, path: '/sellers/verification' },
+            { text: 'فروشندگان ', icon: <Store />, path: '/sellers', key: 'Permissions.Menu.Sellers' },
+            { text: 'احراز هویت فروشندگان', icon: <VerifiedUser />, path: '/sellers/verification', key: 'Permissions.Menu.SellersVerification' },
         ],
     },
     {
         section: fa.buyersManagement,
         collapsible: true,
         items: [
-            { text: 'خریداران خرد', icon: <ShoppingCart />, path: '/buyers/retail' },
-            { text: 'خریداران عمده', icon: <ShoppingCart />, path: '/buyers/whole' },
-            { text: 'خریداران مکان ثابت', icon: <LocationOn />, path: '/buyers/fixed-location' },
-            { text: 'احراز هویت خریداران', icon: <VerifiedUser />, path: '/buyers/verification' },
+            { text: 'خریداران', icon: <ShoppingCart />, path: '/buyers/retail', key: 'Permissions.Menu.RetailBuyer' },
+            { text: 'احراز هویت خریداران', icon: <VerifiedUser />, path: '/buyers/verification', key: 'Permissions.Menu.BuyersVerification' },
         ],
     },
     {
         section: fa.supports,
         collapsible: true,
         items: [
-            { text: 'لیست پشتیبان‌ها', icon: <SupportAgent />, path: '/supports' },
-            { text: 'مدیریت سطح دسترسی', icon: <AdminPanelSettings />, path: '/supports/permissions' },
-            { text: 'پیگیری فعالیت‌ها', icon: <History />, path: '/supports/activity' },
+            { text: 'لیست پشتیبان‌ها', icon: <SupportAgent />, path: '/supports', key: 'Permissions.Menu.Supports' },
+            { text: 'مدیریت سطح دسترسی', icon: <AdminPanelSettings />, path: '/supports/permissions', key: 'Permissions.Menu.Permissions' },
+            { text: 'پیگیری فعالیت‌ها', icon: <History />, path: '/supports/activity', key: 'Permissions.Menu.SupportsActivity' },
         ],
     },
     {
         section: fa.adminRequests,
         collapsible: true,
         items: [
-            { text: 'درخواست‌های جدید', icon: <AdminPanelSettings />, path: '/admin-requests/new' },
-            { text: 'درخواست‌های بررسی شده', icon: <History />, path: '/admin-requests/reviewed' },
+            { text: 'درخواست‌های جدید', icon: <AdminPanelSettings />, path: '/admin-requests/new', key: 'Permissions.Menu.NewRequests' },
+            { text: 'درخواست‌های بررسی شده', icon: <History />, path: '/admin-requests/reviewed', key: 'Permissions.Menu.ReviewedRequests' },
         ],
     },
     {
         section: fa.financialManagement,
         collapsible: true,
         items: [
-            { text: 'تراکنش‌ها', icon: <ReceiptLong />, path: '/finance/transactions' },
-            { text: 'فاکتورها', icon: <Description />, path: '/finance/invoices' },
-
+            { text: 'تراکنش‌ها', icon: <ReceiptLong />, path: '/finance/transactions', key: 'Permissions.Menu.Transactions' },
+            { text: 'فاکتورها', icon: <Description />, path: '/finance/invoices', key: 'Permissions.Menu.Invoices' },
         ],
     },
     {
         section: 'پرسش‌ها و پاسخ‌ها',
         collapsible: true,
         items: [
-            { text: 'سوالات کاربران', icon: <AdminPanelSettings />, path: '/questions' },
-            { text: 'پاسخ‌های ثبت شده', icon: <History />, path: '/questions/answers' },
+            { text: 'سوالات کاربران', icon: <AdminPanelSettings />, path: '/questions', key: 'Permissions.Menu.FAQ' },
+            { text: 'پاسخ‌های ثبت شده', icon: <History />, path: '/questions/answers', key: 'Permissions.Menu.FAQ' },
         ],
     },
     {
         section: 'اخبار',
         collapsible: true,
         items: [
-            { text: 'لیست اخبار', icon: <Description />, path: '/news' },
+            { text: 'لیست اخبار', icon: <Description />, path: '/news', key: 'Permissions.Menu.News' },
         ],
     },
-
     {
         section: fa.settings,
         collapsible: true,
         items: [
-            { text: 'تنظیمات سیستم', icon: <Settings />, path: '/settings' },
+            { text: 'تنظیمات سیستم', icon: <Settings />, path: '/settings', key: 'Permissions.Menu.Settings' },
         ],
     },
 ];

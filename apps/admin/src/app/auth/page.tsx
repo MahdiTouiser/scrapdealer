@@ -85,7 +85,7 @@ export default function LoginPage() {
         resolver: zodResolver(loginSchema),
     });
     const router = useRouter();
-    const { setAuth, setPermissions } = useAuth();
+    const { setAuth, permissions, setPermissions } = useAuth();
 
     const [role, setRole] = useState<'Admin' | 'Support'>('Admin');
     const [showPassword, setShowPassword] = useState(false);
@@ -98,19 +98,8 @@ export default function LoginPage() {
         onError: 'ورود ناموفق بود',
     });
 
-    const { mutateAsync: getPermissions } = useApi<any>({
-        key: ['get-permissions'],
-        url: '/Permissions?pageIndex=0&pageSize=100',
-        method: 'GET',
-        enabled: false,
-    });
 
-    const { mutateAsync: getPermissionsSupport } = useApi<any>({
-        key: ['get-permissions-support'],
-        url: '/Permissions/Support?pageIndex=0&pageSize=100',
-        method: 'GET',
-        enabled: false,
-    });
+
 
     const onSubmit = async (data: LoginFormData) => {
         try {
@@ -122,23 +111,12 @@ export default function LoginPage() {
             const response = await login(loginPayload);
             if (response) {
                 setAuth(response.token, response.role);
-
-                if (role === 'Admin') {
-                    const permissionsResult = await getPermissions();
-                    console.log('Permissions:', permissionsResult);
-
-                    if (permissionsResult) setPermissions(permissionsResult.data || permissionsResult);
-
-                } else {
-                    const permissionsResult = await getPermissionsSupport();
-                    console.log('Permissions:', permissionsResult);
-
-                    if (permissionsResult) setPermissions(permissionsResult.data || permissionsResult);
-                }
+                setPermissions(response.permissions);
 
                 router.push('/dashboard/main');
                 router.refresh();
             }
+            console.log(permissions);
         } catch (error) {
             console.error('API Error:', error);
         }

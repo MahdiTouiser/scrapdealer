@@ -1,24 +1,19 @@
 'use client';
 
 import {
-    createContext,
-    ReactNode,
-    useContext,
-    useEffect,
-    useState,
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
 } from 'react';
-
-interface Permission {
-    id: string;
-    name: string;
-}
 
 interface AuthContextType {
     token: string | null;
     role: string | null;
-    permissions: Permission[];
+    permissions: string[];
     setAuth: (token: string, role: string) => void;
-    setPermissions: (permissions: Permission[]) => void;
+    setPermissions: (permissions: string[]) => void;
     clearAuth: () => void;
     hasPermission: (permissionName: string) => boolean;
     isAuthenticated: boolean;
@@ -29,9 +24,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [token, setToken] = useState<string | null>(null);
     const [role, setRole] = useState<string | null>(null);
-    const [permissions, setPermissionsState] = useState<Permission[]>([]);
+    const [permissions, setPermissionsState] = useState<string[]>([]);
 
-    // Load from localStorage on mount
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const storedToken = localStorage.getItem('auth_token');
@@ -59,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const setPermissions = (newPermissions: Permission[]) => {
+    const setPermissions = (newPermissions: string[]) => {
         setPermissionsState(newPermissions);
         if (typeof window !== 'undefined') {
             localStorage.setItem('permissions', JSON.stringify(newPermissions));
@@ -77,8 +71,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const hasPermission = (permissionName: string) => {
-        return permissions.some(p => p.name === permissionName);
+    const hasPermission = () => {
+        return permissions;
     };
 
     const isAuthenticated = !!token;
