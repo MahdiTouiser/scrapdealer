@@ -2,9 +2,7 @@
 
 import { useState } from 'react';
 
-import WholeBuyersTable, {
-  WholeBuyer,
-} from '@/components/buyers/wholesale/WholeBuyersTable';
+import BuyersTable, { Buyer } from '@/components/buyers/BuyersTable';
 import AddButton from '@/components/common/AddButton';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import CustomFormModal, {
@@ -15,50 +13,55 @@ import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import { Box } from '@mui/material';
 
-const WholeSaleBuyers = () => {
+const Buyers = () => {
     const [open, setOpen] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [editMode, setEditMode] = useState(false);
-    const [editingBuyer, setEditingBuyer] = useState<WholeBuyer | null>(null);
+    const [editingBuyer, setEditingBuyer] = useState<Buyer | null>(null);
 
-    const { data: buyers, loading, refetch: refetchBuyers } = useApi<{ data: WholeBuyer[]; totalCount: number }>({
-        key: ['get-whole-buyers'],
-        url: '/WholeBuyers',
-    });
+    const { data: buyers, loading, refetch: refetchBuyers } =
+        useApi<{ data: Buyer[]; totalCount: number }>({
+            key: ['get-buyers'],
+            url: '/Buyers/Admin/Get',
+        });
 
-    const { mutate: addBuyer, loading: adding } = useApi<void, Partial<WholeBuyer>>({
-        key: ['add-whole-buyer'],
-        url: '/WholeBuyers',
+    const { mutate: addBuyer, loading: adding } = useApi<void, Partial<Buyer>>({
+        key: ['add-buyer'],
+        url: '/Buyers',
         method: 'POST',
-        onError: 'افزودن خریدار عمده با خطا مواجه شد',
-        onSuccess: 'خریدار عمده با موفقیت اضافه شد',
+        onError: 'افزودن خریدار با خطا مواجه شد',
+        onSuccess: 'خریدار با موفقیت اضافه شد',
     });
 
-    const { mutate: updateBuyer, loading: updating } = useApi<void, Partial<WholeBuyer> & { id: string }>({
-        key: ['update-whole-buyer'],
-        url: (data) => `/WholeBuyers/${data?.id}`,
+    const { mutate: updateBuyer, loading: updating } = useApi<
+        void,
+        Partial<Buyer> & { id: string }
+    >({
+        key: ['update-buyer'],
+        url: data => `/Buyers/${data?.id}`,
         method: 'PUT',
-        onError: 'ویرایش خریدار عمده با خطا مواجه شد',
-        onSuccess: 'خریدار عمده با موفقیت ویرایش شد',
+        onError: 'ویرایش خریدار با خطا مواجه شد',
+        onSuccess: 'خریدار با موفقیت ویرایش شد',
     });
 
     const { mutate: deleteBuyer, loading: deleting } = useApi<void, string>({
-        key: ['delete-whole-buyer'],
-        url: (id) => `/WholeBuyers/${id}`,
+        key: ['delete-buyer'],
+        url: id => `/Buyers/${id}`,
         method: 'DELETE',
-        onError: 'حذف خریدار عمده با خطا مواجه شد',
-        onSuccess: 'خریدار عمده با موفقیت حذف شد',
+        onError: 'حذف خریدار با خطا مواجه شد',
+        onSuccess: 'خریدار با موفقیت حذف شد',
     });
 
     const handleOpen = () => setOpen(true);
+
     const handleClose = () => {
         setOpen(false);
         setEditMode(false);
         setEditingBuyer(null);
     };
 
-    const handleAddBuyer = async (data: Record<string, any>) => {
+    const handleAddBuyer = async (data: Partial<Buyer>) => {
         await addBuyer(data, {
             onSuccess: () => {
                 handleClose();
@@ -67,7 +70,7 @@ const WholeSaleBuyers = () => {
         });
     };
 
-    const handleEdit = (buyer: WholeBuyer) => {
+    const handleEdit = (buyer: Buyer) => {
         setEditMode(true);
         setEditingBuyer(buyer);
         handleOpen();
@@ -91,30 +94,40 @@ const WholeSaleBuyers = () => {
     };
 
     const formFields: FormField[] = [
-        { name: 'companyName', label: 'نام شرکت', fieldType: 'text', required: true },
-        { name: 'contactPerson', label: 'نام تماس', fieldType: 'text', required: true },
-        { name: 'phoneNumber', label: 'شماره تماس', fieldType: 'phone', required: true },
-        { name: 'email', label: 'ایمیل', fieldType: 'text' },
+        { name: 'firstName', label: 'نام', fieldType: 'text', required: true },
+        { name: 'lastName', label: 'نام خانوادگی', fieldType: 'text', required: true },
+        { name: 'nationalCode', label: 'کد ملی', fieldType: 'text', required: true },
+        { name: 'companyName', label: 'نام شرکت', fieldType: 'text' },
         { name: 'city', label: 'شهر', fieldType: 'text' },
         { name: 'province', label: 'استان', fieldType: 'text' },
         { name: 'addressDescription', label: 'آدرس', fieldType: 'text' },
-        { name: 'typeOfWaste', label: 'نوع ضایعات', fieldType: 'text', required: true },
-        { name: 'vehiclePlate', label: 'شماره پلاک', fieldType: 'text' }, // e.g., ۱۲ ط ۴۵۶ ایران ۵۰
+        { name: 'numberPlate', label: 'پلاک خودرو', fieldType: 'text' },
+        {
+            name: 'gender',
+            label: 'جنسیت',
+            fieldType: 'select',
+            options: [
+                { label: 'زن', value: 'Female' },
+                { label: 'مرد', value: 'Male' },
+            ],
+        },
+        {
+            name: 'activityArea',
+            label: 'منطقه فعالیت',
+            fieldType: 'select',
+            options: [
+                { label: 'شمال', value: 'North' },
+                { label: 'جنوب', value: 'South' },
+                { label: 'شرق', value: 'East' },
+                { label: 'غرب', value: 'West' },
+                { label: 'تهران', value: 'Tehran' },
+            ],
+        },
     ];
 
     const getDefaultValues = () => {
         if (editMode && editingBuyer) {
-            return {
-                companyName: editingBuyer.companyName || '',
-                contactPerson: editingBuyer.contactPerson || '',
-                phoneNumber: editingBuyer.phoneNumber || '',
-                email: editingBuyer.email || '',
-                city: editingBuyer.city || '',
-                province: editingBuyer.province || '',
-                addressDescription: editingBuyer.addressDescription || '',
-                typeOfWaste: editingBuyer.typeOfWaste || '',
-                vehiclePlate: editingBuyer.vehiclePlate || '',
-            };
+            return { ...editingBuyer };
         }
         return {};
     };
@@ -122,35 +135,33 @@ const WholeSaleBuyers = () => {
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
             <PageTitle title={fa.buyers} />
+
             <Box display="flex" justifyContent="flex-start" mb={2}>
-                <AddButton label="افزودن خریدار عمده جدید" onClick={handleOpen} />
+                <AddButton label="افزودن خریدار جدید" onClick={handleOpen} />
             </Box>
 
-            <WholeBuyersTable
+            <BuyersTable
                 data={buyers?.data || []}
                 loading={loading}
-                onDelete={handleDelete}
                 onEdit={handleEdit}
+                onDelete={handleDelete}
             />
 
             <CustomFormModal
                 open={open}
                 onClose={handleClose}
-                title={editMode ? 'ویرایش خریدار عمده' : 'افزودن خریدار عمده جدید'}
+                title={editMode ? 'ویرایش خریدار' : 'افزودن خریدار جدید'}
                 defaultValues={getDefaultValues()}
                 fields={formFields}
-                onSubmit={async (data) => {
-                    if (editMode && editingBuyer) {
-                        await updateBuyer({ id: editingBuyer.id, ...data }, {
-                            onSuccess: () => {
-                                handleClose();
-                                refetchBuyers();
-                            },
-                        });
-                    } else {
-                        await handleAddBuyer(data);
-                    }
-                }}
+                onSubmit={
+                    editMode
+                        ? data =>
+                            updateBuyer(
+                                { ...data, id: editingBuyer?.id! },
+                                { onSuccess: () => { handleClose(); refetchBuyers(); } }
+                            )
+                        : handleAddBuyer
+                }
                 submitLabel={editMode ? 'ویرایش' : 'افزودن'}
                 cancelLabel="لغو"
                 submitLoading={adding || updating}
@@ -160,7 +171,7 @@ const WholeSaleBuyers = () => {
                 open={confirmOpen}
                 onCancel={() => setConfirmOpen(false)}
                 onConfirm={confirmDelete}
-                message="آیا از حذف این خریدار عمده اطمینان دارید؟"
+                message="آیا از حذف این خریدار اطمینان دارید؟"
                 confirmLabel="حذف"
                 cancelLabel="لغو"
                 loading={deleting}
@@ -169,4 +180,4 @@ const WholeSaleBuyers = () => {
     );
 };
 
-export default WholeSaleBuyers;
+export default Buyers;
