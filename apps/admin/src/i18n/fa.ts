@@ -35,8 +35,6 @@ const fa = {
   supports: 'پشتیبان ها',
   permissionLevel: 'مدیریت سطح دسترسی',
   activity: 'پیگیری فعالیت ها',
-  wholeBuyers: 'خریداران عمده',
-  retailBuyers: 'خریداران خرد',
   verificationBuyers: 'احراز هویت خریداران',
   seeBuyersVerifications: 'در این بخش می‌توانید مدارک و وضعیت حساب خریداران را مشاهده، بررسی و تأیید کنید.',
   seeSellersVerifications: 'در این بخش می‌توانید مدارک و وضعیت حساب فروشندگان را مشاهده، بررسی و تأیید کنید.',

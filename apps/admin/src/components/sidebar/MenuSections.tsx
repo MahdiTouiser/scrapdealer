@@ -36,7 +36,7 @@ export const MENU_SECTIONS: MenuSection[] = [
         section: fa.buyersManagement,
         collapsible: true,
         items: [
-            { text: 'خریداران', icon: <ShoppingCart />, path: '/buyers/retail', key: 'Permissions.Menu.RetailBuyer' },
+            { text: 'خریداران', icon: <ShoppingCart />, path: '/buyers', key: 'Permissions.Menu.RetailBuyer' },
             { text: 'احراز هویت خریداران', icon: <VerifiedUser />, path: '/buyers/verification', key: 'Permissions.Menu.BuyersVerification' },
         ],
     },

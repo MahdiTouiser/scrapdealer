@@ -81,7 +81,7 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
     return jsonResponse as T
 }
 
-export function useApi<TData = unknown, TVariables = void>({
+export function useApi<TData = unknown, TVariables = unknown>({
     key,
     url,
     method = 'GET',

@@ -3,10 +3,11 @@
 import React from 'react';
 
 import PageTitle from '@/components/common/PageTitle';
+import CategoryPriceManager
+  from '@/components/dashboard/categories/CategoryPriceManager';
 import CommissionControl from '@/components/dashboard/CommissionControl';
 import KpiCard from '@/components/dashboard/KpiCard';
 import NotificationsPanel from '@/components/dashboard/NotificationsPanel';
-import ScrapPriceManager from '@/components/dashboard/ScrapPriceManager';
 import TransactionsTable from '@/components/dashboard/TransactionsTable';
 import fa from '@/i18n/fa';
 import Box from '@mui/material/Box';
@@ -16,8 +17,8 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
 import {
-    Item,
-    kpiStats,
+  Item,
+  kpiStats,
 } from '../admin-dashboard/page';
 
 const MainPage: React.FC = () => {
@@ -58,7 +59,7 @@ const MainPage: React.FC = () => {
             <Paper sx={{ p: 2, mb: 3 }}>
                 <Typography variant="h6" mb={1}>مدیریت قیمت ضایعات</Typography>
                 <Divider sx={{ mb: 2 }} />
-                <ScrapPriceManager />
+                <CategoryPriceManager />
             </Paper>
 
             <Paper sx={{ p: 2, mb: 3 }}>

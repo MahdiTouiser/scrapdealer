@@ -3,12 +3,12 @@
 import { useState } from 'react';
 
 import WholeBuyersTable, {
-    WholeBuyer,
+  WholeBuyer,
 } from '@/components/buyers/wholesale/WholeBuyersTable';
 import AddButton from '@/components/common/AddButton';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import CustomFormModal, {
-    FormField,
+  FormField,
 } from '@/components/common/CustomFormModal';
 import PageTitle from '@/components/common/PageTitle';
 import { useApi } from '@/hooks/useApi';
@@ -121,7 +121,7 @@ const WholeSaleBuyers = () => {
 
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
-            <PageTitle title={fa.wholeBuyers} />
+            <PageTitle title={fa.buyers} />
             <Box display="flex" justifyContent="flex-start" mb={2}>
                 <AddButton label="افزودن خریدار عمده جدید" onClick={handleOpen} />
             </Box>
