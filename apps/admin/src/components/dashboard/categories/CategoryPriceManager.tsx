@@ -1,17 +1,17 @@
 'use client';
 
+import { Cat } from '@/components/types';
 import { useApi } from '@/hooks/useApi';
 import {
-  Box,
-  CircularProgress,
-  Divider,
-  Paper,
-  Typography,
+    Box,
+    CircularProgress,
+    Divider,
+    Paper,
+    Typography,
 } from '@mui/material';
 
 import AddCategoryForm from './AddCategoryForm';
 import CategoryList from './CategoryList';
-import { Cat } from './types';
 
 export default function CategoryPriceManager() {
     const { data: res, loading, refetch } = useApi<{ data: Cat[] }>({

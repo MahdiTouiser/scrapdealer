@@ -24,3 +24,18 @@ export interface AuthInterface {
   role: string;
   permissions: string[];
 }
+export interface SubCat {
+  id: string;
+  name: string;
+  minPrice: number;
+  maxPrice: number;
+  categoryId?: string;
+}
+
+export interface Cat {
+  id: string;
+  name: string;
+  minPrice: number;
+  maxPrice: number;
+  subCategories: SubCat[];
+}

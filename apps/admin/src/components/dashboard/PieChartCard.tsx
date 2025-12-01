@@ -1,17 +1,17 @@
 import React from 'react';
 
 import {
-  Cell,
-  Pie,
-  PieChart,
-  PieLabelRenderProps,
-  ResponsiveContainer,
-  Tooltip,
+    Cell,
+    Pie,
+    PieChart,
+    PieLabelRenderProps,
+    ResponsiveContainer,
+    Tooltip,
 } from 'recharts';
 
 import {
-  Paper,
-  Typography,
+    Paper,
+    Typography,
 } from '@mui/material';
 
 interface PieData {
@@ -44,7 +44,7 @@ const PieChartCard: React.FC<PieChartCardProps> = ({
             <Typography
                 variant="h6"
                 gutterBottom
-                sx={{ fontWeight: 600, mb: 2, fontFamily: 'Vazirmatn, sans-serif' }}
+                sx={{ fontWeight: 600, mb: 2 }}
             >
                 {title}
             </Typography>
@@ -76,7 +76,6 @@ const PieChartCard: React.FC<PieChartCardProps> = ({
                             backgroundColor: '#fff',
                             borderRadius: 12,
                             boxShadow: '0 3px 10px rgba(0,0,0,0.12)',
-                            fontFamily: 'Vazirmatn, sans-serif',
                         }}
                     />
                 </PieChart>
