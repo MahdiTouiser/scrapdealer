@@ -6,29 +6,30 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { MENU_SECTIONS } from '@/components/sidebar/MenuSections';
 import { AuthInterface } from '@/components/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  AdminPanelSettings,
-  SupportAgent,
-  Visibility,
-  VisibilityOff,
+    AdminPanelSettings,
+    SupportAgent,
+    Visibility,
+    VisibilityOff,
 } from '@mui/icons-material';
 import {
-  Alert,
-  Box,
-  Button,
-  Container,
-  IconButton,
-  InputAdornment,
-  Paper,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
+    Alert,
+    Box,
+    Button,
+    Container,
+    IconButton,
+    InputAdornment,
+    Paper,
+    TextField,
+    ToggleButton,
+    ToggleButtonGroup,
+    Typography,
 } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { styled } from '@mui/material/styles';
@@ -98,45 +99,34 @@ export default function LoginPage() {
         onError: 'ورود ناموفق بود',
     });
 
-    const { mutateAsync: getPermissions } = useApi<any>({
-        key: ['get-permissions'],
-        url: '/Permissions?pageIndex=0&pageSize=100',
-        method: 'GET',
-        enabled: false,
-    });
 
-    const { mutateAsync: getPermissionsSupport } = useApi<any>({
-        key: ['get-permissions-support'],
-        url: '/Permissions/Support?pageIndex=0&pageSize=100',
-        method: 'GET',
-        enabled: false,
-    });
 
     const onSubmit = async (data: LoginFormData) => {
         try {
-            const loginPayload: LoginPayload = {
-                ...data,
-                role: role,
-            };
-
+            const loginPayload: LoginPayload = { ...data, role };
             const response = await login(loginPayload);
+
             if (response) {
                 setAuth(response.token, response.role);
+                setPermissions(response.permissions);
 
-                if (role === 'Admin') {
-                    const permissionsResult = await getPermissions();
-                    console.log('Permissions:', permissionsResult);
+                let firstRoute = '/dashboard/main';
 
-                    if (permissionsResult) setPermissions(permissionsResult.data || permissionsResult);
-
+                if (response.role === 'Admin') {
+                    firstRoute = '/dashboard/main';
                 } else {
-                    const permissionsResult = await getPermissionsSupport();
-                    console.log('Permissions:', permissionsResult);
-
-                    if (permissionsResult) setPermissions(permissionsResult.data || permissionsResult);
+                    for (const section of MENU_SECTIONS) {
+                        for (const item of section.items) {
+                            if (response.permissions.includes(item.key)) {
+                                firstRoute = item.path;
+                                break;
+                            }
+                        }
+                        if (firstRoute !== '/dashboard/main') break;
+                    }
                 }
 
-                router.push('/dashboard/main');
+                router.push(firstRoute);
                 router.refresh();
             }
         } catch (error) {

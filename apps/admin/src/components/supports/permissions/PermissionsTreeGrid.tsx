@@ -1,38 +1,38 @@
 "use client";
 import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
 } from 'react';
 
 import type {
-  ColDef,
-  ICellRendererParams,
+    ColDef,
+    ICellRendererParams,
 } from 'ag-grid-community';
 import {
-  AllCommunityModule,
-  ModuleRegistry,
+    AllCommunityModule,
+    ModuleRegistry,
 } from 'ag-grid-community';
 
 import DataGrid from '@/components/DataGrid';
 import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import {
-  ChevronLeft,
-  DescriptionOutlined,
-  ExpandMore,
-  FolderOutlined,
+    ChevronLeft,
+    DescriptionOutlined,
+    ExpandMore,
+    FolderOutlined,
 } from '@mui/icons-material';
 import {
-  alpha,
-  Box,
-  CircularProgress,
-  Paper,
-  Switch,
-  Typography,
-  useTheme,
+    alpha,
+    Box,
+    CircularProgress,
+    Paper,
+    Switch,
+    Typography,
+    useTheme,
 } from '@mui/material';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -53,33 +53,28 @@ interface PermissionsTreeGridProps {
 }
 
 const translatePermissionPart = (part: string, index: number) => {
-    if (index === 1) {
+    if (index === 2) {
         switch (part) {
-            case 'SaleOrders': return fa.mainPage;
-            case 'News': return fa.news;
-            case 'Buyers': return fa.buyers;
-            case 'Sellers': return fa.sellers;
-            case 'Categories': return fa.categories;
-            case 'SubCategories': return fa.categories;
-            case 'Users': return 'کاربران';
-            default: return part;
-        }
-    } else if (index === 2) {
-        switch (part) {
-            case 'ToggleActivation': return 'فعال/غیرفعال';
-            case 'Verification': return fa.verificationBuyers;
-            case 'ViewAll': return 'مشاهده همه';
-            case 'Review': return 'بررسی';
-            case 'Create': return fa.addNews;
-            case 'Update': return fa.editNews;
-            case 'Delete': return 'حذف';
-            case 'State': return 'وضعیت';
-            case 'Verify': return 'تایید';
-            default: return part;
+            case 'Menu': return 'منو'
+            case 'Dashboard': return 'داشبورد'
+            case 'Sellers': return 'فروشندگان'
+            case 'SellersVerification': return 'احراز هویت فروشندگان'
+            case 'RetailBuyer': return 'خریداران خرد'
+            case 'WholeSaleBuyer': return 'خریداران عمده'
+            case 'BuyersVerification': return 'احراز هویت خریداران'
+            case 'Supports': return 'پشتیبانی'
+            case 'Permissions': return 'دسترسی‌ها'
+            case 'ReviewedRequests': return 'درخواست‌های بررسی شده'
+            case 'Invoices': return 'فاکتورها'
+            case 'FAQ': return fa.FAQ
+            case 'News': return 'اخبار'
+            case 'Settings': return 'تنظیمات'
+            default: return part
         }
     }
-    return part;
-};
+    return part
+}
+
 
 const PermissionsTreeGrid: React.FC<PermissionsTreeGridProps> = ({ userId, onPermissionsChange }) => {
     const theme = useTheme();
@@ -119,18 +114,14 @@ const PermissionsTreeGrid: React.FC<PermissionsTreeGridProps> = ({ userId, onPer
         isInitialLoad.current = true;
     }, [permissionsData, buildTreeFromApi]);
 
-    // Extract and notify parent of selected permissions whenever allData changes
-    // Skip on initial load to prevent triggering hasChanges
     useEffect(() => {
         if (!allData.length) return;
 
-        // Skip the notification on initial load
         if (isInitialLoad.current) {
             isInitialLoad.current = false;
             return;
         }
 
-        // Get only leaf nodes (actual permissions, not sections) that are accessible
         const selectedPermissions = allData
             .filter(node => !node.isSection && node.accessible)
             .map(node => node.id);
@@ -170,7 +161,6 @@ const PermissionsTreeGrid: React.FC<PermissionsTreeGridProps> = ({ userId, onPer
             node.accessible = value;
 
             if (node.isSection) {
-                // Update all children recursively
                 const updateChildren = (id: string, val: boolean) => {
                     const children = next.filter(n => n.parent === id);
                     children.forEach(c => {
@@ -180,7 +170,6 @@ const PermissionsTreeGrid: React.FC<PermissionsTreeGridProps> = ({ userId, onPer
                 };
                 updateChildren(nodeId, value);
             } else {
-                // Update parent status based on children
                 const parent = next.find(n => n.id === node.parent);
                 if (parent) {
                     const siblings = next.filter(n => n.parent === parent.id && !n.isSection);

@@ -1,11 +1,15 @@
 'use client';
 
+import { useMemo } from 'react';
+
 import PageTitle from '@/components/common/PageTitle';
 import BarChartCard from '@/components/dashboard/BarChartCard';
 import DateTimeCard from '@/components/dashboard/DateTimeCard';
 import KpiCard from '@/components/dashboard/KpiCard';
 import LineChartCard from '@/components/dashboard/LineChartCard';
 import PieChartCard from '@/components/dashboard/PieChartCard';
+import { Cat } from '@/components/types';
+import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -27,6 +31,8 @@ export const Item = styled(Paper)(({ theme }) => ({
         boxShadow: theme.shadows[4],
     },
 }));
+
+
 
 
 const dailyStats = {
@@ -72,12 +78,22 @@ const totalIncome = [
     { month: 'مهر', income: 4600000 },
 ];
 
-const pieData = [
-    { name: 'آهن', value: 65 },
-    { name: 'مس', value: 35 },
-];
 
 const AdminDashboard = () => {
+    const { data: res } = useApi<{ data: Cat[] }>({
+        key: ['categories'],
+        url: '/categories',
+    });
+
+    const pieData = useMemo(() => {
+        const list = res?.data ?? []
+        return list.map(c => ({
+            name: c.name,
+            value: Math.floor(Math.random() * 100),
+        }))
+    }, [res?.data])
+
+
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
             <PageTitle title={fa.adminDashboard} />

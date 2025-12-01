@@ -2,63 +2,66 @@
 
 import { useState } from 'react';
 
-import RetailBuyersTable, {
-    RetailBuyer,
-} from '@/components/buyers/retail/RetailBuyersTable';
+import BuyersTable, { Buyer } from '@/components/buyers/BuyersTable';
 import AddButton from '@/components/common/AddButton';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import CustomFormModal, {
-    FormField,
+  FormField,
 } from '@/components/common/CustomFormModal';
 import PageTitle from '@/components/common/PageTitle';
 import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import { Box } from '@mui/material';
 
-const RetailBuyers = () => {
+const Buyers = () => {
     const [open, setOpen] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [editMode, setEditMode] = useState(false);
-    const [editingBuyer, setEditingBuyer] = useState<RetailBuyer | null>(null);
+    const [editingBuyer, setEditingBuyer] = useState<Buyer | null>(null);
 
-    const { data: buyers, loading, refetch: refetchBuyers } = useApi<{ data: RetailBuyer[]; totalCount: number }>({
-        key: ['get-retail-buyers'],
-        url: '/RetailBuyers',
-    });
+    const { data: buyers, loading, refetch: refetchBuyers } =
+        useApi<{ data: Buyer[]; totalCount: number }>({
+            key: ['get-buyers'],
+            url: '/Buyers/Admin/Get',
+        });
 
-    const { mutate: addBuyer, loading: adding } = useApi<void, Partial<RetailBuyer>>({
-        key: ['add-retail-buyer'],
-        url: '/RetailBuyers',
+    const { mutate: addBuyer, loading: adding } = useApi<void, Partial<Buyer>>({
+        key: ['add-buyer'],
+        url: '/Buyers',
         method: 'POST',
         onError: 'افزودن خریدار با خطا مواجه شد',
         onSuccess: 'خریدار با موفقیت اضافه شد',
     });
 
-    const { mutate: updateBuyer, loading: updating } = useApi<void, Partial<RetailBuyer> & { id: string }>({
-        key: ['update-retail-buyer'],
-        url: (data) => `/RetailBuyers/${data?.id}`,
+    const { mutate: updateBuyer, loading: updating } = useApi<
+        void,
+        Partial<Buyer> & { id: string }
+    >({
+        key: ['update-buyer'],
+        url: data => `/Buyers/${data?.id}`,
         method: 'PUT',
         onError: 'ویرایش خریدار با خطا مواجه شد',
         onSuccess: 'خریدار با موفقیت ویرایش شد',
     });
 
     const { mutate: deleteBuyer, loading: deleting } = useApi<void, string>({
-        key: ['delete-retail-buyer'],
-        url: (id) => `/RetailBuyers/${id}`,
+        key: ['delete-buyer'],
+        url: id => `/Buyers/${id}`,
         method: 'DELETE',
         onError: 'حذف خریدار با خطا مواجه شد',
         onSuccess: 'خریدار با موفقیت حذف شد',
     });
 
     const handleOpen = () => setOpen(true);
+
     const handleClose = () => {
         setOpen(false);
         setEditMode(false);
         setEditingBuyer(null);
     };
 
-    const handleAddBuyer = async (data: Record<string, any>) => {
+    const handleAddBuyer = async (data: Partial<Buyer>) => {
         await addBuyer(data, {
             onSuccess: () => {
                 handleClose();
@@ -67,7 +70,7 @@ const RetailBuyers = () => {
         });
     };
 
-    const handleEdit = (buyer: RetailBuyer) => {
+    const handleEdit = (buyer: Buyer) => {
         setEditMode(true);
         setEditingBuyer(buyer);
         handleOpen();
@@ -94,63 +97,71 @@ const RetailBuyers = () => {
         { name: 'firstName', label: 'نام', fieldType: 'text', required: true },
         { name: 'lastName', label: 'نام خانوادگی', fieldType: 'text', required: true },
         { name: 'nationalCode', label: 'کد ملی', fieldType: 'text', required: true },
-        { name: 'city', label: 'شهر', fieldType: 'text', required: true },
-        { name: 'province', label: 'استان', fieldType: 'text', required: true },
-        { name: 'postalCode', label: 'کد پستی', fieldType: 'text', required: true },
-        { name: 'addressDescription', label: 'آدرس', fieldType: 'text', required: true },
-        { name: 'email', label: 'ایمیل', fieldType: 'text', required: true },
-        { name: 'gender', label: 'جنسیت', fieldType: 'select', options: ['Male', 'Female'], required: true },
+        { name: 'companyName', label: 'نام شرکت', fieldType: 'text' },
+        { name: 'city', label: 'شهر', fieldType: 'text' },
+        { name: 'province', label: 'استان', fieldType: 'text' },
+        { name: 'addressDescription', label: 'آدرس', fieldType: 'text' },
+        { name: 'numberPlate', label: 'پلاک خودرو', fieldType: 'text' },
+        {
+            name: 'gender',
+            label: 'جنسیت',
+            fieldType: 'select',
+            options: [
+                { label: 'زن', value: 'Female' },
+                { label: 'مرد', value: 'Male' },
+            ],
+        },
+        {
+            name: 'activityArea',
+            label: 'منطقه فعالیت',
+            fieldType: 'select',
+            options: [
+                { label: 'شمال', value: 'North' },
+                { label: 'جنوب', value: 'South' },
+                { label: 'شرق', value: 'East' },
+                { label: 'غرب', value: 'West' },
+                { label: 'تهران', value: 'Tehran' },
+            ],
+        },
     ];
 
     const getDefaultValues = () => {
         if (editMode && editingBuyer) {
-            return {
-                firstName: editingBuyer.firstName || '',
-                lastName: editingBuyer.lastName || '',
-                nationalCode: editingBuyer.nationalCode || '',
-                city: editingBuyer.city || '',
-                province: editingBuyer.province || '',
-                postalCode: editingBuyer.postalCode || '',
-                addressDescription: editingBuyer.addressDescription || '',
-                email: editingBuyer.email || '',
-                gender: editingBuyer.gender || 'Male',
-            };
+            return { ...editingBuyer };
         }
         return {};
     };
 
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
-            <PageTitle title={fa.retailBuyers} />
+            <PageTitle title={fa.buyers} />
+
             <Box display="flex" justifyContent="flex-start" mb={2}>
                 <AddButton label="افزودن خریدار جدید" onClick={handleOpen} />
             </Box>
 
-            <RetailBuyersTable
+            <BuyersTable
                 data={buyers?.data || []}
                 loading={loading}
-                onDelete={handleDelete}
                 onEdit={handleEdit}
+                onDelete={handleDelete}
             />
 
             <CustomFormModal
                 open={open}
                 onClose={handleClose}
-                title={editMode ? 'ویرایش خریدار' : 'افزودن خریدار خرد جدید'}
+                title={editMode ? 'ویرایش خریدار' : 'افزودن خریدار جدید'}
                 defaultValues={getDefaultValues()}
                 fields={formFields}
-                onSubmit={async (data) => {
-                    if (editMode && editingBuyer) {
-                        await updateBuyer({ id: editingBuyer.id, ...data }, {
-                            onSuccess: () => {
-                                handleClose();
-                                refetchBuyers();
-                            },
-                        });
-                    } else {
-                        await handleAddBuyer(data);
-                    }
-                }}
+                onSubmit={
+                    editMode
+                        ? data =>
+                            updateBuyer(
+                                { ...data, id: editingBuyer?.id! },
+                                { onSuccess: () => { handleClose(); refetchBuyers(); } }
+                            )
+                        : handleAddBuyer
+                }
                 submitLabel={editMode ? 'ویرایش' : 'افزودن'}
                 cancelLabel="لغو"
                 submitLoading={adding || updating}
@@ -169,4 +180,4 @@ const RetailBuyers = () => {
     );
 };
 
-export default RetailBuyers;
+export default Buyers;

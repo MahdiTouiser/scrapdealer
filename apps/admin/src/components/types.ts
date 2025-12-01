@@ -2,6 +2,7 @@ export interface MenuItem {
   text: string;
   icon: React.ReactNode;
   path: string;
+  key: string;
 }
 
 export interface MenuSection {
@@ -22,4 +23,19 @@ export interface AuthInterface {
   token: string;
   role: string;
   permissions: string[];
+}
+export interface SubCat {
+  id: string;
+  name: string;
+  minPrice: number;
+  maxPrice: number;
+  categoryId?: string;
+}
+
+export interface Cat {
+  id: string;
+  name: string;
+  minPrice: number;
+  maxPrice: number;
+  subCategories: SubCat[];
 }
