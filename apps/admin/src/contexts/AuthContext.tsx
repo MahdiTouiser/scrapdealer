@@ -1,11 +1,11 @@
 'use client';
 
 import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
+    createContext,
+    ReactNode,
+    useContext,
+    useEffect,
+    useState,
 } from 'react';
 
 interface AuthContextType {
@@ -71,8 +71,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const hasPermission = () => {
-        return permissions;
+    const hasPermission = (permissionName: string) => {
+        if (role === 'Admin') return true;
+        return permissions.includes(permissionName);
     };
 
     const isAuthenticated = !!token;

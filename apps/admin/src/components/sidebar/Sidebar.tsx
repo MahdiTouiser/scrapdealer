@@ -12,6 +12,7 @@ import {
 } from 'next/navigation';
 import toast from 'react-hot-toast';
 
+import { useAuth } from '@/contexts/AuthContext';
 import fa from '@/i18n/fa';
 import {
     ChevronLeft,
@@ -58,6 +59,7 @@ const Sidebar: React.FC = () => {
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(
         Object.fromEntries(MENU_SECTIONS.map((section) => [section.section, false]))
     );
+    const { hasPermission } = useAuth();
 
     const [selectedItem, setSelectedItem] = useState<string>(fa.adminDashboard);
     const router = useRouter();
@@ -243,88 +245,79 @@ const Sidebar: React.FC = () => {
                 <Divider sx={{ borderColor: theme.palette.divider, mx: 1 }} />
 
                 <List sx={{ px: 1, pt: 1 }}>
-                    {MENU_SECTIONS.map((section) => (
-                        <Box key={section.section} sx={{ mb: 1.5 }}>
-                            {section.collapsible ? (
-                                <>
-                                    {open && (
-                                        <ListItemButton
-                                            onClick={() => handleSectionToggle(section.section)}
-                                            sx={{
-                                                borderRadius: 2,
-                                                justifyContent: open ? 'space-between' : 'center',
-                                                px: 2,
-                                                py: 1,
-                                                mb: 0.5,
-                                                '&:hover': {
-                                                    bgcolor: theme.palette.action.hover,
-                                                    animation: `${glow} 1.5s infinite`,
-                                                },
-                                            }}
-                                        >
+                    {MENU_SECTIONS.map((section) => {
+                        const filteredItems = section.items.filter(item => hasPermission(item.key));
+                        if (filteredItems.length === 0) return null;
+
+                        return (
+                            <Box key={section.section} sx={{ mb: 1.5 }}>
+                                {section.collapsible ? (
+                                    <>
+                                        {open && (
+                                            <ListItemButton
+                                                onClick={() => handleSectionToggle(section.section)}
+                                                sx={{
+                                                    borderRadius: 2,
+                                                    justifyContent: open ? 'space-between' : 'center',
+                                                    px: 2,
+                                                    py: 1,
+                                                    mb: 0.5,
+                                                    '&:hover': { bgcolor: theme.palette.action.hover, animation: `${glow} 1.5s infinite` },
+                                                }}
+                                            >
+                                                <Typography variant="subtitle2" sx={{ color: theme.palette.primary.main, fontWeight: 700 }}>
+                                                    {section.section}
+                                                </Typography>
+                                                {expandedSections[section.section] ? (
+                                                    <ExpandLess sx={{ color: theme.palette.primary.main }} />
+                                                ) : (
+                                                    <ExpandMore sx={{ color: theme.palette.primary.main }} />
+                                                )}
+                                            </ListItemButton>
+                                        )}
+
+                                        <Collapse in={expandedSections[section.section] || !open} timeout="auto" unmountOnExit>
+                                            <List disablePadding>
+                                                {filteredItems.map((item) => (
+                                                    <MenuItem
+                                                        key={item.text}
+                                                        item={item}
+                                                        open={open}
+                                                        selected={selectedItem === item.text}
+                                                        component={Link}
+                                                        href={item.path}
+                                                    />
+                                                ))}
+                                            </List>
+                                        </Collapse>
+                                    </>
+                                ) : (
+                                    <>
+                                        {open && (
                                             <Typography
                                                 variant="subtitle2"
-                                                sx={{
-                                                    color: theme.palette.primary.main,
-                                                    fontWeight: 700,
-                                                }}
+                                                sx={{ px: 2, pt: 2, pb: 1, color: theme.palette.primary.main, fontWeight: 700 }}
                                             >
                                                 {section.section}
                                             </Typography>
-                                            {expandedSections[section.section] ? (
-                                                <ExpandLess sx={{ color: theme.palette.primary.main }} />
-                                            ) : (
-                                                <ExpandMore sx={{ color: theme.palette.primary.main }} />
-                                            )}
-                                        </ListItemButton>
-                                    )}
-
-                                    <Collapse in={expandedSections[section.section] || !open} timeout="auto" unmountOnExit>
-                                        <List disablePadding>
-                                            {section.items.map((item) => (
-                                                <MenuItem
-                                                    key={item.text}
-                                                    item={item}
-                                                    open={open}
-                                                    selected={selectedItem === item.text}
-                                                    component={Link}
-                                                    href={item.path}
-                                                />
-                                            ))}
-                                        </List>
-                                    </Collapse>
-                                </>
-                            ) : (
-                                <>
-                                    {open && (
-                                        <Typography
-                                            variant="subtitle2"
-                                            sx={{
-                                                px: 2,
-                                                pt: 2,
-                                                pb: 1,
-                                                color: theme.palette.primary.main,
-                                                fontWeight: 700,
-                                            }}
-                                        >
-                                            {section.section}
-                                        </Typography>
-                                    )}
-                                    {section.items.map((item) => (
-                                        <MenuItem
-                                            key={item.text}
-                                            item={item}
-                                            open={open}
-                                            selected={selectedItem === item.text}
-                                            component={Link}
-                                            href={item.path}
-                                        />
-                                    ))}
-                                </>
-                            )}
-                        </Box>
-                    ))}
+                                        )}
+                                        {filteredItems.map((item) => (
+                                            <MenuItem
+                                                key={item.text}
+                                                item={item}
+                                                open={open}
+                                                selected={selectedItem === item.text}
+                                                component={Link}
+                                                href={item.path}
+                                            />
+                                        ))}
+                                    </>
+                                )}
+                            </Box>
+                        );
+                    })}
                 </List>
+
 
                 <Box sx={{ flexGrow: 1 }} />
 

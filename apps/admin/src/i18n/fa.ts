@@ -90,6 +90,7 @@ const fa = {
       State: 'وضعیت کاربران',
     },
   },
+  FAQ: 'سوالات متداول',
 };
 
 export default fa;

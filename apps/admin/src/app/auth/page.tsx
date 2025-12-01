@@ -6,29 +6,30 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { MENU_SECTIONS } from '@/components/sidebar/MenuSections';
 import { AuthInterface } from '@/components/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  AdminPanelSettings,
-  SupportAgent,
-  Visibility,
-  VisibilityOff,
+    AdminPanelSettings,
+    SupportAgent,
+    Visibility,
+    VisibilityOff,
 } from '@mui/icons-material';
 import {
-  Alert,
-  Box,
-  Button,
-  Container,
-  IconButton,
-  InputAdornment,
-  Paper,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
+    Alert,
+    Box,
+    Button,
+    Container,
+    IconButton,
+    InputAdornment,
+    Paper,
+    TextField,
+    ToggleButton,
+    ToggleButtonGroup,
+    Typography,
 } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { styled } from '@mui/material/styles';
@@ -85,7 +86,7 @@ export default function LoginPage() {
         resolver: zodResolver(loginSchema),
     });
     const router = useRouter();
-    const { setAuth, permissions, setPermissions } = useAuth();
+    const { setAuth, setPermissions } = useAuth();
 
     const [role, setRole] = useState<'Admin' | 'Support'>('Admin');
     const [showPassword, setShowPassword] = useState(false);
@@ -100,23 +101,34 @@ export default function LoginPage() {
 
 
 
-
     const onSubmit = async (data: LoginFormData) => {
         try {
-            const loginPayload: LoginPayload = {
-                ...data,
-                role: role,
-            };
-
+            const loginPayload: LoginPayload = { ...data, role };
             const response = await login(loginPayload);
+
             if (response) {
                 setAuth(response.token, response.role);
                 setPermissions(response.permissions);
 
-                router.push('/dashboard/main');
+                let firstRoute = '/dashboard/main';
+
+                if (response.role === 'Admin') {
+                    firstRoute = '/dashboard/main';
+                } else {
+                    for (const section of MENU_SECTIONS) {
+                        for (const item of section.items) {
+                            if (response.permissions.includes(item.key)) {
+                                firstRoute = item.path;
+                                break;
+                            }
+                        }
+                        if (firstRoute !== '/dashboard/main') break;
+                    }
+                }
+
+                router.push(firstRoute);
                 router.refresh();
             }
-            console.log(permissions);
         } catch (error) {
             console.error('API Error:', error);
         }

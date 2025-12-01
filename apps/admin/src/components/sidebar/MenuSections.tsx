@@ -1,16 +1,15 @@
 import fa from '@/i18n/fa';
 import {
-  AdminPanelSettings,
-  Dashboard,
-  Description,
-  History,
-  Home,
-  ReceiptLong,
-  Settings,
-  ShoppingCart,
-  Store,
-  SupportAgent,
-  VerifiedUser,
+    AdminPanelSettings,
+    Dashboard,
+    Description,
+    History,
+    Home,
+    Settings,
+    ShoppingCart,
+    Store,
+    SupportAgent,
+    VerifiedUser,
 } from '@mui/icons-material';
 
 import { MenuSection } from '../types';
@@ -46,7 +45,7 @@ export const MENU_SECTIONS: MenuSection[] = [
         items: [
             { text: 'لیست پشتیبان‌ها', icon: <SupportAgent />, path: '/supports', key: 'Permissions.Menu.Supports' },
             { text: 'مدیریت سطح دسترسی', icon: <AdminPanelSettings />, path: '/supports/permissions', key: 'Permissions.Menu.Permissions' },
-            { text: 'پیگیری فعالیت‌ها', icon: <History />, path: '/supports/activity', key: 'Permissions.Menu.SupportsActivity' },
+            // { text: 'پیگیری فعالیت‌ها', icon: <History />, path: '/supports/activity', key: 'Permissions.Menu.SupportsActivity' },
         ],
     },
     {
@@ -61,7 +60,7 @@ export const MENU_SECTIONS: MenuSection[] = [
         section: fa.financialManagement,
         collapsible: true,
         items: [
-            { text: 'تراکنش‌ها', icon: <ReceiptLong />, path: '/finance/transactions', key: 'Permissions.Menu.Transactions' },
+            // { text: 'تراکنش‌ها', icon: <ReceiptLong />, path: '/finance/transactions', key: 'Permissions.Menu.Transactions' },
             { text: 'فاکتورها', icon: <Description />, path: '/finance/invoices', key: 'Permissions.Menu.Invoices' },
         ],
     },
