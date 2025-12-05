@@ -1,22 +1,22 @@
 import React from 'react';
 
 import {
-  Animated,
-  Platform,
-  StyleSheet,
-  TextInput as RNTextInput,
-  View,
+    Animated,
+    Platform,
+    TextInput as RNTextInput,
+    StyleSheet,
+    View,
 } from 'react-native';
 import {
-  Button,
-  HelperText,
+    Button,
+    HelperText,
 } from 'react-native-paper';
 
 import {
-  colors,
-  radii,
-  spacing,
-  typography,
+    colors,
+    radii,
+    spacing,
+    typography,
 } from '@scrapdealer/tokens';
 
 import { Text } from '../../components/CustomText';
@@ -214,6 +214,7 @@ const styles = StyleSheet.create({
         paddingVertical: spacing.sm,
     },
     buttonLabel: {
+        color: '#fff',
         fontFamily: 'Vazirmatn',
         fontWeight: '700',
         fontSize: 17,
