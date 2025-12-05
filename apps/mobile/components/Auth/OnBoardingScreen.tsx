@@ -175,7 +175,7 @@ export const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
                         }
                     ]}
                 >
-                    <Text style={[styles.title, { color: '#ffffff' }]}>
+                    <Text style={[styles.title, { color: '#ffffff', fontFamily: 'Vazirmatn' }]}>
                         {item.title}
                     </Text>
                     <Text style={[styles.description, { color: 'rgba(255, 255, 255, 0.95)' }]}>
