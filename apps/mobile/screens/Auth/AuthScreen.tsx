@@ -1,20 +1,20 @@
 import React from 'react';
 
 import {
-    Animated,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    View,
+  Animated,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
-    spacing,
-    typography,
+  spacing,
+  typography,
 } from '@scrapdealer/tokens';
 
 import { AuthHeader } from '../../components/Auth/AuthHeader';
@@ -59,8 +59,8 @@ export const AuthScreen: React.FC = () => {
 
 
     const handleResendOTP = async () => {
-        const clean = phoneNumber.replace(/\D/g, '');
-        await apiResendOTP(clean);
+        console.log('clicked');
+
     };
 
 
@@ -145,20 +145,8 @@ export const AuthScreen: React.FC = () => {
     );
 };
 
-const apiSendOTP = async (phone: string) => {
-    return new Promise(resolve => setTimeout(resolve, 600));
-};
 
-const apiVerifyOTP = async (phone: string, otp: string) => {
-    return {
-        token: 'token123',
-        role: 'User',
-    };
-};
 
-const apiResendOTP = async (phone: string) => {
-    return new Promise(resolve => setTimeout(resolve, 600));
-};
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#ffffff' },
