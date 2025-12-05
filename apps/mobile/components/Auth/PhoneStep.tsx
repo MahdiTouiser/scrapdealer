@@ -44,7 +44,7 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({
     stepTransition,
 }) => {
     const { theme } = useThemeContext();
-    const { myColors, colors } = theme;
+    const { myColors } = theme;
 
     const { mutate: sendOtp, isPending: sendingOtp } = useApi<
         { success: boolean; message?: string },
@@ -75,37 +75,20 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({
     };
 
     return (
-        <Animated.View
-            style={[
-                styles.container,
-                {
-                    opacity: stepTransition.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }),
-                    transform: [
-                        {
-                            translateX: stepTransition.interpolate({
-                                inputRange: [0, 1],
-                                outputRange: [0, -60],
-                            }),
-                        },
-                    ],
-                },
-            ]}
-        >
+        <Animated.View style={[styles.container, animatedStyles(stepTransition)]}>
             <Text style={[styles.label, { color: myColors.textSecondary }]}>
                 شماره موبایل
             </Text>
 
-            <View
-                style={[
-                    styles.inputWrapper,
-                    phoneFocused && styles.inputWrapperFocused,
-                    { borderColor: phoneFocused ? colors.primary : myColors.textSecondary + '40' },
-                ]}
-            >
+            <View style={[
+                styles.inputWrapper,
+                phoneFocused && styles.inputWrapperFocused,
+                { borderColor: phoneFocused ? colors.light.primary : myColors.textSecondary + '66' },
+            ]}>
                 <Text style={styles.countryCode}>+98</Text>
 
                 <RNTextInput
-                    style={[styles.input, { color: myColors.textPrimary, fontFamily: 'Vazirmatn' }]}
+                    style={[styles.input, { color: myColors.textPrimary }]}
                     value={phoneNumber}
                     onChangeText={onChangePhone}
                     onFocus={() => setPhoneFocused(true)}
@@ -113,7 +96,7 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({
                     keyboardType="phone-pad"
                     maxLength={17}
                     placeholder="912 345 6789"
-                    placeholderTextColor={myColors.textSecondary + '60'}
+                    placeholderTextColor={myColors.textSecondary + '80'}
                     textAlign="left"
                     editable={!sendingOtp}
                 />
@@ -135,13 +118,23 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({
                     styles.button,
                     (!isValid || sendingOtp) && styles.buttonDisabled,
                 ]}
-                labelStyle={{ fontFamily: 'Vazirmatn', fontWeight: '600' }}
+                labelStyle={styles.buttonLabel}
             >
                 ارسال کد تایید
             </Button>
         </Animated.View>
     );
 };
+
+const animatedStyles = (stepTransition: Animated.Value) => ({
+    opacity: stepTransition.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }),
+    transform: [{
+        translateX: stepTransition.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, -60],
+        }),
+    }],
+});
 
 const styles = StyleSheet.create({
     container: {
@@ -152,57 +145,78 @@ const styles = StyleSheet.create({
         marginBottom: spacing.md,
         fontWeight: '600',
         textAlign: 'right',
+        fontFamily: 'Vazirmatn',
     },
     inputWrapper: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderWidth: 1.5,
-        borderRadius: radii.xl,
-        paddingHorizontal: spacing.lg,
-        height: 64,
-        backgroundColor: 'rgba(120,120,128,0.06)',
+        borderWidth: 2,
+        borderRadius: radii.xl + 4,
+        paddingHorizontal: spacing.xl,
+        height: 68,
+        backgroundColor: 'rgba(120, 120, 128, 0.04)',
         marginBottom: spacing.lg,
         ...Platform.select({
             ios: {
-                shadowOpacity: 0.08,
-                shadowRadius: 12,
+                shadowColor: '#000',
                 shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.08,
+                shadowRadius: 16,
             },
-            android: { elevation: 6 },
+            android: {
+                elevation: 8,
+            },
         }),
     },
     inputWrapperFocused: {
-        backgroundColor: 'rgba(120,120,128,0.1)',
-        shadowOpacity: 0.15,
-        shadowRadius: 20,
-        elevation: 12,
+        backgroundColor: 'rgba(120, 120, 128, 0.08)',
+        borderColor: colors.light.primary,
+        ...Platform.select({
+            ios: {
+                shadowOpacity: 0.2,
+                shadowRadius: 24,
+            },
+            android: {
+                elevation: 16,
+            },
+        }),
     },
     countryCode: {
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: '700',
-        color: '#666',
-        marginRight: 8,
+        color: '#444',
+        marginRight: spacing.sm,
+        fontFamily: 'Vazirmatn-Bold',
     },
     input: {
         flex: 1,
-        fontSize: 19,
-        paddingVertical: 16,
-        textAlign: 'left',
+        fontSize: 20,
+        paddingVertical: spacing.md,
+        fontFamily: 'Vazirmatn',
     },
     errorText: {
         textAlign: 'right',
-        marginTop: -8,
+        marginTop: -spacing.xs,
         marginBottom: spacing.md,
+        fontFamily: 'Vazirmatn',
     },
     button: {
         borderRadius: radii.xl,
         marginTop: spacing.xl,
         backgroundColor: colors.light.primary,
+        height: 56,
     },
     buttonDisabled: {
-        backgroundColor: '#585858ff',
+        backgroundColor: '#888',
+        opacity: 0.7,
     },
     buttonContent: {
-        paddingVertical: 8,
+        paddingVertical: spacing.sm,
+    },
+    buttonLabel: {
+        color: '#fff',
+        fontFamily: 'Vazirmatn',
+        fontWeight: '700',
+        fontSize: 17,
     },
 });

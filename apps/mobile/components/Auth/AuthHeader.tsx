@@ -1,17 +1,16 @@
-// components/Auth/AuthHeader.tsx
 import React from 'react';
 
 import {
-    Animated,
-    Platform,
-    StyleSheet,
-    View,
+  Animated,
+  Platform,
+  StyleSheet,
+  View,
 } from 'react-native';
 
 import {
-    radii,
-    spacing,
-    typography,
+  radii,
+  spacing,
+  typography,
 } from '@scrapdealer/tokens';
 
 import { Text } from '../../components/CustomText';
@@ -31,7 +30,6 @@ export const AuthHeader: React.FC<{
 
     return (
         <View style={styles.container}>
-            {/* Phone Step */}
             <Animated.View
                 style={[
                     styles.slideContainer,
@@ -64,7 +62,6 @@ export const AuthHeader: React.FC<{
                 )}
             </Animated.View>
 
-            {/* OTP Step */}
             <Animated.View
                 style={[
                     styles.slideContainer,
@@ -98,7 +95,6 @@ export const AuthHeader: React.FC<{
                             کد ۶ رقمی ارسال شده به
                         </Text>
 
-                        {/* Premium Glass Card – using only theme.surface */}
                         <View style={[styles.phoneCard, { backgroundColor: colors.surface + (isDark ? '20' : '10') }]}>
                             <Text style={[styles.phoneNumber, { color: myColors.textPrimary }]}>
                                 {phoneNumber}
