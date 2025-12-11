@@ -3,8 +3,8 @@ import './globals.css';
 import ThemeProvider from './components/ThemeProvider';
 
 export const metadata = {
-  title: 'Your App Title',
-  description: 'Your app description',
+  title: 'ضایعات چی',
+  description: 'پلتفرم آنلاین خرید و فروش ضایعات به صورت عمده',
 };
 
 export default function RootLayout({
