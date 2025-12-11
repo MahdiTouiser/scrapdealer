@@ -1,14 +1,23 @@
 import './globals.css';
 
+import ThemeProvider from './components/ThemeProvider';
+
+export const metadata = {
+  title: 'Your App Title',
+  description: 'Your app description',
+};
+
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
+    <html lang="ar" dir="rtl">
       <body>
-        {children}
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
