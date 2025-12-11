@@ -2,7 +2,6 @@
 import { colors } from '@/colors';
 import {
     Box,
-    Button,
     Container,
     Grid,
     Typography,
@@ -13,7 +12,7 @@ export default function AboutSection() {
         <Box sx={{ bgcolor: colors.light.surface, py: 10 }}>
             <Container>
                 <Grid container spacing={8} alignItems="center">
-                    <Grid item xs={12} md={6}>
+                    <Grid>
                         <Typography
                             variant="h3"
                             fontWeight="bold"
@@ -33,20 +32,8 @@ export default function AboutSection() {
                         >
                             با ما می‌توانید قیمت‌های لحظه‌ای بازار را مشاهده کنید، درخواست فروش ثبت نمایید و در سریع‌ترین زمان ممکن، ضایعات خود را به فروش برسانید.
                         </Typography>
-                        <Button
-                            variant="contained"
-                            size="large"
-                            sx={{
-                                bgcolor: colors.light.primary,
-                                px: 5,
-                                py: 1.5,
-                                '&:hover': { bgcolor: '#00a043' }
-                            }}
-                        >
-                            بیشتر بخوانید
-                        </Button>
                     </Grid>
-                    <Grid item xs={12} md={6}>
+                    <Grid>
                         <Box
                             sx={{
                                 height: 450,
