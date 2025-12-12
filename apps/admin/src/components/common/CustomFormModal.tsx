@@ -1,14 +1,15 @@
 'use client';
+
 import {
-  useEffect,
-  useState,
+    useEffect,
+    useState,
 } from 'react';
 
 import {
-  Controller,
-  FieldValues,
-  SubmitHandler,
-  useForm,
+    Controller,
+    FieldValues,
+    SubmitHandler,
+    useForm,
 } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -18,25 +19,25 @@ import CloseIcon from '@mui/icons-material/Close';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import {
-  alpha,
-  Box,
-  Button,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControlLabel,
-  IconButton,
-  MenuItem,
-  Stack,
-  Switch,
-  TextField,
-  useTheme,
-  Zoom,
+    alpha,
+    Box,
+    Button,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControlLabel,
+    IconButton,
+    MenuItem,
+    Stack,
+    Switch,
+    TextField,
+    useTheme,
+    Zoom,
 } from '@mui/material';
 
-export type FieldType = 'text' | 'email' | 'select' | 'toggle' | 'password' | 'phone' | 'textarea';
+export type FieldType = 'text' | 'email' | 'select' | 'toggle' | 'password' | 'phone' | 'textarea' | 'file';
 
 export interface FormField {
     name: string;
@@ -110,23 +111,18 @@ const CustomFormModal = ({
         control,
         formState: { errors },
         reset,
+        setValue,
     } = useForm({
         resolver: zodResolver(schema),
         defaultValues,
     });
 
-    // Reset form when defaultValues change OR when modal opens
     useEffect(() => {
-        if (open) {
-            reset(defaultValues);
-        }
+        if (open) reset(defaultValues);
     }, [open, defaultValues, reset]);
 
-    // Also reset when modal closes
     useEffect(() => {
-        if (!open) {
-            reset({});
-        }
+        if (!open) reset({});
     }, [open, reset]);
 
     const handleClose = () => {
@@ -137,7 +133,6 @@ const CustomFormModal = ({
     const handleFormSubmit = async (data: FieldValues) => {
         await onSubmit(data);
     };
-
 
     return (
         <Dialog
@@ -252,6 +247,22 @@ const CustomFormModal = ({
                                                 placeholder={field.placeholder}
                                                 disabled={submitLoading}
                                                 sx={{ gridColumn: '1 / -1' }}
+                                            />
+                                        );
+                                    }
+                                    if (field.fieldType === 'file') {
+                                        return (
+                                            <TextField
+                                                key={field.name}
+                                                label={field.label}
+                                                type="file"
+                                                fullWidth
+                                                disabled={submitLoading}
+                                                InputLabelProps={{ shrink: true }}
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) setValue(field.name, file);
+                                                }}
                                             />
                                         );
                                     }
