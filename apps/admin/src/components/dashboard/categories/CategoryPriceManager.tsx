@@ -20,7 +20,6 @@ export default function CategoryPriceManager() {
     });
 
     const categories = res?.data ?? [];
-
     if (loading) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" minHeight={400}>

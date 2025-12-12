@@ -64,14 +64,14 @@ export const MENU_SECTIONS: MenuSection[] = [
             { text: 'فاکتورها', icon: <Description />, path: '/finance/invoices', key: 'Permissions.Menu.Invoices' },
         ],
     },
-    {
-        section: 'پرسش‌ها و پاسخ‌ها',
-        collapsible: true,
-        items: [
-            { text: 'سوالات کاربران', icon: <AdminPanelSettings />, path: '/questions', key: 'Permissions.Menu.FAQ' },
-            { text: 'پاسخ‌های ثبت شده', icon: <History />, path: '/questions/answers', key: 'Permissions.Menu.FAQ' },
-        ],
-    },
+    // {
+    //     section: 'پرسش‌ها و پاسخ‌ها',
+    //     collapsible: true,
+    //     items: [
+    //         { text: 'سوالات کاربران', icon: <AdminPanelSettings />, path: '/questions', key: 'Permissions.Menu.FAQ' },
+    //         { text: 'پاسخ‌های ثبت شده', icon: <History />, path: '/questions/answers', key: 'Permissions.Menu.FAQ' },
+    //     ],
+    // },
     {
         section: 'اخبار',
         collapsible: true,
