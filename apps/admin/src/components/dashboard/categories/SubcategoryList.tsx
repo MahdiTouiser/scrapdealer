@@ -1,5 +1,4 @@
 'use client';
-
 import {
     useEffect,
     useState,
@@ -23,14 +22,12 @@ interface Props {
     onSuccess: () => void;
 }
 
-// Format number with thousand separators
 const formatNumber = (value: string): string => {
     const num = value.replace(/[^\d]/g, '');
     if (!num) return '';
     return Number(num).toLocaleString('en-US');
 };
 
-// Remove formatting for API submission
 const parseNumber = (value: string): number => {
     return Number(value.replace(/[^\d]/g, ''));
 };
@@ -59,10 +56,13 @@ export default function SubcategoryList({ categoryId, onSuccess }: Props) {
     const handleAdd = async () => {
         if (!newSub.name || !newSub.minPrice || !newSub.maxPrice) return;
 
-        await createSub.mutate({
+        const minPrice = parseNumber(newSub.minPrice);
+        const maxPrice = parseNumber(newSub.maxPrice);
+
+        await createSub.mutateAsync({
             name: newSub.name,
-            minPrice: parseNumber(newSub.minPrice),
-            maxPrice: parseNumber(newSub.maxPrice),
+            minPrice,
+            maxPrice,
             categoryId,
         });
 
@@ -77,26 +77,6 @@ export default function SubcategoryList({ categoryId, onSuccess }: Props) {
 
     return (
         <Stack spacing={2}>
-            {/* DEBUG INFO - Remove this after testing */}
-            <Paper sx={{ p: 2, bgcolor: 'yellow' }}>
-                <Typography variant="caption">DEBUG INFO:</Typography>
-                <Typography variant="body2">Min Price State: "{newSub.minPrice}"</Typography>
-                <Typography variant="body2">Max Price State: "{newSub.maxPrice}"</Typography>
-                <Typography variant="body2">
-                    Format Test: {formatNumber('1000')} | {formatNumber('1000000')}
-                </Typography>
-                <Button
-                    size="small"
-                    onClick={() => {
-                        console.log('Test button clicked');
-                        setNewSub({ ...newSub, minPrice: '1,234' });
-                    }}
-                >
-                    Test Set Min to 1,234
-                </Button>
-            </Paper>
-            {/* END DEBUG */}
-
             {subcategories.map((sub) => (
                 <SubcategoryItem
                     key={sub.id}
@@ -127,44 +107,38 @@ export default function SubcategoryList({ categoryId, onSuccess }: Props) {
                 >
                     افزودن زیر دسته جدید
                 </Typography>
-
                 <Stack direction="row" spacing={2} alignItems="center">
                     <TextField
                         label="نام زیر دسته"
                         size="small"
                         value={newSub.name}
                         onChange={(e) => {
-                            console.log('Name field changed:', e.target.value);
                             setNewSub({ ...newSub, name: e.target.value });
                         }}
                         sx={{ minWidth: 180 }}
                     />
                     <TextField
-                        label="حداقل"
+                        label="حداقل (تومان)"
                         size="small"
                         value={newSub.minPrice}
                         onChange={(e) => {
-                            console.log('Min price field changed:', e.target.value);
                             const formatted = formatNumber(e.target.value);
-                            console.log('Formatted to:', formatted);
                             setNewSub({ ...newSub, minPrice: formatted });
                         }}
-                        sx={{ width: 110 }}
+                        sx={{ width: 130 }}
                         inputProps={{
                             inputMode: 'numeric',
                         }}
                     />
                     <TextField
-                        label="حداکثر"
+                        label="حداکثر (تومان)"
                         size="small"
                         value={newSub.maxPrice}
                         onChange={(e) => {
-                            console.log('Max price field changed:', e.target.value);
                             const formatted = formatNumber(e.target.value);
-                            console.log('Formatted to:', formatted);
                             setNewSub({ ...newSub, maxPrice: formatted });
                         }}
-                        sx={{ width: 110 }}
+                        sx={{ width: 130 }}
                         inputProps={{
                             inputMode: 'numeric',
                         }}
