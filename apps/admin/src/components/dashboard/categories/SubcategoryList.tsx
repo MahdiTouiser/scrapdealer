@@ -1,4 +1,5 @@
 'use client';
+
 import {
     useEffect,
     useState,
@@ -44,7 +45,9 @@ export default function SubcategoryList({ categoryId, onSuccess }: Props) {
         url: `/subcategories?categoryId=${categoryId}`,
     });
 
-    const subcategories = subRes?.data ?? [];
+    const subcategories = (subRes?.data ?? []).filter(
+        (sub) => String(sub.parentCategoryId) === String(categoryId)
+    );
 
     const createSub = useApi<SubCat>({
         key: ['createSub'],
@@ -64,6 +67,7 @@ export default function SubcategoryList({ categoryId, onSuccess }: Props) {
             minPrice,
             maxPrice,
             categoryId,
+            parentCategoryId: categoryId,
         });
 
         setNewSub({ name: '', minPrice: '', maxPrice: '' });
@@ -77,16 +81,17 @@ export default function SubcategoryList({ categoryId, onSuccess }: Props) {
 
     return (
         <Stack spacing={2}>
-            {subcategories.map((sub) => (
-                <SubcategoryItem
-                    key={sub.id}
-                    subcategory={sub}
-                    onSuccess={() => {
-                        refetchSubs();
-                        onSuccess?.();
-                    }}
-                />
-            ))}
+            {subcategories.length > 0 &&
+                subcategories.map((sub) => (
+                    <SubcategoryItem
+                        key={sub.id}
+                        subcategory={sub}
+                        onSuccess={() => {
+                            refetchSubs();
+                            onSuccess?.();
+                        }}
+                    />
+                ))}
 
             <Paper
                 elevation={0}
@@ -112,36 +117,28 @@ export default function SubcategoryList({ categoryId, onSuccess }: Props) {
                         label="نام زیر دسته"
                         size="small"
                         value={newSub.name}
-                        onChange={(e) => {
-                            setNewSub({ ...newSub, name: e.target.value });
-                        }}
+                        onChange={(e) => setNewSub({ ...newSub, name: e.target.value })}
                         sx={{ minWidth: 180 }}
                     />
                     <TextField
                         label="حداقل (تومان)"
                         size="small"
                         value={newSub.minPrice}
-                        onChange={(e) => {
-                            const formatted = formatNumber(e.target.value);
-                            setNewSub({ ...newSub, minPrice: formatted });
-                        }}
+                        onChange={(e) =>
+                            setNewSub({ ...newSub, minPrice: formatNumber(e.target.value) })
+                        }
                         sx={{ width: 130 }}
-                        inputProps={{
-                            inputMode: 'numeric',
-                        }}
+                        inputProps={{ inputMode: 'numeric' }}
                     />
                     <TextField
                         label="حداکثر (تومان)"
                         size="small"
                         value={newSub.maxPrice}
-                        onChange={(e) => {
-                            const formatted = formatNumber(e.target.value);
-                            setNewSub({ ...newSub, maxPrice: formatted });
-                        }}
+                        onChange={(e) =>
+                            setNewSub({ ...newSub, maxPrice: formatNumber(e.target.value) })
+                        }
                         sx={{ width: 130 }}
-                        inputProps={{
-                            inputMode: 'numeric',
-                        }}
+                        inputProps={{ inputMode: 'numeric' }}
                     />
                     <Button
                         variant="contained"
