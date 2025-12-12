@@ -31,9 +31,6 @@ export default function CategoryPriceManager() {
 
     return (
         <Paper elevation={2} sx={{ p: 4, borderRadius: 3 }}>
-            <Typography variant="h5" fontWeight={600} mb={3}>
-                مدیریت دسته‌بندی و قیمت‌ها
-            </Typography>
 
             <AddCategoryForm onSuccess={refetch} />
 

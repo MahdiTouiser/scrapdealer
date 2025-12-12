@@ -1,10 +1,10 @@
+import { Cat } from '@/components/types';
 import {
-  Fade,
-  Stack,
+    Fade,
+    Stack,
 } from '@mui/material';
 
 import CategoryItem from './CategoryItem';
-import { Cat } from './types';
 
 interface Props {
     categories: Cat[];
