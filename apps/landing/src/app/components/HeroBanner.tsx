@@ -90,7 +90,6 @@ export default function HeroBanner() {
                         animation: `${fadeInUp} 1s ease-out`
                     }}
                 >
-                    {/* Badge */}
                     <Box
                         sx={{
                             display: 'inline-flex',
@@ -168,36 +167,7 @@ export default function HeroBanner() {
                         با ضایعات چی، قیمت‌های روز بازار را ببینید، درخواست فروش ثبت کنید و بهترین پیشنهاد را دریافت کنید. همین حالا شروع کنید!
                     </Typography>
 
-                    {/* Stats */}
-                    <Stack
-                        direction={{ xs: 'column', sm: 'row' }}
-                        spacing={4}
-                        sx={{ mb: 5 }}
-                    >
-                        {[
-                            { label: 'کاربر فعال', value: '+۱۰۰۰' },
-                            { label: 'معامله موفق', value: '+۵۰۰۰' },
-                            { label: 'رضایت مشتری', value: '۹۸٪' }
-                        ].map((stat, index) => (
-                            <Box key={index} sx={{ textAlign: { xs: 'center', sm: 'right' } }}>
-                                <Typography
-                                    variant="h3"
-                                    color="white"
-                                    fontWeight="900"
-                                    sx={{ fontSize: { xs: '2rem', md: '2.5rem' } }}
-                                >
-                                    {stat.value}
-                                </Typography>
-                                <Typography
-                                    variant="body2"
-                                    color="white"
-                                    sx={{ opacity: 0.9, fontSize: '1rem' }}
-                                >
-                                    {stat.label}
-                                </Typography>
-                            </Box>
-                        ))}
-                    </Stack>
+
 
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3}>
                         <Button
@@ -224,71 +194,12 @@ export default function HeroBanner() {
                             دانلود اندروید
                         </Button>
 
-                        <Button
-                            variant="outlined"
-                            size="large"
-                            sx={{
-                                color: 'white',
-                                borderColor: 'rgba(255,255,255,0.5)',
-                                fontWeight: 'bold',
-                                px: 5,
-                                py: 2.5,
-                                fontSize: '1.2rem',
-                                borderRadius: '16px',
-                                borderWidth: '2px',
-                                backdropFilter: 'blur(10px)',
-                                bgcolor: 'rgba(255,255,255,0.1)',
-                                '&:hover': {
-                                    borderColor: 'white',
-                                    bgcolor: 'rgba(255,255,255,0.2)',
-                                    borderWidth: '2px',
-                                    transform: 'translateY(-4px)',
-                                    boxShadow: '0 8px 24px rgba(0,0,0,0.2)'
-                                },
-                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-                            }}
-                        >
-                            مشاهده قیمت‌ها
-                        </Button>
                     </Stack>
 
-                    {/* Trust Badges */}
-                    <Stack
-                        direction="row"
-                        spacing={2}
-                        alignItems="center"
-                        sx={{ mt: 5, flexWrap: 'wrap', gap: 2 }}
-                    >
-                        <Typography variant="body2" color="white" sx={{ opacity: 0.8 }}>
-                            قابل اعتماد برای:
-                        </Typography>
-                        {['مراکز بازیافت', 'کسب‌وکارها', 'افراد'].map((item, index) => (
-                            <Box
-                                key={index}
-                                sx={{
-                                    px: 2.5,
-                                    py: 1,
-                                    borderRadius: '12px',
-                                    bgcolor: 'rgba(255,255,255,0.15)',
-                                    backdropFilter: 'blur(10px)',
-                                    border: '1px solid rgba(255,255,255,0.2)'
-                                }}
-                            >
-                                <Typography
-                                    variant="body2"
-                                    color="white"
-                                    fontWeight="600"
-                                    sx={{ fontSize: '0.9rem' }}
-                                >
-                                    {item}
-                                </Typography>
-                            </Box>
-                        ))}
-                    </Stack>
+
                 </Box>
             </Container>
 
-            {/* Bottom Wave */}
             <Box
                 sx={{
                     position: 'absolute',

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { Cat } from '@/components/types';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   Accordion,
@@ -12,7 +13,6 @@ import {
 
 import CategoryHeader from './CategoryHeader';
 import SubcategoryList from './SubcategoryList';
-import { Cat } from './types';
 
 interface Props {
     category: Cat;

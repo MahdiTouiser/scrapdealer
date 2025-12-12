@@ -1,7 +1,6 @@
 'use client'
 import './globals.css';
 
-import { colors } from '@/colors';
 import { Box } from '@mui/material';
 
 import AboutSection from './components/AboutSection';
@@ -17,11 +16,11 @@ import VideoSection from './components/VideoSection';
 export default function Page() {
   return (
     <ThemeProvider>
-      <Box sx={{ direction: 'rtl', bgcolor: colors.light.background }}>
+      <Box>
         <HeroBanner />
+        <PricesSection />
         <FeaturesSection />
         <AboutSection />
-        <PricesSection />
         <VideoSection />
         <NewsSection />
         <ContactSection />
