@@ -1,12 +1,30 @@
 import { LocalShipping, Recycling, Speed, TrendingUp } from '@mui/icons-material';
 
 export const prices = [
-  { name: 'آهن قراضه', minPrice: 250000, maxPrice: 550000, unit: 'تومان/کیلو', trend: '+5%', up: true },
-  { name: 'مس', minPrice: 750000, maxPrice: 1100000, unit: 'تومان/کیلو', trend: '+12%', up: true },
-  { name: 'آلومینیوم', minPrice: 350000, maxPrice: 600000, unit: 'تومان/کیلو', trend: '+3%', up: true },
-  { name: 'برنج', minPrice: 180000, maxPrice: 320000, unit: 'تومان/کیلو', trend: '-2%', up: false },
-  { name: 'استیل', minPrice: 420000, maxPrice: 680000, unit: 'تومان/کیلو', trend: '+8%', up: true },
-  { name: 'کابل', minPrice: 550000, maxPrice: 850000, unit: 'تومان/کیلو', trend: '+6%', up: true },
+  {
+    category: 'ضایعات آهنی',
+    items: [
+      { name: 'آهن سنگین', price: 15800, change: 350, percent: 1.8, up: true },
+      { name: 'آهن سبک', price: 13200, change: -120, percent: -0.9, up: false },
+      { name: 'پروفیل ضایعاتی', price: 18900, change: 420, percent: 2.3, up: true },
+    ],
+  },
+  {
+    category: 'ضایعات مس و آلومینیوم',
+    items: [
+      { name: 'مس درجه یک', price: 398000, change: 5500, percent: 1.4, up: true },
+      { name: 'مس درجه دو', price: 365000, change: -3200, percent: -0.8, up: false },
+      { name: 'آلومینیوم ضایعاتی', price: 72000, change: 800, percent: 1.1, up: true },
+    ],
+  },
+  {
+    category: 'ضایعات استیل و برنج',
+    items: [
+      { name: 'استیل ۳۰۴', price: 118000, change: 900, percent: 0.7, up: true },
+      { name: 'استیل ۲۰۱', price: 68000, change: -500, percent: -0.6, up: false },
+      { name: 'برنج ضایعاتی', price: 210000, change: 2400, percent: 1.2, up: true },
+    ],
+  },
 ];
 
 export const news = [

@@ -1,102 +1,67 @@
 'use client'
-import { colors } from '@/colors';
 import { prices } from '@/data';
 import {
     Box,
     Card,
-    CardContent,
-    Chip,
     Container,
-    Grid,
+    Divider,
     Stack,
     Typography,
 } from '@mui/material';
 
 export default function PricesSection() {
     return (
-        <Container sx={{ py: 10 }}>
-            <Box sx={{ textAlign: 'center', mb: 8 }}>
-                <Typography
-                    variant="h3"
-                    fontWeight="bold"
-                    sx={{ mb: 2, color: colors.light.textPrimary }}
-                >
-                    قیمت و انواع ضایعات
-                </Typography>
-                <Typography variant="body1" sx={{ color: colors.light.textSecondary, fontSize: '1.1rem' }}>
-                    قیمت‌های بروز شده هر ساعت
-                </Typography>
-            </Box>
-
-            <Grid container spacing={3}>
-                {prices.map((item, i) => (
-                    <Grid item xs={12} sm={6} md={4} key={i}>
-                        <Card
-                            elevation={0}
-                            sx={{
-                                height: '100%',
-                                transition: 'all 0.3s',
-                                bgcolor: colors.light.surface,
-                                border: `2px solid ${colors.light.secondary}`,
-                                borderRadius: 3,
-                                '&:hover': {
-                                    transform: 'translateY(-8px)',
-                                    boxShadow: `0 12px 30px rgba(0, 200, 83, 0.2)`,
-                                    borderColor: colors.light.primary
-                                }
-                            }}
+        <Container sx={{ py: 6 }}>
+            <Stack spacing={4}>
+                {prices.map((cat, i) => (
+                    <Card
+                        key={i}
+                        sx={{
+                            p: 2,
+                            borderRadius: 3,
+                            border: '1px solid #e0e0e0',
+                        }}
+                    >
+                        <Typography
+                            variant="h6"
+                            sx={{ mb: 2, fontWeight: 'bold', textAlign: 'center' }}
                         >
-                            <CardContent sx={{ p: 3 }}>
-                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-                                    <Typography
-                                        variant="h5"
-                                        fontWeight="bold"
-                                        sx={{ color: colors.light.textPrimary }}
+                            {cat.category}
+                        </Typography>
+
+                        <Stack spacing={2}>
+                            {cat.items.map((item, idx) => (
+                                <Box key={idx}>
+                                    <Stack
+                                        direction="row"
+                                        justifyContent="space-between"
+                                        alignItems="center"
+                                        sx={{ py: 1 }}
                                     >
-                                        {item.name}
-                                    </Typography>
-                                    <Chip
-                                        label={item.trend}
-                                        size="small"
-                                        sx={{
-                                            bgcolor: item.up ? '#e8f5e9' : '#ffebee',
-                                            color: item.up ? '#2e7d32' : '#c62828',
-                                            fontWeight: 'bold',
-                                            fontSize: '0.85rem'
-                                        }}
-                                    />
-                                </Stack>
+                                        <Typography sx={{ fontSize: '1rem' }}>{item.name}</Typography>
 
-                                <Box sx={{ mb: 2, p: 2, bgcolor: colors.light.secondary, borderRadius: 2 }}>
-                                    <Stack direction="row" justifyContent="space-between" sx={{ mb: 1.5 }}>
-                                        <Typography variant="body2" sx={{ color: colors.light.textSecondary }}>
-                                            حداقل:
+                                        <Typography sx={{ fontSize: '1rem', fontWeight: 'bold' }}>
+                                            {item.price.toLocaleString()}
                                         </Typography>
-                                        <Typography variant="h6" fontWeight="bold" sx={{ color: colors.light.textPrimary }}>
-                                            {item.minPrice.toLocaleString()}
-                                        </Typography>
-                                    </Stack>
-                                    <Stack direction="row" justifyContent="space-between">
-                                        <Typography variant="body2" sx={{ color: colors.light.textSecondary }}>
-                                            حداکثر:
-                                        </Typography>
-                                        <Typography variant="h6" fontWeight="bold" sx={{ color: colors.light.textPrimary }}>
-                                            {item.maxPrice.toLocaleString()}
+
+                                        <Typography
+                                            sx={{
+                                                fontSize: '0.9rem',
+                                                fontWeight: 'bold',
+                                                color: item.up ? '#2e7d32' : '#c62828'
+                                            }}
+                                        >
+                                            {item.change.toLocaleString()} ({item.percent}%)
                                         </Typography>
                                     </Stack>
+
+                                    {idx !== cat.items.length - 1 && <Divider />}
                                 </Box>
-
-                                <Typography
-                                    variant="caption"
-                                    sx={{ color: colors.light.textSecondary, fontSize: '0.9rem' }}
-                                >
-                                    {item.unit}
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
+                            ))}
+                        </Stack>
+                    </Card>
                 ))}
-            </Grid>
+            </Stack>
         </Container>
-    );
+    )
 }

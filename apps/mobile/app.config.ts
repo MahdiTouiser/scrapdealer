@@ -13,6 +13,9 @@ export default () => ({
     resizeMode: 'contain',
     backgroundColor: '#ffffff',
   },
+  ios: {
+    supportsTablet: true,
+  },
   android: {
     package: 'com.scrapdealer.mobile',
     adaptiveIcon: {
