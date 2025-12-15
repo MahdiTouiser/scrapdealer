@@ -34,7 +34,7 @@ export default function AddCategoryForm({ onSuccess }: Props) {
     const handleSubmit = async () => {
         if (!form.name || !form.minPrice || !form.maxPrice) return
 
-        await createCat.mutate({
+        await createCat.mutateAsync({
             name: form.name,
             minPrice: Number(rawNumber(form.minPrice)),
             maxPrice: Number(rawNumber(form.maxPrice)),

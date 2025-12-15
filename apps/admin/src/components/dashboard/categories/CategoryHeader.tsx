@@ -15,88 +15,114 @@ import {
 } from '@mui/material';
 
 interface Props {
-    category: Cat
-    onSuccess: () => void
+    category: Cat;
+    onSuccess: () => void;
 }
 
+const formatNumber = (value: string): string => {
+    const num = value.replace(/[^\d]/g, '');
+    if (!num) return '';
+    return Number(num).toLocaleString('en-US');
+};
+
+const parseNumber = (value: string): number => {
+    return Number(value.replace(/[^\d]/g, ''));
+};
+
 export default function CategoryHeader({ category, onSuccess }: Props) {
-    const [buffer, setBuffer] = useState<Partial<Cat>>({})
+    const [buffer, setBuffer] = useState<Partial<Cat>>({});
 
-    const updateCat = useApi({ key: ['updateCat'], url: `/categories/${category.id}`, method: 'PUT' })
-    const deleteCat = useApi({ key: ['deleteCat'], url: `/categories/${category.id}`, method: 'DELETE' })
+    const updateCat = useApi({
+        key: ['updateCat'],
+        url: `/categories/${category.id}`,
+        method: 'PUT',
+        onSuccess: 'دسته بروزرسانی شد',
+    });
 
-    const hasChanges = Object.keys(buffer).length > 0
+    const deleteCat = useApi({
+        key: ['deleteCat'],
+        url: `/categories/${category.id}`,
+        method: 'DELETE',
+        onSuccess: 'دسته حذف شد',
+    });
 
-    const formatNumber = (v: string) => {
-        const n = v.replace(/\D/g, '')
-        return n.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-    }
+    const hasChanges = Object.keys(buffer).length > 0;
 
-    const raw = (v: string) => v.replace(/,/g, '')
+    const getDisplayValue = (field: 'minPrice' | 'maxPrice') => {
+        const value = buffer[field] ?? category[field];
+        return formatNumber(String(value));
+    };
 
     const save = async () => {
-        if (!hasChanges) return
+        if (!hasChanges) return;
+
         await updateCat.mutateAsync({
             ...category,
-            minPrice: Number(raw(String(buffer.minPrice ?? category.minPrice))),
-            maxPrice: Number(raw(String(buffer.maxPrice ?? category.maxPrice)))
-        })
-        setBuffer({})
-        onSuccess()
-    }
+            minPrice: buffer.minPrice ?? category.minPrice,
+            maxPrice: buffer.maxPrice ?? category.maxPrice,
+        });
+
+        setBuffer({});
+        onSuccess();
+    };
 
     const remove = async () => {
-        if (!confirm('آیا از حذف این دسته مطمئن هستید؟')) return
-        await deleteCat.mutateAsync({})
-        onSuccess()
-    }
+        if (!confirm('آیا از حذف این دسته مطمئن هستید؟')) return;
+        await deleteCat.mutateAsync({});
+        onSuccess();
+    };
 
-    const getDisplay = (val: number | string | undefined) => {
-        const base = val === undefined ? '' : String(val)
-        return formatNumber(base)
-    }
+    const handleMinChange = (value: string) => {
+        const formatted = formatNumber(value);
+        setBuffer({ ...buffer, minPrice: parseNumber(formatted) });
+    };
 
-    const handleMin = (v: string) => {
-        const formatted = formatNumber(v)
-        setBuffer({ ...buffer, minPrice: Number(raw(formatted)) })
-    }
-
-    const handleMax = (v: string) => {
-        const formatted = formatNumber(v)
-        setBuffer({ ...buffer, maxPrice: Number(raw(formatted)) })
-    }
+    const handleMaxChange = (value: string) => {
+        const formatted = formatNumber(value);
+        setBuffer({ ...buffer, maxPrice: parseNumber(formatted) });
+    };
 
     return (
         <Stack direction="row" alignItems="center" spacing={2} mb={2}>
             <Stack direction="row" spacing={1} alignItems="center" flexGrow={1}>
                 <TextField
                     size="small"
-                    value={getDisplay(buffer.minPrice ?? category.minPrice)}
-                    onChange={(e) => handleMin(e.target.value)}
-                    sx={{ width: 120 }}
+                    value={getDisplayValue('minPrice')}
+                    onChange={(e) => handleMinChange(e.target.value)}
+                    sx={{ width: 130 }}
+                    inputProps={{
+                        inputMode: 'numeric',
+                    }}
+                    placeholder="حداقل"
                 />
-
                 <Typography color="text.secondary">—</Typography>
-
                 <TextField
                     size="small"
-                    value={getDisplay(buffer.maxPrice ?? category.maxPrice)}
-                    onChange={(e) => handleMax(e.target.value)}
-                    sx={{ width: 120 }}
+                    value={getDisplayValue('maxPrice')}
+                    onChange={(e) => handleMaxChange(e.target.value)}
+                    sx={{ width: 130 }}
+                    inputProps={{
+                        inputMode: 'numeric',
+                    }}
+                    placeholder="حداکثر"
                 />
-
-                <Typography variant="body2" color="text.secondary">تومان</Typography>
+                <Typography variant="body2" color="text.secondary">
+                    تومان
+                </Typography>
             </Stack>
-
             <Stack direction="row" spacing={1}>
                 <Tooltip title="ذخیره تغییرات">
                     <span>
-                        <IconButton onClick={save} color="success" disabled={!hasChanges} size="small">
+                        <IconButton
+                            onClick={save}
+                            color="success"
+                            disabled={!hasChanges}
+                            size="small"
+                        >
                             <Save fontSize="small" />
                         </IconButton>
                     </span>
                 </Tooltip>
-
                 <Tooltip title="حذف دسته">
                     <span>
                         <IconButton onClick={remove} color="error" size="small">
@@ -106,5 +132,5 @@ export default function CategoryHeader({ category, onSuccess }: Props) {
                 </Tooltip>
             </Stack>
         </Stack>
-    )
+    );
 }

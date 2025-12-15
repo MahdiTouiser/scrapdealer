@@ -2,39 +2,48 @@
 
 import { useState } from 'react';
 
+import { SubCat } from '@/components/types';
 import { useApi } from '@/hooks/useApi';
 import {
-  DeleteOutlineRounded,
-  Save,
+    DeleteOutlineRounded,
+    Save,
 } from '@mui/icons-material';
 import {
-  IconButton,
-  Paper,
-  Stack,
-  TextField,
-  Tooltip,
-  Typography,
+    IconButton,
+    Paper,
+    Stack,
+    TextField,
+    Tooltip,
+    Typography,
 } from '@mui/material';
-
-import { SubCat } from './types';
 
 interface Props {
     subcategory: SubCat;
     onSuccess: () => void;
 }
 
+const formatNumber = (value: string | number): string => {
+    const num = String(value).replace(/[^\d]/g, '');
+    if (!num) return '';
+    return Number(num).toLocaleString('en-US');
+};
+
+const parseNumber = (value: string): number => {
+    return Number(value.replace(/[^\d]/g, ''));
+};
+
 export default function SubcategoryItem({ subcategory, onSuccess }: Props) {
     const [buffer, setBuffer] = useState<Partial<SubCat>>({});
 
     const updateSub = useApi<SubCat>({
-        key: ['updateSub', subcategory.id],
+        key: ['updateSubcategory', subcategory.id],
         url: `/subcategories/${subcategory.id}`,
         method: 'PUT',
         onSuccess: 'ذخیره شد',
     });
 
     const deleteSub = useApi({
-        key: ['deleteSub', subcategory.id],
+        key: ['deleteSubcategory', subcategory.id],
         url: `/subcategories/${subcategory.id}`,
         method: 'DELETE',
         onSuccess: 'حذف شد',
@@ -42,16 +51,39 @@ export default function SubcategoryItem({ subcategory, onSuccess }: Props) {
 
     const hasChanges = Object.keys(buffer).length > 0;
 
+    const getDisplayValue = (field: 'minPrice' | 'maxPrice') => {
+        const value = buffer[field] ?? subcategory[field];
+        return formatNumber(value);
+    };
+
+    const handleMinChange = (value: string) => {
+        const formatted = formatNumber(value);
+        setBuffer({ ...buffer, minPrice: parseNumber(formatted) });
+    };
+
+    const handleMaxChange = (value: string) => {
+        const formatted = formatNumber(value);
+        setBuffer({ ...buffer, maxPrice: parseNumber(formatted) });
+    };
+
     const save = async () => {
         if (!hasChanges) return;
-        await updateSub.mutate({ ...subcategory, ...buffer } as any);
+
+        await updateSub.mutateAsync({
+            ...subcategory,
+            minPrice: buffer.minPrice ?? subcategory.minPrice,
+            maxPrice: buffer.maxPrice ?? subcategory.maxPrice,
+        } as any);
+
         setBuffer({});
         onSuccess();
     };
 
     const remove = async () => {
-        if (!confirm('آیا از حذف این زیر دسته مطمئن هستید؟')) return;
-        await deleteSub.mutate({});
+        if (!confirm(`آیا از حذف زیر دسته "${subcategory.name}" مطمئن هستید؟`)) return;
+
+        console.log('Deleting subcategory:', subcategory.id, subcategory.name);
+        await deleteSub.mutateAsync({});
         onSuccess();
     };
 
@@ -61,52 +93,54 @@ export default function SubcategoryItem({ subcategory, onSuccess }: Props) {
             sx={{
                 p: 2,
                 borderRadius: 2,
+                bgcolor: 'grey.100',
                 border: '1px solid',
                 borderColor: 'divider',
             }}
         >
-            <Stack direction="row" spacing={2} alignItems="center">
-                <Typography sx={{ minWidth: 150, fontWeight: 500 }}>
+            <Stack direction="row" alignItems="center" spacing={2}>
+                <Typography variant="body2" fontWeight={500} sx={{ minWidth: 150 }}>
                     {subcategory.name}
                 </Typography>
 
-                <TextField
-                    type="number"
-                    size="small"
-                    value={buffer.minPrice ?? subcategory.minPrice}
-                    onChange={(e) =>
-                        setBuffer({ ...buffer, minPrice: Number(e.target.value) })
-                    }
-                    sx={{ width: 100 }}
-                />
-                <Typography color="text.secondary">—</Typography>
-                <TextField
-                    type="number"
-                    size="small"
-                    value={buffer.maxPrice ?? subcategory.maxPrice}
-                    onChange={(e) =>
-                        setBuffer({ ...buffer, maxPrice: Number(e.target.value) })
-                    }
-                    sx={{ width: 100 }}
-                />
-                <Typography variant="body2" color="text.secondary">
-                    تومان
-                </Typography>
+                <Stack direction="row" spacing={1} alignItems="center" flexGrow={1}>
+                    <TextField
+                        size="small"
+                        value={getDisplayValue('minPrice')}
+                        onChange={(e) => handleMinChange(e.target.value)}
+                        sx={{ width: 130 }}
+                        inputProps={{
+                            inputMode: 'numeric',
+                        }}
+                    />
+                    <Typography color="text.secondary">—</Typography>
+                    <TextField
+                        size="small"
+                        value={getDisplayValue('maxPrice')}
+                        onChange={(e) => handleMaxChange(e.target.value)}
+                        sx={{ width: 130 }}
+                        inputProps={{
+                            inputMode: 'numeric',
+                        }}
+                    />
+                    <Typography variant="body2" color="text.secondary">
+                        تومان
+                    </Typography>
+                </Stack>
 
-                <Stack direction="row" spacing={1} ml="auto">
+                <Stack direction="row" spacing={1}>
                     <Tooltip title="ذخیره تغییرات">
                         <span>
                             <IconButton
                                 onClick={save}
                                 color="success"
-                                size="small"
                                 disabled={!hasChanges}
+                                size="small"
                             >
                                 <Save fontSize="small" />
                             </IconButton>
                         </span>
                     </Tooltip>
-
                     <Tooltip title="حذف زیر دسته">
                         <span>
                             <IconButton onClick={remove} color="error" size="small">

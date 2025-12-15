@@ -5,15 +5,15 @@ import { useState } from 'react';
 import AddButton from '@/components/common/AddButton';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import CustomFormModal, {
-  FormField,
+    FormField,
 } from '@/components/common/CustomFormModal';
 import PageTitle from '@/components/common/PageTitle';
 import NewsTable, { News } from '@/components/news/NewsTable';
 import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import {
-  Box,
-  CircularProgress,
+    Box,
+    CircularProgress,
 } from '@mui/material';
 
 const NewsPage = () => {
@@ -27,7 +27,7 @@ const NewsPage = () => {
     const { data: news, loading, refetch: refetchNews } =
         useApi<{ data: News[]; totalCount: number }>({ key: ['get-news'], url: '/News' });
 
-    const { mutate: addNews, loading: adding } = useApi<void, { title: string; summary: string; content: string }>({
+    const { mutate: addNews, loading: adding } = useApi<void, FormData>({
         key: ['add-news'],
         url: '/News',
         method: 'POST',
@@ -35,7 +35,7 @@ const NewsPage = () => {
         onSuccess: 'خبر با موفقیت اضافه شد',
     });
 
-    const { mutate: updateNews, loading: updating } = useApi<void, { id: string; title: string; summary: string; content: string }>({
+    const { mutate: updateNews, loading: updating } = useApi<void, { id: string; formData: FormData }>({
         key: ['update-news'],
         url: (data) => `/News/${data?.id}`,
         method: 'PUT',
@@ -62,6 +62,7 @@ const NewsPage = () => {
         { name: 'title', label: 'عنوان', fieldType: 'text', required: true },
         { name: 'summary', label: 'خلاصه', fieldType: 'text', required: true },
         { name: 'content', label: 'متن خبر', fieldType: 'textarea', required: true },
+        { name: 'image', label: 'تصویر', fieldType: 'file', required: false },
     ];
 
     const handleOpenAdd = () => {
@@ -78,10 +79,28 @@ const NewsPage = () => {
     };
 
     const handleAddNews = async (data: Record<string, any>) => {
-        await addNews(
-            { title: data['title'], summary: data['summary'], content: data['content'] },
-            { onSuccess: () => { handleClose(); refetchNews(); } }
-        );
+        const formData = new FormData();
+        formData.append('title', data['title']);
+        formData.append('summary', data['summary']);
+        formData.append('content', data['content']);
+        if (data['image']) formData.append('image', data['image']);
+
+        await addNews(formData, {
+            onSuccess: () => { handleClose(); refetchNews(); }
+        });
+    };
+
+    const handleUpdateNews = async (data: Record<string, any>) => {
+        if (!editingNews) return;
+        const formData = new FormData();
+        formData.append('title', data['title']);
+        formData.append('summary', data['summary']);
+        formData.append('content', data['content']);
+        if (data['image']) formData.append('image', data['image']);
+
+        await updateNews({ id: editingNews.id, formData }, {
+            onSuccess: () => { handleClose(); refetchNews(); }
+        });
     };
 
     const handleEdit = async (id: string) => {
@@ -97,6 +116,7 @@ const NewsPage = () => {
             setFetchingEdit(false);
         }
     };
+
     const handleDelete = (id: string) => {
         setSelectedId(id);
         setConfirmOpen(true);
@@ -122,32 +142,23 @@ const NewsPage = () => {
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
             <PageTitle title={fa.news} />
-
             <Box display="flex" justifyContent="flex-start" mb={2}>
                 <AddButton label={fa.addNews} onClick={handleOpenAdd} />
             </Box>
-
             <NewsTable
                 data={news?.data || []}
                 loading={loading}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
             />
-
             <CustomFormModal
                 open={open}
                 onClose={handleClose}
                 title={editMode ? 'ویرایش خبر' : 'افزودن خبر جدید'}
                 defaultValues={getDefaultValues()}
                 onSubmit={async (data) => {
-                    if (editMode && editingNews) {
-                        await updateNews(
-                            { id: editingNews.id, title: data['title'], summary: data['summary'], content: data['content'] },
-                            { onSuccess: () => { handleClose(); refetchNews(); } }
-                        );
-                    } else {
-                        await handleAddNews(data);
-                    }
+                    if (editMode) await handleUpdateNews(data);
+                    else await handleAddNews(data);
                 }}
                 fields={formFields}
                 submitLabel={editMode ? 'ویرایش' : 'افزودن'}
@@ -160,7 +171,6 @@ const NewsPage = () => {
                     </Box>
                 )}
             </CustomFormModal>
-
             <ConfirmationModal
                 open={confirmOpen}
                 onCancel={() => setConfirmOpen(false)}
