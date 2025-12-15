@@ -1,7 +1,6 @@
 'use client'
 
 import React, {
-  useCallback,
   useEffect,
   useState,
 } from 'react';
@@ -9,10 +8,7 @@ import React, {
 import type { ColDef } from 'ag-grid-community';
 
 import DataGrid from '@/components/DataGrid';
-import {
-  Box,
-  Switch,
-} from '@mui/material';
+import { Box } from '@mui/material';
 
 import ActionsCell from '../common/ActionCell';
 import Loading from '../common/Loading';
@@ -25,6 +21,7 @@ export interface Buyer {
   city: string
   province: string
   addressDescription: string
+  phone: string
   gender: 'Male' | 'Female'
   activityArea: 'North' | 'South' | 'East' | 'West' | 'Tehran'
   companyName: string
@@ -32,14 +29,12 @@ export interface Buyer {
   businessLicenseFileId: string
   nationalCardFileId: string
   profileFormFileId: string
-  isFixedLocation: boolean
-  isWholeSaleBuyer: boolean
 }
 
 const BuyersTable: React.FC<{
   data?: Buyer[]
   loading: boolean
-  onEdit?: (id: string) => void
+  onEdit?: (buyer: Buyer) => void
   onDelete?: (id: string) => void
 }> = ({ data = [], loading, onEdit, onDelete }) => {
   const [rowData, setRowData] = useState<Buyer[]>([])
@@ -48,80 +43,90 @@ const BuyersTable: React.FC<{
     setRowData(data)
   }, [data])
 
-  const handleToggle = useCallback((id: string) => {
-    setRowData(prev =>
-      prev.map(b =>
-        b.id === id ? { ...b, isFixedLocation: !b.isFixedLocation } : b
-      )
-    )
-  }, [])
-
   const columnDefs: ColDef<Buyer>[] = [
     {
       headerName: 'نام',
       field: 'firstName',
       flex: 1,
+      minWidth: 100,
     },
     {
       headerName: 'نام خانوادگی',
       field: 'lastName',
       flex: 1,
+      minWidth: 120,
     },
     {
       headerName: 'نام شرکت',
       field: 'companyName',
       flex: 1,
+      minWidth: 120,
     },
     {
       headerName: 'کد ملی',
       field: 'nationalCode',
       flex: 1,
+      minWidth: 120,
     },
     {
-      headerName: 'شهر',
-      field: 'city',
+      headerName: 'شماره تماس',
+      field: 'phone',
       flex: 1,
+      minWidth: 130,
     },
     {
       headerName: 'استان',
       field: 'province',
       flex: 1,
+      minWidth: 100,
+    },
+    {
+      headerName: 'شهر',
+      field: 'city',
+      flex: 1,
+      minWidth: 100,
+    },
+    {
+      headerName: 'آدرس',
+      field: 'addressDescription',
+      flex: 2,
+      minWidth: 200,
     },
     {
       headerName: 'پلاک خودرو',
       field: 'numberPlate',
       flex: 1,
+      minWidth: 120,
+    },
+    {
+      headerName: 'جنسیت',
+      field: 'gender',
+      valueFormatter: p => (p.value === 'Male' ? 'مرد' : 'زن'),
+      flex: 1,
+      minWidth: 80,
     },
     {
       headerName: 'منطقه فعالیت',
       field: 'activityArea',
+      valueFormatter: p => {
+        const areaMap: Record<string, string> = {
+          North: 'شمال',
+          South: 'جنوب',
+          East: 'شرق',
+          West: 'غرب',
+          Tehran: 'تهران',
+        }
+        return areaMap[p.value] || p.value
+      },
       flex: 1,
-    },
-    {
-      headerName: 'عمده‌فروش',
-      field: 'isWholeSaleBuyer',
-      valueFormatter: p => (p.value ? 'بله' : 'خیر'),
-      flex: 1,
-    },
-    {
-      headerName: 'دارای مکان ثابت',
-      field: 'isFixedLocation',
-      cellRenderer: p => (
-        <Box display='flex' justifyContent='center'>
-          <Switch
-            checked={p.value}
-            onChange={() => handleToggle(p.data.id)}
-            color='success'
-          />
-        </Box>
-      ),
-      maxWidth: 150,
+      minWidth: 120,
     },
     {
       headerName: 'عملیات',
       cellRenderer: ActionsCell,
       cellRendererParams: { onEdit, onDelete },
       maxWidth: 150,
+      pinned: 'left',
     },
   ]
 

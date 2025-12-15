@@ -81,17 +81,17 @@ export default function SubcategoryList({ categoryId, onSuccess }: Props) {
 
     return (
         <Stack spacing={2}>
-            {subcategories.length > 0 &&
-                subcategories.map((sub) => (
-                    <SubcategoryItem
-                        key={sub.id}
-                        subcategory={sub}
-                        onSuccess={() => {
-                            refetchSubs();
-                            onSuccess?.();
-                        }}
-                    />
-                ))}
+
+            {subcategories.map((sub) => (
+                <SubcategoryItem
+                    key={sub.id}
+                    subcategory={sub}
+                    onSuccess={() => {
+                        refetchSubs();
+                        onSuccess?.();
+                    }}
+                />
+            ))}
 
             <Paper
                 elevation={0}

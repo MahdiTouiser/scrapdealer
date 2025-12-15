@@ -24,8 +24,8 @@ interface BuyerDetails {
     registrationDate: string;
     documentsStatus: string;
     accountStatus: string;
-    idCard?: string; // URL to national ID image
-    businessLicense?: string; // URL to business license image
+    idCard?: string;
+    businessLicense?: string;
 }
 
 interface RowDetailsModalProps {

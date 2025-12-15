@@ -298,21 +298,7 @@ const BuyersVerificationTable: React.FC = () => {
 
     return (
         <>
-            <Box
-                sx={{
-                    width: '100%',
-                    height: '100%',
-                    '& .ag-theme-alpine': {
-                        '--ag-border-color': '#e0e0e0',
-                        '--ag-header-background-color': '#fafafa',
-                        '--ag-row-hover-color': '#f9f9f9',
-                        '--ag-selected-row-background-color': '#e3f2fd',
-                        '--ag-font-family': 'IRANSans, sans-serif',
-                        borderRadius: '12px',
-                        boxShadow: '0 4px 10px rgba(0,0,0,0.05)',
-                    },
-                }}
-            >
+            <Box>
                 <DataGrid<BuyerVerification>
                     rowData={rowData}
                     columnDefs={columnDefs}

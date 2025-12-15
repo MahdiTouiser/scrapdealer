@@ -1,5 +1,4 @@
 'use client';
-
 import {
     useEffect,
     useState,
@@ -27,7 +26,6 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
-    FormControlLabel,
     IconButton,
     MenuItem,
     Stack,
@@ -37,7 +35,15 @@ import {
     Zoom,
 } from '@mui/material';
 
-export type FieldType = 'text' | 'email' | 'select' | 'toggle' | 'password' | 'phone' | 'textarea' | 'file';
+export type FieldType =
+    | 'text'
+    | 'email'
+    | 'select'
+    | 'toggle'
+    | 'password'
+    | 'phone'
+    | 'textarea'
+    | 'file';
 
 export interface FormField {
     name: string;
@@ -65,24 +71,30 @@ const getZodSchema = (fields: FormField[]) => {
     const shape: Record<string, any> = {};
     fields.forEach((field) => {
         switch (field.fieldType) {
+            case 'toggle':
+                shape[field.name] = field.required
+                    ? z.boolean()
+                    : z.boolean().optional();
+                break;
             case 'password':
                 shape[field.name] = z
                     .string()
-                    .min(8, 'رمز عبور حداقل باید ۸ کاراکتر باشد')
-                    .regex(/(?=.*[a-z])/, 'رمز عبور باید شامل حروف کوچک باشد')
-                    .regex(/(?=.*[A-Z])/, 'رمز عبور باید شامل حروف بزرگ باشد')
-                    .regex(/(?=.*\d)/, 'رمز عبور باید شامل عدد باشد');
+                    .min(8)
+                    .regex(/(?=.*[a-z])/)
+                    .regex(/(?=.*[A-Z])/)
+                    .regex(/(?=.*\d)/);
                 if (!field.required) shape[field.name] = shape[field.name].optional();
                 break;
             case 'phone':
-                shape[field.name] = z
-                    .string()
-                    .regex(/^\d{11}$/, 'شماره تلفن باید ۱۱ رقم باشد');
+                shape[field.name] = z.string().regex(/^\d{11}$/);
                 if (!field.required) shape[field.name] = shape[field.name].optional();
+                break;
+            case 'file':
+                shape[field.name] = z.any().optional();
                 break;
             default:
                 shape[field.name] = field.required
-                    ? z.string().nonempty(`${field.label} الزامی است`)
+                    ? z.string().nonempty()
                     : z.string().optional();
         }
     });
@@ -104,7 +116,6 @@ const CustomFormModal = ({
     const theme = useTheme();
     const [showPassword, setShowPassword] = useState(false);
     const schema = getZodSchema(fields);
-
     const {
         register,
         handleSubmit,
@@ -130,10 +141,6 @@ const CustomFormModal = ({
         onClose();
     };
 
-    const handleFormSubmit = async (data: FieldValues) => {
-        await onSubmit(data);
-    };
-
     return (
         <Dialog
             open={open}
@@ -151,40 +158,22 @@ const CustomFormModal = ({
                         maxHeight: '90vh',
                         display: 'flex',
                         flexDirection: 'column',
-                        background:
-                            theme.palette.mode === 'dark'
-                                ? `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${alpha(
-                                    theme.palette.background.paper,
-                                    0.95
-                                )} 100%)`
-                                : theme.palette.background.paper,
-                    },
-                },
-                backdrop: {
-                    sx: {
-                        backgroundColor: alpha(theme.palette.common.black, 0.5),
-                        backdropFilter: 'blur(12px)',
                     },
                 },
             }}
         >
             <Box
                 sx={{
-                    background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+                    background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
                     position: 'relative',
-                    overflow: 'hidden',
                 }}
             >
                 <DialogTitle
                     sx={{
                         fontWeight: 700,
-                        fontSize: { xs: '1.25rem', sm: '1.5rem' },
                         textAlign: 'center',
-                        color: theme.palette.common.white,
+                        color: '#fff',
                         py: 2.5,
-                        px: 6,
-                        position: 'relative',
-                        letterSpacing: '0.3px',
                     }}
                 >
                     {title}
@@ -197,35 +186,15 @@ const CustomFormModal = ({
                         right: 12,
                         top: '50%',
                         transform: 'translateY(-50%)',
-                        color: theme.palette.common.white,
-                        backgroundColor: alpha(theme.palette.common.white, 0.1),
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        '&:hover': {
-                            backgroundColor: alpha(theme.palette.common.white, 0.2),
-                            transform: 'translateY(-50%) rotate(90deg) scale(1.1)',
-                        },
-                        '&.Mui-disabled': {
-                            color: alpha(theme.palette.common.white, 0.5),
-                        },
+                        color: '#fff',
                     }}
                 >
                     <CloseIcon />
                 </IconButton>
             </Box>
-
-            <form onSubmit={handleSubmit(handleFormSubmit)}>
-                <DialogContent
-                    sx={{
-                        pt: 3,
-                        pb: 2,
-                        px: 4,
-                        overflowY: 'auto',
-                        maxHeight: '70vh',
-                    }}
-                >
-                    {children ? (
-                        children
-                    ) : (
+            <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+                <DialogContent sx={{ px: 4, flex: 1, overflowY: 'auto', minHeight: 0 }}>
+                    {children ?? (
                         <Stack spacing={2.5}>
                             <Box
                                 display="grid"
@@ -233,6 +202,35 @@ const CustomFormModal = ({
                                 gap={2}
                             >
                                 {fields.map((field) => {
+                                    if (field.fieldType === 'toggle') {
+                                        return (
+                                            <Controller
+                                                key={field.name}
+                                                name={field.name}
+                                                control={control}
+                                                defaultValue={false}
+                                                render={({ field: f }) => (
+                                                    <Box
+                                                        gridColumn="1 / -1"
+                                                        display="flex"
+                                                        alignItems="center"
+                                                        justifyContent="space-between"
+                                                        px={2}
+                                                        py={1.5}
+                                                        borderRadius={2}
+                                                        bgcolor={alpha(theme.palette.primary.main, 0.06)}
+                                                    >
+                                                        <Box fontWeight={500}>{field.label}</Box>
+                                                        <Switch
+                                                            checked={!!f.value}
+                                                            onChange={(e) => f.onChange(e.target.checked)}
+                                                            disabled={submitLoading}
+                                                        />
+                                                    </Box>
+                                                )}
+                                            />
+                                        );
+                                    }
                                     if (field.fieldType === 'textarea') {
                                         return (
                                             <TextField
@@ -242,10 +240,7 @@ const CustomFormModal = ({
                                                 rows={5}
                                                 {...register(field.name)}
                                                 error={!!errors[field.name]}
-                                                helperText={errors[field.name]?.message?.toString()}
                                                 fullWidth
-                                                placeholder={field.placeholder}
-                                                disabled={submitLoading}
                                                 sx={{ gridColumn: '1 / -1' }}
                                             />
                                         );
@@ -257,119 +252,75 @@ const CustomFormModal = ({
                                                 label={field.label}
                                                 type="file"
                                                 fullWidth
-                                                disabled={submitLoading}
                                                 InputLabelProps={{ shrink: true }}
-                                                onChange={(e) => {
-                                                    const file = e.target.files?.[0];
-                                                    if (file) setValue(field.name, file);
+                                                onChange={(e) =>
+                                                    setValue(field.name, (e.target as HTMLInputElement).files?.[0])
+                                                }
+                                            />
+                                        );
+                                    }
+                                    if (field.fieldType === 'select') {
+                                        return (
+                                            <TextField
+                                                key={field.name}
+                                                select
+                                                label={field.label}
+                                                {...register(field.name)}
+                                                error={!!errors[field.name]}
+                                                fullWidth
+                                            >
+                                                {field.options?.map((opt) => (
+                                                    <MenuItem key={opt.value} value={opt.value}>
+                                                        {opt.label}
+                                                    </MenuItem>
+                                                ))}
+                                            </TextField>
+                                        );
+                                    }
+                                    if (field.fieldType === 'password') {
+                                        return (
+                                            <TextField
+                                                key={field.name}
+                                                label={field.label}
+                                                type={showPassword ? 'text' : 'password'}
+                                                {...register(field.name)}
+                                                error={!!errors[field.name]}
+                                                fullWidth
+                                                InputProps={{
+                                                    endAdornment: (
+                                                        <IconButton onClick={() => setShowPassword(!showPassword)}>
+                                                            {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                                        </IconButton>
+                                                    ),
                                                 }}
                                             />
                                         );
                                     }
-                                    switch (field.fieldType) {
-                                        case 'select':
-                                            return (
-                                                <TextField
-                                                    key={field.name}
-                                                    select
-                                                    label={field.label}
-                                                    defaultValue=""
-                                                    {...register(field.name)}
-                                                    error={!!errors[field.name]}
-                                                    helperText={errors[field.name]?.message?.toString()}
-                                                    fullWidth
-                                                    disabled={submitLoading}
-                                                >
-                                                    {field.options?.map((opt) => (
-                                                        <MenuItem key={opt.value} value={opt.value}>
-                                                            {opt.label}
-                                                        </MenuItem>
-                                                    ))}
-                                                </TextField>
-                                            );
-                                        case 'toggle':
-                                            return (
-                                                <Controller
-                                                    key={field.name}
-                                                    name={field.name}
-                                                    control={control}
-                                                    defaultValue={false}
-                                                    render={({ field: controllerField }) => (
-                                                        <FormControlLabel
-                                                            control={
-                                                                <Switch
-                                                                    checked={!!controllerField.value}
-                                                                    onChange={(e) =>
-                                                                        controllerField.onChange(e.target.checked)
-                                                                    }
-                                                                    disabled={submitLoading}
-                                                                />
-                                                            }
-                                                            label={field.label}
-                                                        />
-                                                    )}
-                                                />
-                                            );
-                                        case 'password':
-                                            return (
-                                                <TextField
-                                                    key={field.name}
-                                                    label={field.label}
-                                                    type={showPassword ? 'text' : 'password'}
-                                                    {...register(field.name)}
-                                                    error={!!errors[field.name]}
-                                                    helperText={errors[field.name]?.message?.toString()}
-                                                    fullWidth
-                                                    placeholder={field.placeholder}
-                                                    disabled={submitLoading}
-                                                    InputProps={{
-                                                        endAdornment: (
-                                                            <IconButton
-                                                                onClick={() => setShowPassword(!showPassword)}
-                                                                edge="end"
-                                                                disabled={submitLoading}
-                                                            >
-                                                                {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                                                            </IconButton>
-                                                        ),
-                                                    }}
-                                                />
-                                            );
-                                        case 'phone':
-                                            return (
-                                                <TextField
-                                                    key={field.name}
-                                                    label={field.label}
-                                                    type="tel"
-                                                    {...register(field.name)}
-                                                    error={!!errors[field.name]}
-                                                    helperText={errors[field.name]?.message?.toString()}
-                                                    fullWidth
-                                                    placeholder={field.placeholder}
-                                                    disabled={submitLoading}
-                                                />
-                                            );
-                                        default:
-                                            return (
-                                                <TextField
-                                                    key={field.name}
-                                                    label={field.label}
-                                                    type={field.fieldType || 'text'}
-                                                    {...register(field.name)}
-                                                    error={!!errors[field.name]}
-                                                    helperText={errors[field.name]?.message?.toString()}
-                                                    fullWidth
-                                                    placeholder={field.placeholder}
-                                                    disabled={submitLoading}
-                                                />
-                                            );
-                                    }
+                                    return (
+                                        <TextField
+                                            key={field.name}
+                                            label={field.label}
+                                            {...register(field.name)}
+                                            error={!!errors[field.name]}
+                                            fullWidth
+                                        />
+                                    );
                                 })}
                             </Box>
                         </Stack>
                     )}
                 </DialogContent>
-                <DialogActions sx={{ justifyContent: 'space-between', px: 4, pb: 3 }}>
+                <DialogActions
+                    sx={{
+                        px: 4,
+                        pb: 3,
+                        pt: 2,
+                        gap: 2,
+                        flexShrink: 0,
+                        borderTop: 1,
+                        borderColor: 'divider',
+                    }}
+                >
                     <Button onClick={handleClose} variant="outlined" fullWidth disabled={submitLoading}>
                         {cancelLabel}
                     </Button>
