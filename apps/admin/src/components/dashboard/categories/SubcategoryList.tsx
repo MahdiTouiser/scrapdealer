@@ -77,25 +77,6 @@ export default function SubcategoryList({ categoryId, onSuccess }: Props) {
 
     return (
         <Stack spacing={2}>
-            {/* DEBUG INFO - Remove this after testing */}
-            <Paper sx={{ p: 2, bgcolor: 'yellow' }}>
-                <Typography variant="caption">DEBUG INFO:</Typography>
-                <Typography variant="body2">Min Price State: "{newSub.minPrice}"</Typography>
-                <Typography variant="body2">Max Price State: "{newSub.maxPrice}"</Typography>
-                <Typography variant="body2">
-                    Format Test: {formatNumber('1000')} | {formatNumber('1000000')}
-                </Typography>
-                <Button
-                    size="small"
-                    onClick={() => {
-                        console.log('Test button clicked');
-                        setNewSub({ ...newSub, minPrice: '1,234' });
-                    }}
-                >
-                    Test Set Min to 1,234
-                </Button>
-            </Paper>
-            {/* END DEBUG */}
 
             {subcategories.map((sub) => (
                 <SubcategoryItem
