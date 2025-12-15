@@ -9,8 +9,19 @@ import type { ColDef } from 'ag-grid-community';
 
 import DataGrid from '@/components/DataGrid';
 import {
+    ExpandLess,
+    ExpandMore,
+} from '@mui/icons-material';
+import {
     Box,
+    Chip,
     Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
     Typography,
     useTheme,
 } from '@mui/material';
@@ -85,6 +96,10 @@ const InvoicesTable: React.FC = () => {
             items: [
                 { id: guid(), scrap: 'برنج', weight: 150, price: 52500000 },
                 { id: guid(), scrap: 'مس', weight: 90, price: 42500000 },
+                { id: guid(), scrap: 'آهن', weight: 300, price: 45000000 },
+                { id: guid(), scrap: 'آلومینیوم', weight: 180, price: 54000000 },
+                { id: guid(), scrap: 'استیل', weight: 75, price: 48750000 },
+
             ],
         },
     ], []);
@@ -99,6 +114,7 @@ const InvoicesTable: React.FC = () => {
                     id: inv.id + '-detail',
                     parentId: inv.id,
                     items: inv.items,
+                    invoiceNumber: inv.invoiceNumber,
                 });
             }
         });
@@ -109,107 +125,144 @@ const InvoicesTable: React.FC = () => {
         {
             headerName: '',
             field: 'expand',
-            width: 60,
+            width: 70,
             pinned: 'right',
             cellRenderer: (params: any) => {
-                if (params.data.type !== 'invoice') return '';
+                if (params.data.type !== 'invoice') return null;
                 const isOpen = expandedRow === params.data.id;
                 return (
-                    <button
+                    <Box
                         onClick={() => setExpandedRow(isOpen ? null : params.data.id)}
-                        style={{
+                        sx={{
                             cursor: 'pointer',
-                            background: 'none',
-                            border: 'none',
-                            fontSize: 18,
-                            fontWeight: 'bold',
-                            padding: '4px 8px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            height: '100%',
+                            color: theme.palette.primary.main,
+                            fontSize: 24,
+                            '&:hover': { bgcolor: 'action.hover' },
+                            borderRadius: 1,
                         }}
                     >
-                        {isOpen ? '−' : '+'}
-                    </button>
+                        {isOpen ? <ExpandLess /> : <ExpandMore />}
+                    </Box>
                 );
             },
         },
-        { field: 'invoiceNumber', headerName: 'شماره فاکتور', width: 150, cellRenderer: (p) => (p.data.type === 'invoice' ? p.value : '') },
-        { field: 'date', headerName: 'تاریخ', flex: 1, minWidth: 120, valueFormatter: (p) => p.data.type === 'invoice' ? new Intl.DateTimeFormat('fa-IR').format(new Date(p.value)) : '' },
-        { field: 'buyer', headerName: 'خریدار', flex: 1.5, minWidth: 180, cellRenderer: (p) => (p.data.type === 'invoice' ? p.value : '') },
-        { field: 'seller', headerName: 'فروشنده', flex: 1.5, minWidth: 180, cellRenderer: (p) => (p.data.type === 'invoice' ? p.value : '') },
+        { field: 'invoiceNumber', headerName: 'شماره فاکتور', width: 150 },
+        {
+            field: 'date',
+            headerName: 'تاریخ',
+            width: 130,
+            valueFormatter: (p) => p.data.type === 'invoice' ? new Intl.DateTimeFormat('fa-IR').format(new Date(p.value)) : '',
+        },
+        { field: 'buyer', headerName: 'خریدار', flex: 1.5, minWidth: 180 },
+        { field: 'seller', headerName: 'فروشنده', flex: 1.5, minWidth: 180 },
         {
             field: 'totalPrice',
-            headerName: 'قیمت کل',
-            flex: 1.2,
-            minWidth: 160,
-            valueFormatter: (p) => (p.data.type === 'invoice' ? p.value.toLocaleString('fa-IR') + ' تومان' : ''),
-            cellStyle: { fontWeight: 'bold', color: theme.palette.mode === 'dark' ? '#90caf9' : '#1976d2' },
+            headerName: 'مبلغ کل',
+            width: 180,
+            valueFormatter: (p) => p.data.type === 'invoice' ? `${p.value.toLocaleString('fa-IR')} تومان` : '',
+            cellStyle: { fontWeight: 'bold', color: theme.palette.primary.main },
         },
         {
             field: 'status',
             headerName: 'وضعیت',
-            flex: 1,
-            minWidth: 130,
-            cellRenderer: (p) => (p.data.type === 'invoice' ? p.value : ''),
-            cellStyle: (params: any) => {
-                if (params.data.type !== 'invoice') return {};
-                switch (params.value) {
-                    case 'تکمیل شده': return { backgroundColor: theme.palette.mode === 'dark' ? '#1b5e20' : '#e8f5e9', color: theme.palette.mode === 'dark' ? '#a5d6a7' : '#2e7d32', padding: '4px 12px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
-                    case 'در انتظار پرداخت': return { backgroundColor: theme.palette.mode === 'dark' ? '#0d47a1' : '#e3f2fd', color: theme.palette.mode === 'dark' ? '#90caf9' : '#1565c0', padding: '4px 12px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
-                    default: return {};
-                }
+            width: 140,
+            cellRenderer: (p: any) => {
+                if (p.data.type !== 'invoice') return null;
+                const status = p.value;
+                const isCompleted = status === 'تکمیل شده';
+                return (
+                    <Chip
+                        label={status}
+                        size="small"
+                        sx={{
+                            bgcolor: isCompleted ? 'success.light' : 'info.light',
+                            color: isCompleted ? 'success.contrastText' : 'info.contrastText',
+                            fontWeight: 600,
+                            fontSize: '0.75rem',
+                        }}
+                    />
+                );
             },
         },
-    ], [expandedRow, theme.palette.mode]);
+    ], [expandedRow, theme]);
 
     const DetailRenderer = (params: any) => {
         if (params.data.type !== 'detail') return null;
+
+        const { items, invoiceNumber } = params.data;
+
         return (
-            <Box sx={{ p: 3, backgroundColor: '#fafafa', width: '100%' }}>
-                <Typography fontWeight={700} mb={2} fontSize={14}>
-                    جزئیات فاکتور
+            <Box
+                sx={{
+                    p: 3,
+                    bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
+                    borderTop: `1px solid ${theme.palette.divider}`,
+                }}
+            >
+                <Typography variant="h6" fontWeight={700} mb={2} color="primary">
+                    جزئیات فاکتور {invoiceNumber}
                 </Typography>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-                    <thead>
-                        <tr style={{ backgroundColor: '#e0e0e0' }}>
-                            <th style={{ padding: '10px', textAlign: 'right', fontWeight: 600 }}>نوع ضایعه</th>
-                            <th style={{ padding: '10px', textAlign: 'right', fontWeight: 600 }}>وزن (کیلوگرم)</th>
-                            <th style={{ padding: '10px', textAlign: 'right', fontWeight: 600 }}>قیمت</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {params.data.items.map((i: InvoiceItem) => (
-                            <tr key={i.id} style={{ borderBottom: '1px solid #ddd' }}>
-                                <td style={{ padding: '10px' }}>{i.scrap}</td>
-                                <td style={{ padding: '10px' }}>{i.weight.toLocaleString('fa-IR')} کیلوگرم</td>
-                                <td style={{ padding: '10px', fontWeight: 600, color: '#1976d2' }}>
-                                    {i.price.toLocaleString('fa-IR')} تومان
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+
+                <TableContainer component={Paper} elevation={2} sx={{ maxHeight: 400, borderRadius: 2 }}>
+                    <Table stickyHeader size="small">
+                        <TableHead>
+                            <TableRow sx={{ bgcolor: 'primary.main' }}>
+                                <TableCell sx={{ color: 'white', fontWeight: 700 }}>نوع ضایعه</TableCell>
+                                <TableCell align="center" sx={{ color: 'white', fontWeight: 700 }}>وزن (کیلوگرم)</TableCell>
+                                <TableCell align="right" sx={{ color: 'white', fontWeight: 700 }}>قیمت واحد</TableCell>
+                                <TableCell align="right" sx={{ color: 'white', fontWeight: 700 }}>جمع کل</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {items.map((item: InvoiceItem) => (
+                                <TableRow key={item.id} hover sx={{ '&:last-child td': { border: 0 } }}>
+                                    <TableCell component="th" scope="row" sx={{ fontWeight: 600 }}>
+                                        {item.scrap}
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        {item.weight.toLocaleString('fa-IR')}
+                                    </TableCell>
+                                    <TableCell align="right" sx={{ fontFamily: 'monospace' }}>
+                                        {item.price.toLocaleString('fa-IR')} تومان
+                                    </TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
+                                        {(item.price * item.weight).toLocaleString('fa-IR')} تومان
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                            <TableRow>
+                                <TableCell colSpan={3} align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
+                                    جمع کل فاکتور:
+                                </TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.2rem', color: theme.palette.success.main }}>
+                                    {items.reduce((sum: number, i: InvoiceItem) => sum + i.price * i.weight, 0).toLocaleString('fa-IR')} تومان
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             </Box>
         );
     };
 
     return (
-        <Box sx={{ width: '100%', p: 3 }}>
-            <Paper sx={{ borderRadius: 2, overflow: 'hidden', bgcolor: theme.palette.background.paper }}>
+        <Box sx={{ width: '100%', p: { xs: 1, md: 3 } }}>
+            <Paper elevation={3} sx={{ borderRadius: 3, overflow: 'hidden' }}>
                 <DataGrid
                     rowData={rowData}
                     columnDefs={columnDefs}
                     getRowHeight={(params) => {
                         if (params.data.type === 'detail') {
-                            const itemCount = params.data.items?.length || 0;
-                            const headerHeight = 40;
-                            const rowHeight = 40;
-                            const padding = 24;
-                            return headerHeight + rowHeight * itemCount + padding;
+                            return 500;
                         }
-                        return 55;
+                        return 60;
                     }}
                     isFullWidthRow={(params) => params.rowNode.data?.type === 'detail'}
                     fullWidthCellRenderer={DetailRenderer}
-                    getRowStyle={(params) => params.data.type === 'detail' ? { background: '#fafafa' } : {}}
                 />
             </Paper>
         </Box>

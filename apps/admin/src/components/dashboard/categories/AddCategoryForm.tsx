@@ -15,7 +15,12 @@ interface Props {
 }
 
 export default function AddCategoryForm({ onSuccess }: Props) {
-    const [form, setForm] = useState({ name: '', minPrice: '', maxPrice: '' })
+    const [form, setForm] = useState({
+        name: '',
+        minPrice: '',
+        maxPrice: '',
+        image: null as File | null,
+    })
 
     const createCat = useApi({
         key: ['createCat'],
@@ -34,13 +39,20 @@ export default function AddCategoryForm({ onSuccess }: Props) {
     const handleSubmit = async () => {
         if (!form.name || !form.minPrice || !form.maxPrice) return
 
-        await createCat.mutateAsync({
-            name: form.name,
-            minPrice: Number(rawNumber(form.minPrice)),
-            maxPrice: Number(rawNumber(form.maxPrice)),
-        })
+        const data = new FormData()
+        data.append('name', form.name)
+        data.append('minPrice', rawNumber(form.minPrice))
+        data.append('maxPrice', rawNumber(form.maxPrice))
+        if (form.image) data.append('image', form.image)
 
-        setForm({ name: '', minPrice: '', maxPrice: '' })
+        await createCat.mutateAsync(data)
+
+        setForm({
+            name: '',
+            minPrice: '',
+            maxPrice: '',
+            image: null,
+        })
         onSuccess()
     }
 
@@ -105,6 +117,27 @@ export default function AddCategoryForm({ onSuccess }: Props) {
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 4 }}>
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        component="label"
+                    >
+                        انتخاب تصویر
+                        <input
+                            hidden
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) =>
+                                setForm({
+                                    ...form,
+                                    image: e.target.files?.[0] ?? null,
+                                })
+                            }
+                        />
+                    </Button>
+                </Grid>
+
+                <Grid size={{ xs: 12 }}>
                     <Button
                         fullWidth
                         variant="contained"
