@@ -1,23 +1,23 @@
 import React, {
-    useEffect,
-    useRef,
-    useState,
+  useEffect,
+  useRef,
+  useState,
 } from 'react';
 
 import { LinearGradient } from 'expo-linear-gradient';
 import {
-    Animated,
-    Dimensions,
-    FlatList,
-    Image,
-    Platform,
-    StyleSheet,
-    TouchableOpacity,
-    View,
+  Animated,
+  Dimensions,
+  FlatList,
+  Image,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import {
-    Button,
-    Text,
+  Button,
+  Text,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -104,7 +104,6 @@ export const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
 
     };
 
-    const handleSkip = () => completeOnboarding();
 
     const completeOnboarding = async () => {
         await AsyncStorage.setItem('hasSeenOnboarding', 'true');

@@ -1,7 +1,7 @@
 import {
-    StyleSheet,
-    Text,
-    View,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 
 import { useThemeContext } from '../../theme/ThemeProvider';
