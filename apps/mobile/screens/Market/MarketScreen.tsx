@@ -1,10 +1,9 @@
 import {
-  StyleSheet,
-  Text,
-  View,
+    StyleSheet,
+    Text,
+    View,
 } from 'react-native';
 
-import ClearAuthButton from '../../devUtils/clearAuthButton';
 import { useThemeContext } from '../../theme/ThemeProvider';
 
 const styles = StyleSheet.create({
@@ -44,7 +43,6 @@ export const MarketScreen = () => {
                 <Text style={[styles.screenDescription, { color: myColors.textSecondary }]}>
                     قیمت‌های به‌روز بازار ضایعات
                 </Text>
-                <ClearAuthButton />
             </View>
         </View>
     );

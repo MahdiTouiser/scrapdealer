@@ -1,12 +1,14 @@
 import { Button } from 'react-native';
 
-import { clearAuthToken } from './devUtils';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function ClearAuthButton() {
+    const { signOut } = useAuth();
+
     return (
         <Button
-            title="Clear Auth Token (Dev Only)"
-            onPress={clearAuthToken}
+            title="خروج از حساب کاربری"
+            onPress={signOut}
         />
     );
 }

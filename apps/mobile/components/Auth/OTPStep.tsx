@@ -2,19 +2,19 @@ import React from 'react';
 
 import { LinearGradient } from 'expo-linear-gradient';
 import {
-  Animated,
-  Platform,
-  StyleSheet,
-  TextInput as RNTextInput,
-  TouchableOpacity,
-  View,
+    Animated,
+    Platform,
+    TextInput as RNTextInput,
+    StyleSheet,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { HelperText } from 'react-native-paper';
 
 import {
-  radii,
-  spacing,
-  typography,
+    radii,
+    spacing,
+    typography,
 } from '@scrapdealer/tokens';
 
 import { Text } from '../../components/CustomText';
@@ -388,7 +388,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginVertical: spacing['xl'],
-        paddingHorizontal: spacing.xs,
     },
     otpBoxWrapper: {
         flex: 1,
@@ -442,7 +441,7 @@ const styles = StyleSheet.create({
         elevation: 16,
     },
     otpInput: {
-        fontSize: 28,
+        fontSize: 16,
         fontWeight: '800',
         width: '100%',
         height: '100%',

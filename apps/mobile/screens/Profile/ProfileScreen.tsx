@@ -1,9 +1,10 @@
 import {
-  StyleSheet,
-  Text,
-  View,
+    StyleSheet,
+    Text,
+    View,
 } from 'react-native';
 
+import ClearAuthButton from '../../devUtils/ClearAuthButton';
 import { useThemeContext } from '../../theme/ThemeProvider';
 
 const styles = StyleSheet.create({
@@ -43,6 +44,7 @@ export const ProfileScreen = () => {
                 <Text style={[styles.screenDescription, { color: myColors.textSecondary }]}>
                     مدیریت حساب کاربری و تنظیمات
                 </Text>
+                <ClearAuthButton />
             </View>
         </View>
     );

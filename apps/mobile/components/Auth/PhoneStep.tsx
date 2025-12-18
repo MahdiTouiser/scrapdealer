@@ -1,20 +1,20 @@
 import React from 'react';
 
 import {
-  Animated,
-  Platform,
-  StyleSheet,
-  TextInput as RNTextInput,
-  TouchableOpacity,
-  View,
+    Animated,
+    Platform,
+    TextInput as RNTextInput,
+    StyleSheet,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { HelperText } from 'react-native-paper';
 
 import {
-  colors,
-  radii,
-  spacing,
-  typography,
+    colors,
+    radii,
+    spacing,
+    typography,
 } from '@scrapdealer/tokens';
 
 import { Text } from '../../components/CustomText';
@@ -161,9 +161,6 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({
                 </Animated.View>
                 <Text style={[styles.label, { color: myColors.textPrimary }]}>
                     شماره موبایل خود را وارد کنید
-                </Text>
-                <Text style={[styles.helperLabel, { color: myColors.textSecondary }]}>
-                    برای ورود یا ثبت‌نام، شماره تلفن همراه خود را وارد کنید
                 </Text>
             </View>
 

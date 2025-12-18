@@ -1,23 +1,23 @@
 import React, {
-  useEffect,
-  useRef,
-  useState,
+    useEffect,
+    useRef,
+    useState,
 } from 'react';
 
 import { LinearGradient } from 'expo-linear-gradient';
 import {
-  Animated,
-  Dimensions,
-  FlatList,
-  Image,
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-  View,
+    Animated,
+    Dimensions,
+    FlatList,
+    Image,
+    Platform,
+    StyleSheet,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import {
-  Button,
-  Text,
+    Button,
+    Text,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -180,21 +180,6 @@ export const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
                     <Text style={[styles.description, { color: 'rgba(255, 255, 255, 0.95)' }]}>
                         {item.description}
                     </Text>
-
-                    {item.isLast && (
-                        <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-                            <Button
-                                mode="contained"
-                                onPress={handleNext}
-                                contentStyle={styles.startButtonContent}
-                                style={[styles.startButton, { backgroundColor: '#ffffff' }]}
-                                labelStyle={[styles.startButtonLabel, { color: myColors.white }]}
-                                elevation={4}
-                            >
-                                شروع کنیم
-                            </Button>
-                        </Animated.View>
-                    )}
                 </Animated.View>
             </View>
         );
@@ -282,7 +267,7 @@ export const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
                 </View>
 
                 <View style={styles.buttonRow}>
-                    {index < slides.length - 1 && (
+                    {index < slides.length - 1 ? (
                         <>
                             <Button
                                 mode="contained"
@@ -295,7 +280,20 @@ export const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
                                 بعدی
                             </Button>
                         </>
-                    )}
+                    ) :
+                        <>
+                            <Button
+                                mode="contained"
+                                onPress={handleNext}
+                                contentStyle={styles.nextButtonContent}
+                                style={styles.nextButton}
+                                labelStyle={styles.nextButtonLabel}
+                                elevation={3}
+                            >
+                                شروع کنیم
+                            </Button>
+                        </>
+                    }
                 </View>
             </View>
         </View>
