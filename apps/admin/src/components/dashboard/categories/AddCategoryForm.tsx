@@ -1,13 +1,17 @@
 import { useState } from 'react';
 
 import { useApi } from '@/hooks/useApi';
-import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
+import { useFileApi } from '@/hooks/useFileApi';
+import AddCircleOutlineRoundedIcon
+  from '@mui/icons-material/AddCircleOutlineRounded';
+import CheckCircleOutlineRoundedIcon
+  from '@mui/icons-material/CheckCircleOutlineRounded';
 import {
-    Button,
-    Grid,
-    Paper,
-    TextField,
-    Typography,
+  Button,
+  Grid,
+  Paper,
+  TextField,
+  Typography,
 } from '@mui/material';
 
 interface Props {
@@ -19,8 +23,10 @@ export default function AddCategoryForm({ onSuccess }: Props) {
         name: '',
         minPrice: '',
         maxPrice: '',
-        image: null as File | null,
+        imageId: null as string | null,
     })
+
+    const { upload } = useFileApi()
 
     const createCat = useApi({
         key: ['createCat'],
@@ -34,33 +40,49 @@ export default function AddCategoryForm({ onSuccess }: Props) {
         return n.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
     }
 
-    const rawNumber = (v: string) => v.replace(/,/g, '')
+    const rawNumber = (v: string) => Number(v.replace(/,/g, ''))
+
+    const handleImageSelect = async (file: File) => {
+        const fd = new FormData()
+        fd.append('file', file)
+        fd.append('category', 'categories')
+
+        const id = await upload.mutateAsync(fd)
+
+        setForm((p) => ({
+            ...p,
+            imageId: id,
+        }))
+    }
 
     const handleSubmit = async () => {
         if (!form.name || !form.minPrice || !form.maxPrice) return
 
-        const data = new FormData()
-        data.append('name', form.name)
-        data.append('minPrice', rawNumber(form.minPrice))
-        data.append('maxPrice', rawNumber(form.maxPrice))
-        if (form.image) data.append('image', form.image)
-
-        await createCat.mutateAsync(data)
+        await createCat.mutateAsync({
+            name: form.name,
+            minPrice: rawNumber(form.minPrice),
+            maxPrice: rawNumber(form.maxPrice),
+            images: form.imageId ? [form.imageId] : [],
+        })
 
         setForm({
             name: '',
             minPrice: '',
             maxPrice: '',
-            image: null,
+            imageId: null,
         })
+
         onSuccess()
     }
+
+    const imageSelected = Boolean(form.imageId)
 
     return (
         <Paper elevation={0} sx={{ p: 3, mb: 4, bgcolor: 'grey.50', borderRadius: 2 }}>
             <Typography variant="subtitle2" mb={2} color="text.secondary">
                 افزودن دسته جدید
             </Typography>
+
             <Grid container spacing={2} alignItems="center">
                 <Grid size={{ xs: 12, sm: 3 }}>
                     <TextField
@@ -81,16 +103,6 @@ export default function AddCategoryForm({ onSuccess }: Props) {
                         onChange={(e) =>
                             setForm({ ...form, minPrice: formatNumber(e.target.value) })
                         }
-                        slotProps={{
-                            input: {
-                                inputMode: 'numeric',
-                                endAdornment: (
-                                    <Typography variant="caption" color="text.secondary">
-                                        تومان
-                                    </Typography>
-                                ),
-                            },
-                        }}
                     />
                 </Grid>
 
@@ -103,36 +115,27 @@ export default function AddCategoryForm({ onSuccess }: Props) {
                         onChange={(e) =>
                             setForm({ ...form, maxPrice: formatNumber(e.target.value) })
                         }
-                        slotProps={{
-                            input: {
-                                inputMode: 'numeric',
-                                endAdornment: (
-                                    <Typography variant="caption" color="text.secondary">
-                                        تومان
-                                    </Typography>
-                                ),
-                            },
-                        }}
                     />
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 4 }}>
                     <Button
                         fullWidth
-                        variant="outlined"
+                        variant={imageSelected ? 'contained' : 'outlined'}
+                        color={imageSelected ? 'success' : 'primary'}
                         component="label"
+                        disabled={upload.loading}
+                        startIcon={imageSelected ? <CheckCircleOutlineRoundedIcon /> : undefined}
                     >
-                        انتخاب تصویر
+                        {imageSelected ? 'تصویر انتخاب شد' : 'انتخاب تصویر'}
                         <input
                             hidden
                             type="file"
                             accept="image/*"
-                            onChange={(e) =>
-                                setForm({
-                                    ...form,
-                                    image: e.target.files?.[0] ?? null,
-                                })
-                            }
+                            onChange={(e) => {
+                                const file = e.target.files?.[0]
+                                if (file) handleImageSelect(file)
+                            }}
                         />
                     </Button>
                 </Grid>
@@ -143,7 +146,12 @@ export default function AddCategoryForm({ onSuccess }: Props) {
                         variant="contained"
                         startIcon={<AddCircleOutlineRoundedIcon />}
                         onClick={handleSubmit}
-                        disabled={!form.name || !form.minPrice || !form.maxPrice}
+                        disabled={
+                            !form.name ||
+                            !form.minPrice ||
+                            !form.maxPrice ||
+                            upload.loading
+                        }
                     >
                         افزودن دسته
                     </Button>

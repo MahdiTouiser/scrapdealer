@@ -38,5 +38,6 @@ export interface Cat {
   name: string;
   minPrice: number;
   maxPrice: number;
+  images?: string[];
   subCategories: SubCat[];
 }

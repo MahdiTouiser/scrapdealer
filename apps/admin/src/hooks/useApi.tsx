@@ -9,7 +9,7 @@ import {
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
-interface ApiError {
+export interface ApiError {
     message: string
     status?: number
 }
@@ -26,10 +26,19 @@ interface UseApiOptions<TVariables> {
 async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
     const baseUrl = process.env['NEXT_PUBLIC_API_BASE_URL']
     const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+
+    const headers: Record<string, string> = {}
+
     if (token) headers['Authorization'] = `Bearer ${token}`
 
-    const response = await fetch(`${baseUrl}${url}`, { headers, ...options })
+    if (!(options?.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json'
+    }
+
+    const response = await fetch(`${baseUrl}${url}`, {
+        ...options,
+        headers,
+    })
 
     if (response.status === 401) {
         if (typeof window !== 'undefined') {
@@ -38,47 +47,45 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
             toast.error('دسترسی منقضی شده، لطفاً دوباره وارد شوید')
             window.location.href = '/'
         }
-        throw { message: 'Unauthorized', status: 401 } as ApiError
+        throw { message: 'Unauthorized', status: 401 }
     }
 
     if (!response.ok) {
         let errorMessage = `خطا: ${response.status}`
         try {
-            const contentType = response.headers.get('content-type')
-            if (contentType && contentType.includes('application/json')) {
-                const errorData = await response.json()
+            const ct = response.headers.get('content-type')
+            if (ct?.includes('application/json')) {
+                const e = await response.json()
                 errorMessage =
-                    errorData.message ||
-                    errorData.error ||
-                    errorData.Message ||
-                    errorData.Error ||
+                    e.message ||
+                    e.error ||
+                    e.Message ||
+                    e.Error ||
                     errorMessage
             } else {
-                const textError = await response.text()
-                if (textError) errorMessage = textError
+                const t = await response.text()
+                if (t) errorMessage = t
             }
-        } catch (e) { }
-        const error: ApiError = { message: errorMessage, status: response.status }
-        throw error
+        } catch {}
+        throw { message: errorMessage, status: response.status }
     }
 
     if (response.status === 204) return null as T
 
-    const contentType = response.headers.get('content-type')
+    const ct = response.headers.get('content-type')
 
-    if (!contentType || !contentType.includes('application/json')) {
-        const text = await response.text()
-        return (text || null) as T
+    if (!ct?.includes('application/json')) {
+        return (await response.text()) as T
     }
 
-    let jsonResponse = await response.json()
+    let json = await response.json()
 
-    if (jsonResponse?.data?.data) jsonResponse = jsonResponse.data
-    while (jsonResponse && typeof jsonResponse === 'object' && 'data' in jsonResponse && Object.keys(jsonResponse).length === 1) {
-        jsonResponse = jsonResponse.data
+    if (json?.data?.data) json = json.data
+    while (json && typeof json === 'object' && 'data' in json && Object.keys(json).length === 1) {
+        json = json.data
     }
 
-    return jsonResponse as T
+    return json as T
 }
 
 export function useApi<TData = unknown, TVariables = unknown>({
@@ -103,67 +110,54 @@ export function useApi<TData = unknown, TVariables = unknown>({
     const mutation = useMutation<TData, ApiError, TVariables>({
         mutationFn: async (vars?: TVariables) => {
             const endpoint = typeof url === 'function' ? url(vars) : url
+
+            const body =
+                vars && method !== 'GET' && method !== 'DELETE'
+                    ? vars instanceof FormData
+                        ? vars
+                        : JSON.stringify(vars)
+                    : undefined
+
             return fetchApi<TData>(endpoint, {
                 method,
-                body:
-                    vars && method !== 'GET' && method !== 'DELETE'
-                        ? JSON.stringify(vars)
-                        : undefined,
+                body,
             })
         },
     })
 
-    const shouldUseMutation = method !== 'GET'
-
-    const mutate = shouldUseMutation
-        ? (variables?: TVariables, callbacks?: { onSuccess?: (d: TData) => void; onError?: (e: any) => void }) =>
+    const mutate = method !== 'GET'
+        ? (variables?: TVariables) =>
             mutation.mutate(variables, {
                 onSuccess: (data) => {
                     queryClient.invalidateQueries({ queryKey: key })
                     if (onSuccess) toast.success(onSuccess)
-                    callbacks?.onSuccess?.(data)
+                    return data
                 },
-                onError: (err) => {
-                    toast.error(err.message || onError)
-                    callbacks?.onError?.(err)
+                onError: (e) => {
+                    toast.error(e.message || onError)
                 },
             })
-        : () => { }
+        : () => {}
 
-    const mutateAsync = shouldUseMutation
+    const mutateAsync = method !== 'GET'
         ? async (variables?: TVariables) => {
             try {
                 const data = await mutation.mutateAsync(variables)
                 queryClient.invalidateQueries({ queryKey: key })
                 if (onSuccess) toast.success(onSuccess)
                 return data
-            } catch (err: any) {
-                toast.error(err.message || onError)
-                throw err
+            } catch (e: any) {
+                toast.error(e.message || onError)
+                throw e
             }
         }
         : async () => undefined as unknown as TData
-
-    const fetchManually = method === 'GET' && !enabled
-        ? async (vars?: TVariables) => {
-            try {
-                const endpoint = typeof url === 'function' ? url(vars) : url
-                const data = await fetchApi<TData>(endpoint)
-                if (onSuccess) toast.success(onSuccess)
-                return data
-            } catch (err: any) {
-                toast.error(err.message || onError)
-                throw err
-            }
-        }
-        : undefined
 
     return {
         data: method === 'GET' ? query.data : undefined,
         refetch: method === 'GET' ? query.refetch : undefined,
         mutate,
         mutateAsync,
-        fetchManually,
         loading: method === 'GET' && enabled ? query.isLoading : mutation.isPending,
         error: method === 'GET' && enabled ? query.error : mutation.error,
     }
