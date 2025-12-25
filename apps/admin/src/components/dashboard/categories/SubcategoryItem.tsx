@@ -1,20 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import {
+  useEffect,
+  useState,
+} from 'react';
 
 import { SubCat } from '@/components/types';
 import { useApi } from '@/hooks/useApi';
+import { useFileApi } from '@/hooks/useFileApi';
 import {
-    DeleteOutlineRounded,
-    Save,
+  DeleteOutlineRounded,
+  ImageRounded,
+  Save,
 } from '@mui/icons-material';
 import {
-    IconButton,
-    Paper,
-    Stack,
-    TextField,
-    Tooltip,
-    Typography,
+  Avatar,
+  IconButton,
+  Paper,
+  Skeleton,
+  Stack,
+  TextField,
+  Tooltip,
+  Typography,
 } from '@mui/material';
 
 interface Props {
@@ -34,6 +41,32 @@ const parseNumber = (value: string): number => {
 
 export default function SubcategoryItem({ subcategory, onSuccess }: Props) {
     const [buffer, setBuffer] = useState<Partial<SubCat>>({});
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [loadingImage, setLoadingImage] = useState(false);
+
+    const { download } = useFileApi();
+
+    const firstImageId = subcategory.images?.[0] ?? null;
+
+    useEffect(() => {
+        if (!firstImageId) return;
+
+        let url: string | null = null;
+
+        const loadImage = async () => {
+            setLoadingImage(true);
+            const blob = await download(firstImageId, 'subcategories');
+            url = URL.createObjectURL(blob);
+            setImageUrl(url);
+            setLoadingImage(false);
+        };
+
+        loadImage();
+
+        return () => {
+            if (url) URL.revokeObjectURL(url);
+        };
+    }, [firstImageId, download]);
 
     const updateSub = useApi<SubCat>({
         key: ['updateSubcategory', subcategory.id],
@@ -68,21 +101,17 @@ export default function SubcategoryItem({ subcategory, onSuccess }: Props) {
 
     const save = async () => {
         if (!hasChanges) return;
-
         await updateSub.mutateAsync({
             ...subcategory,
             minPrice: buffer.minPrice ?? subcategory.minPrice,
             maxPrice: buffer.maxPrice ?? subcategory.maxPrice,
         } as any);
-
         setBuffer({});
         onSuccess();
     };
 
     const remove = async () => {
         if (!confirm(`آیا از حذف زیر دسته "${subcategory.name}" مطمئن هستید؟`)) return;
-
-        console.log('Deleting subcategory:', subcategory.id, subcategory.name);
         await deleteSub.mutateAsync({});
         onSuccess();
     };
@@ -99,7 +128,17 @@ export default function SubcategoryItem({ subcategory, onSuccess }: Props) {
             }}
         >
             <Stack direction="row" alignItems="center" spacing={2}>
-                <Typography variant="body2" fontWeight={500} sx={{ minWidth: 150 }}>
+                {loadingImage ? (
+                    <Skeleton variant="circular" width={40} height={40} />
+                ) : imageUrl ? (
+                    <Avatar src={imageUrl} variant="rounded" sx={{ width: 40, height: 40 }} />
+                ) : (
+                    <Avatar variant="rounded" sx={{ width: 40, height: 40, bgcolor: 'grey.200' }}>
+                        <ImageRounded fontSize="small" />
+                    </Avatar>
+                )}
+
+                <Typography variant="body2" fontWeight={500} sx={{ minWidth: 120 }}>
                     {subcategory.name}
                 </Typography>
 
@@ -109,9 +148,7 @@ export default function SubcategoryItem({ subcategory, onSuccess }: Props) {
                         value={getDisplayValue('minPrice')}
                         onChange={(e) => handleMinChange(e.target.value)}
                         sx={{ width: 130 }}
-                        inputProps={{
-                            inputMode: 'numeric',
-                        }}
+                        inputProps={{ inputMode: 'numeric' }}
                     />
                     <Typography color="text.secondary">—</Typography>
                     <TextField
@@ -119,9 +156,7 @@ export default function SubcategoryItem({ subcategory, onSuccess }: Props) {
                         value={getDisplayValue('maxPrice')}
                         onChange={(e) => handleMaxChange(e.target.value)}
                         sx={{ width: 130 }}
-                        inputProps={{
-                            inputMode: 'numeric',
-                        }}
+                        inputProps={{ inputMode: 'numeric' }}
                     />
                     <Typography variant="body2" color="text.secondary">
                         تومان
@@ -131,12 +166,7 @@ export default function SubcategoryItem({ subcategory, onSuccess }: Props) {
                 <Stack direction="row" spacing={1}>
                     <Tooltip title="ذخیره تغییرات">
                         <span>
-                            <IconButton
-                                onClick={save}
-                                color="success"
-                                disabled={!hasChanges}
-                                size="small"
-                            >
+                            <IconButton onClick={save} color="success" disabled={!hasChanges} size="small">
                                 <Save fontSize="small" />
                             </IconButton>
                         </span>

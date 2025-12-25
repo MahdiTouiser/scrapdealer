@@ -1,66 +1,92 @@
 'use client';
 
 import {
-    useEffect,
-    useState,
+  useEffect,
+  useState,
 } from 'react';
 
 import { SubCat } from '@/components/types';
 import { useApi } from '@/hooks/useApi';
-import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
+import { useFileApi } from '@/hooks/useFileApi';
+import AddCircleOutlineRoundedIcon
+  from '@mui/icons-material/AddCircleOutlineRounded';
 import {
-    Button,
-    Paper,
-    Stack,
-    TextField,
-    Typography,
+  Avatar,
+  Button,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
 } from '@mui/material';
 
 import SubcategoryItem from './SubcategoryItem';
 
 interface Props {
-    categoryId: string;
-    onSuccess: () => void;
+    categoryId: string
+    onSuccess: () => void
 }
 
 const formatNumber = (value: string): string => {
-    const num = value.replace(/[^\d]/g, '');
-    if (!num) return '';
-    return Number(num).toLocaleString('en-US');
-};
+    const num = value.replace(/[^\d]/g, '')
+    if (!num) return ''
+    return Number(num).toLocaleString('en-US')
+}
 
 const parseNumber = (value: string): number => {
-    return Number(value.replace(/[^\d]/g, ''));
-};
+    return Number(value.replace(/[^\d]/g, ''))
+}
 
 export default function SubcategoryList({ categoryId, onSuccess }: Props) {
     const [newSub, setNewSub] = useState({
         name: '',
         minPrice: '',
         maxPrice: '',
-    });
+        image: null as File | null,
+    })
 
     const { data: subRes, refetch: refetchSubs } = useApi<{ data: SubCat[] }>({
         key: ['subcategories', categoryId],
         url: `/subcategories?categoryId=${categoryId}`,
-    });
+    })
 
     const subcategories = (subRes?.data ?? []).filter(
         (sub) => String(sub.parentCategoryId) === String(categoryId)
-    );
+    )
 
     const createSub = useApi<SubCat>({
         key: ['createSub'],
         url: '/subcategories',
         method: 'POST',
         onSuccess: 'زیر دسته اضافه شد',
-    });
+    })
+
+    const { upload, download } = useFileApi()
+    const [uploadingImage, setUploadingImage] = useState(false)
+    const [uploadedImageId, setUploadedImageId] = useState<string | null>(null)
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+
+    const handleImageChange = async (file: File) => {
+        setUploadingImage(true)
+        try {
+            const formData = new FormData()
+            formData.append('file', file)
+            formData.append('category', file)
+
+            const id = await upload.mutateAsync(formData)
+            setUploadedImageId(id)
+
+            const blob = await download(id, 'subCategories')
+            const url = URL.createObjectURL(blob)
+            setPreviewUrl(url)
+        } catch (err) { }
+        setUploadingImage(false)
+    }
 
     const handleAdd = async () => {
-        if (!newSub.name || !newSub.minPrice || !newSub.maxPrice) return;
+        if (!newSub.name || !newSub.minPrice || !newSub.maxPrice) return
 
-        const minPrice = parseNumber(newSub.minPrice);
-        const maxPrice = parseNumber(newSub.maxPrice);
+        const minPrice = parseNumber(newSub.minPrice)
+        const maxPrice = parseNumber(newSub.maxPrice)
 
         await createSub.mutateAsync({
             name: newSub.name,
@@ -68,27 +94,29 @@ export default function SubcategoryList({ categoryId, onSuccess }: Props) {
             maxPrice,
             categoryId,
             parentCategoryId: categoryId,
-        });
+            images: uploadedImageId ? [uploadedImageId] : [],
+        })
 
-        setNewSub({ name: '', minPrice: '', maxPrice: '' });
-        refetchSubs();
-        onSuccess?.();
-    };
+        setNewSub({ name: '', minPrice: '', maxPrice: '', image: null })
+        setUploadedImageId(null)
+        setPreviewUrl(null)
+        refetchSubs()
+        onSuccess?.()
+    }
 
     useEffect(() => {
-        refetchSubs();
-    }, [categoryId, refetchSubs]);
+        refetchSubs()
+    }, [categoryId, refetchSubs])
 
     return (
         <Stack spacing={2}>
-
             {subcategories.map((sub) => (
                 <SubcategoryItem
                     key={sub.id}
                     subcategory={sub}
                     onSuccess={() => {
-                        refetchSubs();
-                        onSuccess?.();
+                        refetchSubs()
+                        onSuccess?.()
                     }}
                 />
             ))}
@@ -112,6 +140,7 @@ export default function SubcategoryList({ categoryId, onSuccess }: Props) {
                 >
                     افزودن زیر دسته جدید
                 </Typography>
+
                 <Stack direction="row" spacing={2} alignItems="center">
                     <TextField
                         label="نام زیر دسته"
@@ -140,17 +169,51 @@ export default function SubcategoryList({ categoryId, onSuccess }: Props) {
                         sx={{ width: 130 }}
                         inputProps={{ inputMode: 'numeric' }}
                     />
+
+                    <Button
+                        variant="outlined"
+                        component="label"
+                        size="small"
+                        sx={{ minWidth: 130 }}
+                    >
+                        {uploadingImage
+                            ? 'در حال آپلود...'
+                            : uploadedImageId
+                                ? 'تصویر انتخاب شد'
+                                : 'انتخاب تصویر'}
+                        <input
+                            hidden
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0] ?? null
+                                setNewSub({ ...newSub, image: file })
+                                if (file) handleImageChange(file)
+                            }}
+                        />
+                    </Button>
+
+                    {previewUrl && (
+                        <Avatar
+                            src={previewUrl}
+                            variant="rounded"
+                            sx={{ width: 40, height: 40 }}
+                        />
+                    )}
+
                     <Button
                         variant="contained"
                         size="small"
                         startIcon={<AddCircleOutlineRoundedIcon />}
                         onClick={handleAdd}
-                        disabled={!newSub.name || !newSub.minPrice || !newSub.maxPrice}
+                        disabled={
+                            !newSub.name || !newSub.minPrice || !newSub.maxPrice || uploadingImage
+                        }
                     >
                         افزودن
                     </Button>
                 </Stack>
             </Paper>
         </Stack>
-    );
+    )
 }
