@@ -194,7 +194,7 @@ const CustomFormModal = ({
             </Box>
             <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
                 <DialogContent sx={{ px: 4, flex: 1, overflowY: 'auto', minHeight: 0 }}>
-                    {children ?? (
+                    {children !== undefined && children !== null ? children : (
                         <Stack spacing={2.5}>
                             <Box
                                 display="grid"
@@ -229,8 +229,9 @@ const CustomFormModal = ({
                                                     </Box>
                                                 )}
                                             />
-                                        );
+                                        )
                                     }
+
                                     if (field.fieldType === 'textarea') {
                                         return (
                                             <TextField
@@ -243,8 +244,9 @@ const CustomFormModal = ({
                                                 fullWidth
                                                 sx={{ gridColumn: '1 / -1' }}
                                             />
-                                        );
+                                        )
                                     }
+
                                     if (field.fieldType === 'file') {
                                         return (
                                             <TextField
@@ -257,8 +259,9 @@ const CustomFormModal = ({
                                                     setValue(field.name, (e.target as HTMLInputElement).files?.[0])
                                                 }
                                             />
-                                        );
+                                        )
                                     }
+
                                     if (field.fieldType === 'select') {
                                         return (
                                             <TextField
@@ -275,8 +278,9 @@ const CustomFormModal = ({
                                                     </MenuItem>
                                                 ))}
                                             </TextField>
-                                        );
+                                        )
                                     }
+
                                     if (field.fieldType === 'password') {
                                         return (
                                             <TextField
@@ -294,8 +298,9 @@ const CustomFormModal = ({
                                                     ),
                                                 }}
                                             />
-                                        );
+                                        )
                                     }
+
                                     return (
                                         <TextField
                                             key={field.name}
@@ -304,12 +309,13 @@ const CustomFormModal = ({
                                             error={!!errors[field.name]}
                                             fullWidth
                                         />
-                                    );
+                                    )
                                 })}
                             </Box>
                         </Stack>
                     )}
                 </DialogContent>
+
                 <DialogActions
                     sx={{
                         px: 4,

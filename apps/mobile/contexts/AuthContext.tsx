@@ -37,9 +37,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const signOut = async () => {
-    await AsyncStorage.multiRemove(['auth_token', 'refresh_token'])
+    await AsyncStorage.multiRemove(['auth_token', 'refresh_token', 'hasSeenOnboarding'])
     setAuthenticated(false)
   }
+
 
   return (
     <AuthContext.Provider value={{ authenticated, signIn, signOut }}>
@@ -47,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     </AuthContext.Provider>
   )
 }
-
+93
 export function useAuth() {
   const ctx = useContext(AuthContext)
   if (!ctx) {

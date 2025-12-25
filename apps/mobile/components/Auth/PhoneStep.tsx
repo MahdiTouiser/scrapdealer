@@ -5,12 +5,10 @@ import {
     Platform,
     TextInput as RNTextInput,
     StyleSheet,
+    TouchableOpacity,
     View,
 } from 'react-native';
-import {
-    Button,
-    HelperText,
-} from 'react-native-paper';
+import { HelperText } from 'react-native-paper';
 
 import {
     colors,
@@ -46,6 +44,11 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({
     const { theme } = useThemeContext();
     const { myColors } = theme;
 
+    const focusAnim = React.useRef(new Animated.Value(0)).current;
+    const shakeAnim = React.useRef(new Animated.Value(0)).current;
+    const pulseAnim = React.useRef(new Animated.Value(1)).current;
+    const glowAnim = React.useRef(new Animated.Value(0)).current;
+
     const { mutate: sendOtp, isPending: sendingOtp } = useApi<
         { success: boolean; message?: string },
         { phone: string }
@@ -59,6 +62,65 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({
 
     const cleanPhone = phoneNumber.replace(/\D/g, '');
     const isValid = cleanPhone.length >= 10;
+
+    React.useEffect(() => {
+        Animated.timing(focusAnim, {
+            toValue: phoneFocused ? 1 : 0,
+            duration: 300,
+            useNativeDriver: false,
+        }).start();
+
+        if (phoneFocused) {
+            Animated.loop(
+                Animated.sequence([
+                    Animated.timing(glowAnim, {
+                        toValue: 1,
+                        duration: 1500,
+                        useNativeDriver: false,
+                    }),
+                    Animated.timing(glowAnim, {
+                        toValue: 0,
+                        duration: 1500,
+                        useNativeDriver: false,
+                    }),
+                ])
+            ).start();
+        } else {
+            glowAnim.setValue(0);
+        }
+    }, [phoneFocused]);
+
+    React.useEffect(() => {
+        if (error) {
+            Animated.sequence([
+                Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
+                Animated.timing(shakeAnim, { toValue: -10, duration: 50, useNativeDriver: true }),
+                Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
+                Animated.timing(shakeAnim, { toValue: 0, duration: 50, useNativeDriver: true }),
+            ]).start();
+        }
+    }, [error]);
+
+    React.useEffect(() => {
+        if (isValid) {
+            Animated.loop(
+                Animated.sequence([
+                    Animated.timing(pulseAnim, {
+                        toValue: 1.03,
+                        duration: 2000,
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(pulseAnim, {
+                        toValue: 1,
+                        duration: 2000,
+                        useNativeDriver: true,
+                    }),
+                ])
+            ).start();
+        } else {
+            pulseAnim.setValue(1);
+        }
+    }, [isValid]);
 
     const handleSend = async () => {
         if (!isValid || sendingOtp) return;
@@ -74,54 +136,141 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({
         }
     };
 
+    const borderColorInterpolate = focusAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['rgba(120, 120, 128, 0.2)', colors.light.primary],
+    });
+
+    const backgroundColorInterpolate = focusAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['rgba(120, 120, 128, 0.04)', 'rgba(120, 120, 128, 0.08)'],
+    });
+
+    const glowOpacityInterpolate = glowAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, 0.4],
+    });
+
     return (
         <Animated.View style={[styles.container, animatedStyles(stepTransition)]}>
-            <Text style={[styles.label, { color: myColors.textSecondary }]}>
-                شماره موبایل
-            </Text>
-
-            <View style={[
-                styles.inputWrapper,
-                phoneFocused && styles.inputWrapperFocused,
-                { borderColor: phoneFocused ? colors.light.primary : myColors.textSecondary + '66' },
-            ]}>
-                <Text style={styles.countryCode}>+98</Text>
-
-                <RNTextInput
-                    style={[styles.input, { color: myColors.textPrimary }]}
-                    value={phoneNumber}
-                    onChangeText={onChangePhone}
-                    onFocus={() => setPhoneFocused(true)}
-                    onBlur={() => setPhoneFocused(false)}
-                    keyboardType="phone-pad"
-                    maxLength={17}
-                    placeholder="912 345 6789"
-                    placeholderTextColor={myColors.textSecondary + '80'}
-                    textAlign="left"
-                    editable={!sendingOtp}
-                />
+            <View style={styles.labelContainer}>
+                <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+                    <View style={styles.iconCircle}>
+                        <Text style={styles.icon}>📱</Text>
+                    </View>
+                </Animated.View>
+                <Text style={[styles.label, { color: myColors.textPrimary }]}>
+                    شماره موبایل خود را وارد کنید
+                </Text>
             </View>
 
-            {(error || sendingOtp) && (
-                <HelperText type="error" visible={!!error} style={styles.errorText}>
-                    {error || (sendingOtp ? 'در حال ارسال...' : '')}
-                </HelperText>
+            <Animated.View style={[
+                styles.inputWrapper,
+                {
+                    borderColor: borderColorInterpolate,
+                    backgroundColor: backgroundColorInterpolate,
+                    transform: [{ translateX: shakeAnim }],
+                },
+            ]}>
+                <Animated.View
+                    style={[
+                        styles.inputGlow,
+                        {
+                            opacity: glowOpacityInterpolate,
+                            shadowColor: colors.light.primary,
+                        }
+                    ]}
+                />
+
+                <View style={styles.inputContent}>
+
+
+                    <Text style={[styles.countryCode, { color: myColors.textPrimary }]}>+98</Text>
+
+                    <View style={[styles.divider, { backgroundColor: myColors.textSecondary + '30' }]} />
+
+                    <RNTextInput
+                        style={[styles.input, { color: myColors.textPrimary }]}
+                        value={phoneNumber}
+                        onChangeText={onChangePhone}
+                        onFocus={() => setPhoneFocused(true)}
+                        onBlur={() => setPhoneFocused(false)}
+                        keyboardType="phone-pad"
+                        maxLength={17}
+                        placeholder="912 345 6789"
+                        placeholderTextColor={myColors.textSecondary + '60'}
+                        textAlign="left"
+                        editable={!sendingOtp}
+                        autoFocus
+                    />
+
+                    {phoneNumber.length > 0 && !sendingOtp && (
+                        <TouchableOpacity
+                            onPress={() => onChangePhone('')}
+                            style={styles.clearButton}
+                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        >
+                            <View style={[styles.clearIcon, { backgroundColor: myColors.textSecondary + '30' }]}>
+                                <Text style={styles.clearText}>✕</Text>
+                            </View>
+                        </TouchableOpacity>
+                    )}
+                </View>
+            </Animated.View>
+
+            {error && (
+                <Animated.View style={{
+                    opacity: shakeAnim.interpolate({
+                        inputRange: [-10, 0, 10],
+                        outputRange: [1, 1, 1],
+                    })
+                }}>
+                    <HelperText type="error" visible={!!error} style={styles.errorText}>
+                        {error}
+                    </HelperText>
+                </Animated.View>
             )}
 
-            <Button
-                mode="contained"
+            {sendingOtp && (
+                <View style={styles.loadingContainer}>
+                    <Animated.View style={[styles.loadingDot, { opacity: pulseAnim }]} />
+                    <Text style={[styles.loadingText, { color: myColors.textSecondary }]}>
+                        در حال ارسال کد تأیید...
+                    </Text>
+                </View>
+            )}
+
+
+            <TouchableOpacity
                 onPress={handleSend}
-                loading={sendingOtp}
                 disabled={!isValid || sendingOtp}
-                contentStyle={styles.buttonContent}
-                style={[
-                    styles.button,
-                    (!isValid || sendingOtp) && styles.buttonDisabled,
-                ]}
-                labelStyle={styles.buttonLabel}
+                activeOpacity={0.85}
             >
-                ارسال کد تایید
-            </Button>
+                <Animated.View style={[
+                    styles.button,
+                    { backgroundColor: colors.light.primary },
+                    (!isValid || sendingOtp) && styles.buttonDisabled,
+                    {
+                        transform: [{
+                            scale: (isValid && !sendingOtp) ? pulseAnim : 1
+                        }]
+                    }
+                ]}>
+                    <View style={styles.buttonContent}>
+                        {sendingOtp ? (
+                            <>
+                                <Animated.View style={[styles.spinner, { opacity: pulseAnim }]} />
+                                <Text style={styles.buttonLabel}>در حال ارسال...</Text>
+                            </>
+                        ) : (
+                            <>
+                                <Text style={styles.buttonLabel}>ارسال کد تأیید</Text>
+                                <Text style={styles.buttonIcon}>→</Text>
+                            </>
+                        )}
+                    </View>
+                </Animated.View>
+            </TouchableOpacity>
         </Animated.View>
     );
 };
@@ -140,40 +289,174 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
     },
-    label: {
-        fontSize: typography.body1.size,
+    labelContainer: {
+        alignItems: 'center',
+        marginBottom: spacing['2xl'],
+    },
+    iconCircle: {
+        width: 64,
+        height: 64,
+        borderRadius: 32,
+        backgroundColor: 'rgba(78, 205, 196, 0.1)',
+        justifyContent: 'center',
+        alignItems: 'center',
         marginBottom: spacing.md,
-        fontWeight: '600',
-        textAlign: 'right',
+        borderWidth: 2,
+        borderColor: 'rgba(78, 205, 196, 0.2)',
+    },
+    icon: {
+        fontSize: 32,
+    },
+    label: {
+        fontSize: 22,
+        marginBottom: spacing.xs,
+        fontWeight: '700',
+        textAlign: 'center',
         fontFamily: 'Vazirmatn',
     },
+    helperLabel: {
+        fontSize: typography.body2.size,
+        textAlign: 'center',
+        fontFamily: 'Vazirmatn',
+        opacity: 0.7,
+        lineHeight: 22,
+        paddingHorizontal: spacing.md,
+    },
     inputWrapper: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderWidth: 2,
-        borderRadius: radii.xl + 4,
-        paddingHorizontal: spacing.xl,
-        height: 68,
-        backgroundColor: 'rgba(120, 120, 128, 0.04)',
-        marginBottom: spacing.lg,
+        position: 'relative',
+        borderWidth: 2.5,
+        borderRadius: radii.xl + 6,
+        marginBottom: spacing.md,
+        overflow: 'visible',
         ...Platform.select({
             ios: {
                 shadowColor: '#000',
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.08,
-                shadowRadius: 16,
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.12,
+                shadowRadius: 24,
             },
             android: {
-                elevation: 8,
+                elevation: 12,
             },
         }),
     },
-    inputWrapperFocused: {
-        backgroundColor: 'rgba(120, 120, 128, 0.08)',
-        borderColor: colors.light.primary,
+    inputGlow: {
+        position: 'absolute',
+        top: -8,
+        left: -8,
+        right: -8,
+        bottom: -8,
+        borderRadius: radii.xl + 10,
         ...Platform.select({
             ios: {
-                shadowOpacity: 0.2,
+                shadowOffset: { width: 0, height: 0 },
+                shadowOpacity: 1,
+                shadowRadius: 20,
+            },
+            android: {
+                elevation: 20,
+            },
+        }),
+    },
+    inputContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: spacing.lg,
+        height: 72,
+        position: 'relative',
+    },
+    flagContainer: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: 'rgba(0, 0, 0, 0.05)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: spacing.sm,
+    },
+    flag: {
+        fontSize: 24,
+    },
+    countryCode: {
+        fontSize: 18,
+        fontWeight: '700',
+        marginRight: spacing.sm,
+        fontFamily: 'Vazirmatn-Bold',
+    },
+    divider: {
+        width: 1,
+        height: 32,
+        marginHorizontal: spacing.md,
+    },
+    input: {
+        flex: 1,
+        fontSize: 18,
+        paddingVertical: spacing.md,
+        fontFamily: 'Vazirmatn',
+        fontWeight: '600',
+    },
+    clearButton: {
+        marginLeft: spacing.sm,
+    },
+    clearIcon: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    clearText: {
+        fontSize: 12,
+        fontWeight: '700',
+        color: '#666',
+    },
+    errorText: {
+        textAlign: 'right',
+        marginBottom: spacing.md,
+        fontFamily: 'Vazirmatn',
+        fontSize: typography.body2.size,
+    },
+    loadingContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: spacing.md,
+        paddingVertical: spacing.sm,
+    },
+    loadingDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: colors.light.primary,
+        marginRight: spacing.sm,
+    },
+    loadingText: {
+        fontSize: typography.body2.size,
+        fontFamily: 'Vazirmatn',
+        fontWeight: '600',
+    },
+    infoBox: {
+        borderRadius: radii.lg,
+        padding: spacing.md,
+        marginBottom: spacing.xl,
+        borderWidth: 1,
+    },
+    infoText: {
+        fontSize: typography.body2.size,
+        textAlign: 'center',
+        fontFamily: 'Vazirmatn',
+        fontWeight: '500',
+    },
+    button: {
+        borderRadius: radii.xl + 2,
+        overflow: 'hidden',
+        height: 56,
+        justifyContent: 'center',
+        ...Platform.select({
+            ios: {
+                shadowColor: colors.light.primary,
+                shadowOffset: { width: 0, height: 12 },
+                shadowOpacity: 0.4,
                 shadowRadius: 24,
             },
             android: {
@@ -181,36 +464,22 @@ const styles = StyleSheet.create({
             },
         }),
     },
-    countryCode: {
-        fontSize: 20,
-        fontWeight: '700',
-        color: '#444',
-        marginRight: spacing.sm,
-        fontFamily: 'Vazirmatn-Bold',
-    },
-    input: {
-        flex: 1,
-        fontSize: 20,
-        paddingVertical: spacing.md,
-        fontFamily: 'Vazirmatn',
-    },
-    errorText: {
-        textAlign: 'right',
-        marginTop: -spacing.xs,
-        marginBottom: spacing.md,
-        fontFamily: 'Vazirmatn',
-    },
-    button: {
-        borderRadius: radii.xl,
-        marginTop: spacing.xl,
-        backgroundColor: colors.light.primary,
-        height: 56,
-    },
     buttonDisabled: {
         backgroundColor: '#888',
         opacity: 0.7,
+        ...Platform.select({
+            ios: {
+                shadowOpacity: 0.1,
+            },
+            android: {
+                elevation: 4,
+            },
+        }),
     },
     buttonContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
         paddingVertical: spacing.sm,
     },
     buttonLabel: {
@@ -218,5 +487,20 @@ const styles = StyleSheet.create({
         fontFamily: 'Vazirmatn',
         fontWeight: '700',
         fontSize: 17,
+        marginRight: spacing.xs,
+    },
+    buttonIcon: {
+        color: '#fff',
+        fontSize: 24,
+        fontWeight: '700',
+    },
+    spinner: {
+        width: 20,
+        height: 20,
+        borderRadius: 10,
+        borderWidth: 3,
+        borderColor: '#fff',
+        borderTopColor: 'transparent',
+        marginRight: spacing.sm,
     },
 });

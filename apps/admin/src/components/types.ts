@@ -30,6 +30,7 @@ export interface SubCat {
   minPrice: number;
   maxPrice: number;
   categoryId?: string;
+  images?: string[];
   parentCategoryId: string;
 }
 
@@ -38,5 +39,6 @@ export interface Cat {
   name: string;
   minPrice: number;
   maxPrice: number;
+  images?: string[];
   subCategories: SubCat[];
 }
