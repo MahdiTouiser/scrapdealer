@@ -4,15 +4,15 @@ import { useState } from 'react';
 import AddButton from '@/components/common/AddButton';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import CustomFormModal, {
-  FormField,
+    FormField,
 } from '@/components/common/CustomFormModal';
 import PageTitle from '@/components/common/PageTitle';
 import SupportsTable, { Support } from '@/components/supports/SupportsTable';
 import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import {
-  Box,
-  CircularProgress,
+    Box,
+    CircularProgress,
 } from '@mui/material';
 
 const Supports = () => {
@@ -207,11 +207,11 @@ const Supports = () => {
                 cancelLabel="لغو"
                 submitLoading={adding || updating}
             >
-                {fetchingEdit && (
+                {fetchingEdit ? (
                     <Box display="flex" justifyContent="center" alignItems="center" p={3}>
                         <CircularProgress />
                     </Box>
-                )}
+                ) : null}
             </CustomFormModal>
 
             <ConfirmationModal

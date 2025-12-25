@@ -165,11 +165,12 @@ const NewsPage = () => {
                 cancelLabel="لغو"
                 submitLoading={adding || updating || fetchingEdit}
             >
-                {fetchingEdit && (
+                {fetchingEdit ? (
                     <Box display="flex" justifyContent="center" alignItems="center" p={3}>
                         <CircularProgress />
                     </Box>
-                )}
+                ) : null}
+
             </CustomFormModal>
             <ConfirmationModal
                 open={confirmOpen}
