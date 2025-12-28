@@ -1,29 +1,87 @@
 'use client';
 
-import React from 'react';
+import React, {
+  useEffect,
+  useState,
+} from 'react';
 
 import PageTitle from '@/components/common/PageTitle';
-import NotificationToggle from '@/components/settings/NotificationToggle';
+import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import {
   Box,
-  Paper,
-  Typography,
+  Button,
+  TextField,
 } from '@mui/material';
 
-const SettingsPage: React.FC = () => {
-    return (
-        <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 4 }}>
+export interface Settings {
+    buyerCommissionRate: number | null
+    buyerCommissionFixedAmount: number | null
+}
 
-            <PageTitle title={fa.settings}
+const SettingsPage: React.FC = () => {
+    const { data, loading } = useApi<Settings>({
+        key: ['Settings'],
+        url: '/Settings',
+    });
+
+    const { mutate, loading: saving } = useApi<unknown, Settings>({
+        key: ['Settings'],
+        url: '/Settings',
+        method: 'PUT',
+        onSuccess: fa.savedSuccessfully,
+    });
+
+    const [form, setForm] = useState<Settings>({
+        buyerCommissionRate: null,
+        buyerCommissionFixedAmount: null,
+    });
+
+    useEffect(() => {
+        if (data) setForm(data);
+    }, [data]);
+
+    const update =
+        (key: keyof Settings) =>
+            (e: React.ChangeEvent<HTMLInputElement>) => {
+                const v = e.target.value;
+                setForm({
+                    ...form,
+                    [key]: v === '' ? null : Number(v),
+                });
+            };
+
+    const submit = () => {
+        mutate(form);
+    };
+
+    return (
+        <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <PageTitle title={fa.settings} />
+
+            <TextField
+                label={fa.buyerCommissionRate}
+                type="number"
+                value={form.buyerCommissionRate ?? ''}
+                onChange={update('buyerCommissionRate')}
+                disabled={loading}
             />
 
-            <Paper sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                    🔔 اعلان‌ها
-                </Typography>
-                <NotificationToggle />
-            </Paper>
+            <TextField
+                label={fa.buyerCommissionFixedAmount}
+                type="number"
+                value={form.buyerCommissionFixedAmount ?? ''}
+                onChange={update('buyerCommissionFixedAmount')}
+                disabled={loading}
+            />
+
+            <Button
+                variant="contained"
+                onClick={submit}
+                disabled={saving}
+            >
+                {fa.save}
+            </Button>
         </Box>
     );
 };

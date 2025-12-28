@@ -52,6 +52,10 @@ const fa = {
   addNews: 'افزودن خبر',
   editNews: 'ویرایش خبر',
   deleteNews: 'حذف خبر',
+  save: 'ذخیره',
+  buyerCommissionRate: 'نرخ کمیسیون خریدار',
+  buyerCommissionFixedAmount: 'نرخ ثابت کمیسیون خریدار',
+  savedSuccessfully: 'با موفقیت ذخیره شد',
   permissions: {
     SaleOrders: {
       ViewAll: 'مشاهده همه سفارشات فروش',
