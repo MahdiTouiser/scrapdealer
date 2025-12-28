@@ -56,6 +56,10 @@ const fa = {
   buyerCommissionRate: 'نرخ کمیسیون خریدار',
   buyerCommissionFixedAmount: 'نرخ ثابت کمیسیون خریدار',
   savedSuccessfully: 'با موفقیت ذخیره شد',
+  changePassword: 'تغییر رمز',
+  newPassword: 'رمز جدید',
+  oldPassword: 'رمز قبلی',
+  commissionSettings: 'تنظیمات مربوط به کمیسیون',
   permissions: {
     SaleOrders: {
       ViewAll: 'مشاهده همه سفارشات فروش',

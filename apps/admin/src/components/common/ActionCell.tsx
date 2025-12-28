@@ -3,21 +3,24 @@
 import React from 'react';
 
 import DeleteIcon from '@mui/icons-material/Delete';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
-    Button,
-    Stack,
-    Tooltip,
+  Button,
+  Stack,
+  Tooltip,
 } from '@mui/material';
 
 interface ActionsCellProps {
     data: any;
     onEdit?: (id: string) => void;
     onDelete?: (id: string) => void;
+    onReward?: (id: string) => void;
 }
 
-const ActionsCell: React.FC<ActionsCellProps> = ({ data, onEdit, onDelete }) => {
+const ActionsCell: React.FC<ActionsCellProps> = ({ data, onEdit, onDelete, onReward }) => {
     const id = data?.id;
+    const userId = data?.userId;
 
     return (
         <Stack
@@ -47,6 +50,20 @@ const ActionsCell: React.FC<ActionsCellProps> = ({ data, onEdit, onDelete }) => 
                     <DeleteIcon fontSize="small" />
                 </Button>
             </Tooltip>
+
+            {onReward && (
+                <Tooltip title="تخصیص پاداش" arrow>
+                    <Button
+                        size="small"
+                        color="success"
+                        variant="outlined"
+                        onClick={() => onReward(userId)}
+                        sx={{ minWidth: 0, p: 1, borderRadius: '8px' }}
+                    >
+                        <EmojiEventsIcon fontSize="small" />
+                    </Button>
+                </Tooltip>
+            )}
         </Stack>
     );
 };

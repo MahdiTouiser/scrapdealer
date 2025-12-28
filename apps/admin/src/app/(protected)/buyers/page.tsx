@@ -8,6 +8,7 @@ import CustomFormModal, {
   FormField,
 } from '@/components/common/CustomFormModal';
 import PageTitle from '@/components/common/PageTitle';
+import RewardsModal from '@/components/finance/rewards/RewardsModal';
 import { useApi } from '@/hooks/useApi';
 import { useFileApi } from '@/hooks/useFileApi';
 import fa from '@/i18n/fa';
@@ -18,30 +19,50 @@ import {
   Chip,
 } from '@mui/material';
 
+export interface Reward {
+    id: string;
+    amount: number;
+    userId: string;
+    userFullName: string;
+    description: string;
+}
+
 const Buyers = () => {
-    const [open, setOpen] = useState(false)
-    const [confirmOpen, setConfirmOpen] = useState(false)
-    const [selectedId, setSelectedId] = useState<string | null>(null)
-    const [editMode, setEditMode] = useState(false)
-    const [editingBuyer, setEditingBuyer] = useState<Buyer | null>(null)
+    const [open, setOpen] = useState(false);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [selectedId, setSelectedId] = useState<string | null>(null);
+    const [editMode, setEditMode] = useState(false);
+    const [editingBuyer, setEditingBuyer] = useState<Buyer | null>(null);
 
-    const [isFixedLocation, setIsFixedLocation] = useState<boolean | null>(null)
-    const [isWholeSale, setIsWholeSale] = useState<boolean | null>(null)
+    const [rewardsModalOpen, setRewardsModalOpen] = useState(false);
+    const [selectedUserIdForReward, setSelectedUserIdForReward] = useState<string | null>(null);
 
-    const { upload } = useFileApi()
+    const [isFixedLocation, setIsFixedLocation] = useState<boolean | null>(null);
+    const [isWholeSale, setIsWholeSale] = useState<boolean | null>(null);
+
+
+    const { upload } = useFileApi();
 
     const getQueryParams = () => {
-        const params = new URLSearchParams()
-        if (isFixedLocation !== null) params.append('IsFixedLocation', String(isFixedLocation))
-        if (isWholeSale !== null) params.append('IsWholeSale', String(isWholeSale))
-        return params.toString()
-    }
+        const params = new URLSearchParams();
+        if (isFixedLocation !== null) params.append('IsFixedLocation', String(isFixedLocation));
+        if (isWholeSale !== null) params.append('IsWholeSale', String(isWholeSale));
+        return params.toString();
+    };
 
-    const { data: buyers, loading, refetch: refetchBuyers } =
-        useApi<{ data: Buyer[]; totalCount: number }>({
-            key: ['get-buyers', isFixedLocation, isWholeSale],
-            url: `/Buyers/Admin/Get?${getQueryParams()}`,
-        })
+    const { data: buyers, loading, refetch: refetchBuyers } = useApi<{ data: Buyer[]; totalCount: number }>({
+        key: ['get-buyers', isFixedLocation, isWholeSale],
+        url: `/Buyers/Admin/Get?${getQueryParams()}`,
+    });
+
+    const { data: rewardsData, refetch: refetchRewards } = useApi<{
+        data: { data: Reward[]; totalCount: number };
+    }>({
+        key: ['get-all-rewards'],
+        url: '/Rewards',
+    });
+
+    const allRewards = rewardsData?.data || [];
 
     const { mutateAsync: addBuyer, loading: adding } = useApi<void, any>({
         key: ['add-buyer'],
@@ -49,7 +70,7 @@ const Buyers = () => {
         method: 'POST',
         onError: 'افزودن خریدار با خطا مواجه شد',
         onSuccess: 'خریدار با موفقیت اضافه شد',
-    })
+    });
 
     const { mutateAsync: updateBuyer, loading: updating } = useApi<void, any>({
         key: ['update-buyer'],
@@ -57,7 +78,7 @@ const Buyers = () => {
         method: 'PUT',
         onError: 'ویرایش خریدار با خطا مواجه شد',
         onSuccess: 'خریدار با موفقیت ویرایش شد',
-    })
+    });
 
     const { mutate: deleteBuyer, loading: deleting } = useApi<void, string>({
         key: ['delete-buyer'],
@@ -65,66 +86,66 @@ const Buyers = () => {
         method: 'DELETE',
         onError: 'حذف خریدار با خطا مواجه شد',
         onSuccess: 'خریدار با موفقیت حذف شد',
-    })
+    });
 
-    const handleOpen = () => setOpen(true)
+    const handleOpen = () => setOpen(true);
 
     const handleClose = () => {
-        setOpen(false)
-        setEditMode(false)
-        setEditingBuyer(null)
-    }
+        setOpen(false);
+        setEditMode(false);
+        setEditingBuyer(null);
+    };
 
     const handleEdit = (buyer: Buyer) => {
-        setEditMode(true)
-        setEditingBuyer(buyer)
-        setOpen(true)
-    }
+        setEditMode(true);
+        setEditingBuyer(buyer);
+        setOpen(true);
+    };
 
     const handleDelete = (id: string) => {
-        setSelectedId(id)
-        setConfirmOpen(true)
-    }
+        setSelectedId(id);
+        setConfirmOpen(true);
+    };
 
     const confirmDelete = () => {
-        if (!selectedId) return
+        if (!selectedId) return;
         deleteBuyer(selectedId, {
             onSuccess: () => {
-                setConfirmOpen(false)
-                setSelectedId(null)
-                refetchBuyers()
+                setConfirmOpen(false);
+                setSelectedId(null);
+                refetchBuyers();
             },
             onError: () => setConfirmOpen(false),
-        })
-    }
+        });
+    };
 
     const uploadFile = async (file?: File) => {
-        if (!file) return undefined
-        const fd = new FormData()
-        fd.append('file', file)
-        return await upload.mutateAsync(fd)
-    }
+        if (!file) return undefined;
+        const fd = new FormData();
+        fd.append('file', file);
+        return await upload.mutateAsync(fd);
+    };
 
     const handleSubmit = async (data: any) => {
-        const payload = { ...data }
+        const payload = { ...data };
 
-        payload.businessLicenseFileId = await uploadFile(data.businessLicenseFile)
-        payload.nationalCardFileId = await uploadFile(data.nationalCardFile)
-        payload.profileFormFileId = await uploadFile(data.profileFormFile)
+        payload.businessLicenseFileId = await uploadFile(data.businessLicenseFile);
+        payload.nationalCardFileId = await uploadFile(data.nationalCardFile);
+        payload.profileFormFileId = await uploadFile(data.profileFormFile);
 
-        delete payload.businessLicenseFile
-        delete payload.nationalCardFile
-        delete payload.profileFormFile
+        delete payload.businessLicenseFile;
+        delete payload.nationalCardFile;
+        delete payload.profileFormFile;
 
         if (editMode) {
-            await updateBuyer({ ...payload, id: editingBuyer!.id })
+            await updateBuyer({ ...payload, id: editingBuyer!.id });
         } else {
-            await addBuyer(payload)
+            await addBuyer(payload);
         }
 
-        handleClose()
-        refetchBuyers()
-    }
+        handleClose();
+        refetchBuyers();
+    };
 
     const formFields: FormField[] = [
         { name: 'firstName', label: 'نام', fieldType: 'text', required: true },
@@ -161,19 +182,29 @@ const Buyers = () => {
         { name: 'profileFormFile', label: 'فرم پروفایل', fieldType: 'file' },
         { name: 'isFixedLocation', label: 'مکان ثابت', fieldType: 'toggle' },
         { name: 'isWholeSaleBuyer', label: 'خریدار عمده', fieldType: 'toggle' },
-    ]
+    ];
 
     const getDefaultValues = () => {
-        if (editMode && editingBuyer) return { ...editingBuyer }
-        return {}
-    }
+        if (editMode && editingBuyer) return { ...editingBuyer };
+        return {};
+    };
 
     const clearFilters = () => {
-        setIsFixedLocation(null)
-        setIsWholeSale(null)
-    }
+        setIsFixedLocation(null);
+        setIsWholeSale(null);
+    };
 
-    const activeFiltersCount = [isFixedLocation, isWholeSale].filter(v => v !== null).length
+    const activeFiltersCount = [isFixedLocation, isWholeSale].filter(v => v !== null).length;
+
+    const handleReward = (buyerId: string) => {
+        setSelectedUserIdForReward(buyerId);
+        setRewardsModalOpen(true);
+    };
+
+    const handleRewardsModalClose = () => {
+        setRewardsModalOpen(false);
+        setSelectedUserIdForReward(null);
+    };
 
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
@@ -184,53 +215,23 @@ const Buyers = () => {
 
                 <Box display="flex" gap={2} alignItems="center" flexWrap="wrap">
                     <Box>
-                        <Box mb={0.5} fontSize="0.875rem" fontWeight={500}>
-                            مکان ثابت:
-                        </Box>
+                        <Box mb={0.5} fontSize="0.875rem" fontWeight={500}>مکان ثابت:</Box>
                         <ButtonGroup variant="outlined" size="small">
-                            <Button
-                                variant={isFixedLocation === true ? 'contained' : 'outlined'}
-                                onClick={() => setIsFixedLocation(true)}
-                            >
-                                بله
-                            </Button>
-                            <Button
-                                variant={isFixedLocation === false ? 'contained' : 'outlined'}
-                                onClick={() => setIsFixedLocation(false)}
-                            >
-                                خیر
-                            </Button>
+                            <Button variant={isFixedLocation === true ? 'contained' : 'outlined'} onClick={() => setIsFixedLocation(true)}>بله</Button>
+                            <Button variant={isFixedLocation === false ? 'contained' : 'outlined'} onClick={() => setIsFixedLocation(false)}>خیر</Button>
                         </ButtonGroup>
                     </Box>
 
                     <Box>
-                        <Box mb={0.5} fontSize="0.875rem" fontWeight={500}>
-                            خریدار عمده:
-                        </Box>
+                        <Box mb={0.5} fontSize="0.875rem" fontWeight={500}>خریدار عمده:</Box>
                         <ButtonGroup variant="outlined" size="small">
-                            <Button
-                                variant={isWholeSale === true ? 'contained' : 'outlined'}
-                                onClick={() => setIsWholeSale(true)}
-                            >
-                                بله
-                            </Button>
-                            <Button
-                                variant={isWholeSale === false ? 'contained' : 'outlined'}
-                                onClick={() => setIsWholeSale(false)}
-                            >
-                                خیر
-                            </Button>
+                            <Button variant={isWholeSale === true ? 'contained' : 'outlined'} onClick={() => setIsWholeSale(true)}>بله</Button>
+                            <Button variant={isWholeSale === false ? 'contained' : 'outlined'} onClick={() => setIsWholeSale(false)}>خیر</Button>
                         </ButtonGroup>
                     </Box>
 
                     {activeFiltersCount > 0 && (
-                        <Button
-                            variant="text"
-                            color="error"
-                            size="small"
-                            onClick={clearFilters}
-                            sx={{ mt: 2.5 }}
-                        >
+                        <Button variant="text" color="error" size="small" onClick={clearFilters} sx={{ mt: 2.5 }}>
                             پاک کردن فیلترها ({activeFiltersCount})
                         </Button>
                     )}
@@ -240,22 +241,10 @@ const Buyers = () => {
             {activeFiltersCount > 0 && (
                 <Box display="flex" gap={1} mb={2} flexWrap="wrap">
                     {isFixedLocation !== null && (
-                        <Chip
-                            label={`مکان ثابت: ${isFixedLocation ? 'بله' : 'خیر'}`}
-                            onDelete={() => setIsFixedLocation(null)}
-                            size="small"
-                            color="primary"
-                            variant="outlined"
-                        />
+                        <Chip label={`مکان ثابت: ${isFixedLocation ? 'بله' : 'خیر'}`} onDelete={() => setIsFixedLocation(null)} size="small" color="primary" variant="outlined" />
                     )}
                     {isWholeSale !== null && (
-                        <Chip
-                            label={`خریدار عمده: ${isWholeSale ? 'بله' : 'خیر'}`}
-                            onDelete={() => setIsWholeSale(null)}
-                            size="small"
-                            color="primary"
-                            variant="outlined"
-                        />
+                        <Chip label={`خریدار عمده: ${isWholeSale ? 'بله' : 'خیر'}`} onDelete={() => setIsWholeSale(null)} size="small" color="primary" variant="outlined" />
                     )}
                 </Box>
             )}
@@ -265,6 +254,7 @@ const Buyers = () => {
                 loading={loading}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onReward={handleReward}
             />
 
             <CustomFormModal
@@ -279,6 +269,14 @@ const Buyers = () => {
                 submitLoading={adding || updating || upload.loading}
             />
 
+            <RewardsModal
+                open={rewardsModalOpen}
+                onClose={handleRewardsModalClose}
+                buyerId={selectedUserIdForReward}
+                allRewards={allRewards}
+                refetchRewards={refetchRewards}
+            />
+
             <ConfirmationModal
                 open={confirmOpen}
                 onCancel={() => setConfirmOpen(false)}
@@ -289,7 +287,7 @@ const Buyers = () => {
                 loading={deleting}
             />
         </Box>
-    )
-}
+    );
+};
 
-export default Buyers
+export default Buyers;
