@@ -1,7 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, {
+  useEffect,
+  useState,
+} from 'react';
 
+import { Settings } from '@/app/(protected)/settings/page';
+import { useApi } from '@/hooks/useApi';
 import {
   Box,
   Button,
@@ -10,24 +15,58 @@ import {
 } from '@mui/material';
 
 const CommissionControl: React.FC = () => {
-    const [commission, setCommission] = useState(3);
+    const { data } = useApi<Settings>({
+        key: ['Settings'],
+        url: '/Settings',
+    });
 
-    const handleSave = () => {
-        alert(`درصد کمیسیون به ${commission}% تغییر کرد`);
+    const { mutate, loading } = useApi<unknown, Settings>({
+        key: ['Settings'],
+        url: '/Settings',
+        method: 'PUT',
+    });
+
+    const [commission, setCommission] = useState<number>(0);
+
+    useEffect(() => {
+        if (data?.buyerCommissionRate != null) {
+            setCommission(data.buyerCommissionRate);
+        }
+    }, [data]);
+
+    const onChange = (_: Event, value: number | number[]) => {
+        setCommission(value as number);
+    };
+
+    const onSave = () => {
+        mutate({
+            buyerCommissionRate: commission,
+            buyerCommissionFixedAmount: null,
+        });
     };
 
     return (
         <Box>
-            <Typography gutterBottom>درصد فعلی: {commission}%</Typography>
+            <Typography gutterBottom>
+                درصد فعلی: {commission}%
+            </Typography>
+
             <Slider
                 value={commission}
-                onChange={(e, val) => setCommission(val as number)}
+                onChange={onChange}
                 step={0.5}
                 min={0}
                 max={10}
                 valueLabelDisplay="auto"
             />
-            <Button variant="contained" onClick={handleSave}>ذخیره تغییرات</Button>
+
+            <Button
+                variant="contained"
+                onClick={onSave}
+                disabled={loading}
+            >
+                ذخیره تغییرات
+            </Button>
         </Box>
     );
 };

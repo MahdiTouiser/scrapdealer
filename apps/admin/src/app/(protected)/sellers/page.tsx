@@ -5,13 +5,16 @@ import { useState } from 'react';
 import AddButton from '@/components/common/AddButton';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import CustomFormModal, {
-    FormField,
+  FormField,
 } from '@/components/common/CustomFormModal';
 import PageTitle from '@/components/common/PageTitle';
+import RewardsModal from '@/components/finance/rewards/RewardsModal';
 import SellersTable, { Seller } from '@/components/sellers/SellersTable';
 import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import { Box } from '@mui/material';
+
+import { Reward } from '../buyers/page';
 
 const Sellers = () => {
     const [open, setOpen] = useState(false);
@@ -19,6 +22,30 @@ const Sellers = () => {
     const [editingSeller, setEditingSeller] = useState<Seller | null>(null);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
+
+    const [rewardsModalOpen, setRewardsModalOpen] = useState(false);
+    const [selectedUserIdForReward, setSelectedUserIdForReward] = useState<string | null>(null);
+
+    const handleReward = (buyerId: string) => {
+        setSelectedUserIdForReward(buyerId);
+        setRewardsModalOpen(true);
+    };
+
+    const handleRewardsModalClose = () => {
+        setRewardsModalOpen(false);
+        setSelectedUserIdForReward(null);
+    };
+
+
+
+    const { data: rewardsData, refetch: refetchRewards } = useApi<{
+        data: { data: Reward[]; totalCount: number };
+    }>({
+        key: ['get-all-rewards'],
+        url: '/Rewards',
+    });
+
+    const allRewards = rewardsData?.data || [];
 
     const { data: sellers, loading, refetch: refetchSellers } = useApi<{ data: Seller[]; totalCount: number }>({
         key: ['get-sellers'],
@@ -173,6 +200,16 @@ const Sellers = () => {
                 loading={loading}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onReward={handleReward}
+
+            />
+
+            <RewardsModal
+                open={rewardsModalOpen}
+                onClose={handleRewardsModalClose}
+                buyerId={selectedUserIdForReward}
+                allRewards={allRewards}
+                refetchRewards={refetchRewards}
             />
 
             <CustomFormModal

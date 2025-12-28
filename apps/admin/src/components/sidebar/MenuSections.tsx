@@ -1,15 +1,16 @@
 import fa from '@/i18n/fa';
 import {
-    AdminPanelSettings,
-    Dashboard,
-    Description,
-    History,
-    Home,
-    Settings,
-    ShoppingCart,
-    Store,
-    SupportAgent,
-    VerifiedUser,
+  AdminPanelSettings,
+  CardGiftcard,
+  Dashboard,
+  Description,
+  History,
+  Home,
+  Settings,
+  ShoppingCart,
+  Store,
+  SupportAgent,
+  VerifiedUser,
 } from '@mui/icons-material';
 
 import { MenuSection } from '../types';
@@ -60,7 +61,7 @@ export const MENU_SECTIONS: MenuSection[] = [
         section: fa.financialManagement,
         collapsible: true,
         items: [
-            // { text: 'تراکنش‌ها', icon: <ReceiptLong />, path: '/finance/transactions', key: 'Permissions.Menu.Transactions' },
+            { text: 'پاداش ها', icon: <CardGiftcard />, path: '/finance/rewards', key: 'Permissions.Menu.Rewards' },
             { text: 'فاکتورها', icon: <Description />, path: '/finance/invoices', key: 'Permissions.Menu.Invoices' },
         ],
     },

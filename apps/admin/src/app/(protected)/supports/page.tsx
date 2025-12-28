@@ -4,16 +4,19 @@ import { useState } from 'react';
 import AddButton from '@/components/common/AddButton';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import CustomFormModal, {
-    FormField,
+  FormField,
 } from '@/components/common/CustomFormModal';
 import PageTitle from '@/components/common/PageTitle';
+import RewardsModal from '@/components/finance/rewards/RewardsModal';
 import SupportsTable, { Support } from '@/components/supports/SupportsTable';
 import { useApi } from '@/hooks/useApi';
 import fa from '@/i18n/fa';
 import {
-    Box,
-    CircularProgress,
+  Box,
+  CircularProgress,
 } from '@mui/material';
+
+import { Reward } from '../buyers/page';
 
 const Supports = () => {
     const [open, setOpen] = useState(false);
@@ -22,6 +25,10 @@ const Supports = () => {
     const [editMode, setEditMode] = useState(false);
     const [editingSupport, setEditingSupport] = useState<Support | null>(null);
     const [fetchingEdit, setFetchingEdit] = useState(false);
+
+
+    const [rewardsModalOpen, setRewardsModalOpen] = useState(false);
+    const [selectedUserIdForReward, setSelectedUserIdForReward] = useState<string | null>(null);
 
     const {
         data: supports,
@@ -162,6 +169,26 @@ const Supports = () => {
         };
     };
 
+    const { data: rewardsData, refetch: refetchRewards } = useApi<{
+        data: { data: Reward[]; totalCount: number };
+    }>({
+        key: ['get-all-rewards'],
+        url: '/Rewards',
+    });
+
+    const allRewards = rewardsData?.data || [];
+
+
+    const handleReward = (buyerId: string) => {
+        setSelectedUserIdForReward(buyerId);
+        setRewardsModalOpen(true);
+    };
+
+    const handleRewardsModalClose = () => {
+        setRewardsModalOpen(false);
+        setSelectedUserIdForReward(null);
+    };
+
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
             <PageTitle title={fa.supports} />
@@ -174,6 +201,7 @@ const Supports = () => {
                 loading={loading}
                 onDelete={handleDelete}
                 onEdit={handleEdit}
+                onReward={handleReward}
             />
 
             <CustomFormModal
@@ -213,6 +241,16 @@ const Supports = () => {
                     </Box>
                 ) : null}
             </CustomFormModal>
+
+
+            <RewardsModal
+                open={rewardsModalOpen}
+                onClose={handleRewardsModalClose}
+                buyerId={selectedUserIdForReward}
+                allRewards={allRewards}
+                refetchRewards={refetchRewards}
+            />
+
 
             <ConfirmationModal
                 open={confirmOpen}

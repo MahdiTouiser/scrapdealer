@@ -9,11 +9,11 @@ import Loading from '@/components/common/Loading';
 import DataGrid from '@/components/DataGrid';
 import ImageIcon from '@mui/icons-material/Image';
 import {
-    Box,
-    Dialog,
-    DialogContent,
-    IconButton,
-    Tooltip,
+  Box,
+  Dialog,
+  DialogContent,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
 
 import ActionsCell from '../common/ActionCell';
@@ -32,9 +32,10 @@ interface Props {
     loading?: boolean;
     onEdit: (id: string) => void;
     onDelete: (id: string) => void;
+    onReward?: (userId: string) => void
 }
 
-const SupportsTable: React.FC<Props> = ({ data, loading, onEdit, onDelete }) => {
+const SupportsTable: React.FC<Props> = ({ data, loading, onEdit, onDelete, onReward }) => {
     const [openImage, setOpenImage] = useState(false);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -83,7 +84,7 @@ const SupportsTable: React.FC<Props> = ({ data, loading, onEdit, onDelete }) => 
             minWidth: 160,
             filter: false,
             cellRenderer: ActionsCell,
-            cellRendererParams: { onEdit, onDelete },
+            cellRendererParams: { onEdit, onDelete, onReward },
         },
     ];
 

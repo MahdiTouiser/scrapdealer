@@ -41,7 +41,8 @@ const SellersTable: React.FC<{
     loading: boolean
     onEdit?: (id: string) => void;
     onDelete?: (id: string) => void;
-}> = ({ data = [], onEdit, onDelete, loading }) => {
+    onReward?: (userId: string) => void
+}> = ({ data = [], onEdit, onDelete, onReward, loading }) => {
     const [rowData, setRowData] = useState<Seller[]>([]);
 
     useEffect(() => {
@@ -91,7 +92,7 @@ const SellersTable: React.FC<{
         {
             headerName: 'عملیات',
             cellRenderer: ActionsCell,
-            cellRendererParams: { onEdit, onDelete },
+            cellRendererParams: { onEdit, onDelete, onReward },
             maxWidth: 150,
         },
     ]);
