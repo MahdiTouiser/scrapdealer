@@ -20,10 +20,21 @@ export default function Page() {
         <Header />
         <Navbar />
         <Banner />
-        <Box display='flex' justifyContent='center'>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', lg: 'row' },
+            justifyContent: 'center',
+            alignItems: 'stretch',
+            gap: 3,
+            px: { xs: 2, lg: 0 },
+            mt: 4
+          }}
+        >
           <CurrentPrice />
           <MostViewed />
         </Box>
+
         <NeedHelp />
         <ScrapsGrid />
         <ScrapSegregation />

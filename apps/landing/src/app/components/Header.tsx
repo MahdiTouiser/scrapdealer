@@ -9,20 +9,23 @@ const Header = () => {
         <Box
             component="header"
             sx={{
-                height: '72px',
+                height: { xs: 56, sm: 64, md: 72 },
+                px: { xs: 2, sm: 3 },
                 backgroundColor: '#F5F5F5',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
             }}
         >
-            <Image
-                src="/icons/headerIcon.png"
-                alt="logo"
-                width={130}
-                height={36}
-                priority
-            />
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Image
+                    src="/icons/headerIcon.png"
+                    alt="logo"
+                    width={110}
+                    height={32}
+                    priority
+                />
+            </Box>
         </Box>
     )
 }
