@@ -15,17 +15,16 @@ const Banner = () => {
             sx={{
                 position: 'relative',
                 width: '100%',
-                maxWidth: 1440,
                 height: 500,
-                margin: '0 auto'
+                overflow: 'hidden'
             }}
         >
             <Image
                 src="/images/banner.jpg"
                 alt="banner"
-                width={1440}
-                height={500}
+                fill
                 priority
+                style={{ objectFit: 'cover' }}
             />
 
             <Box
@@ -41,7 +40,7 @@ const Banner = () => {
             >
                 <Typography
                     sx={{
-                        fontWeight: '900',
+                        fontWeight: 900,
                         fontSize: 80,
                         color: '#06975C',
                         WebkitTextStroke: '3px #FFFFFF',
@@ -50,6 +49,7 @@ const Banner = () => {
                 >
                     ضایعات‌چی!
                 </Typography>
+
                 <Typography
                     sx={{
                         fontWeight: 900,
@@ -65,6 +65,7 @@ const Banner = () => {
                     </Box>{' '}
                     بازار ضایعات
                 </Typography>
+
                 <Typography
                     sx={{
                         fontWeight: 900,
@@ -77,7 +78,7 @@ const Banner = () => {
                     جایی برای همکاری، شفافیت و رشد مشترک کسب‌وکارها
                 </Typography>
 
-                <Stack direction="row" sx={{ mt: 3, gap: '16px' }}>
+                <Stack direction="row" sx={{ mt: 3, gap: 2 }}>
                     <Button
                         sx={{
                             width: 220,
@@ -90,17 +91,11 @@ const Banner = () => {
                             borderRadius: '12px',
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
                             gap: 1,
                             '&:hover': { backgroundColor: '#057749' }
                         }}
                     >
-                        <Image
-                            src="/icons/note.svg"
-                            alt="icon"
-                            width={24}
-                            height={24}
-                        />
+                        <Image src="/icons/note.svg" alt="icon" width={24} height={24} />
                         آموزش رایگان
                     </Button>
 
@@ -116,21 +111,13 @@ const Banner = () => {
                             borderRadius: '12px',
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
                             gap: 1,
                             '&:hover': { backgroundColor: '#f0f0f0' }
                         }}
                     >
-                        <Image
-                            src="/icons/direct-inbox.svg"
-                            alt="icon"
-                            width={24}
-                            height={24}
-                        />
+                        <Image src="/icons/direct-inbox.svg" alt="icon" width={24} height={24} />
                         دانلود اپلیکیشن اندرویدی
                     </Button>
-
-
                 </Stack>
             </Box>
         </Box>

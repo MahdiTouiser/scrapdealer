@@ -13,7 +13,7 @@ import ThemeProvider from './components/ThemeProvider';
 
 export default function Page() {
   return (
-    <ThemeProvider>
+    <ThemeProvider >
       <Box>
         <Header />
         <Navbar />
