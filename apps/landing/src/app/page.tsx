@@ -10,6 +10,7 @@ import MostViewed from './components/MostViewed';
 import Navbar from './components/Navbar';
 import NeedHelp from './components/NeedHelp';
 import ScrapSegregation from './components/ScrapSegregation';
+import ScrapsGrid from './components/ScrapsGrid';
 import ThemeProvider from './components/ThemeProvider';
 
 export default function Page() {
@@ -24,6 +25,7 @@ export default function Page() {
           <MostViewed />
         </Box>
         <NeedHelp />
+        <ScrapsGrid />
         <ScrapSegregation />
       </Box>
     </ThemeProvider>
