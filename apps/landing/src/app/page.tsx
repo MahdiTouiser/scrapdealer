@@ -6,6 +6,7 @@ import { Box } from '@mui/material';
 import Banner from './components/Banner';
 import CurrentPrice from './components/CurrentPrice';
 import Header from './components/Header';
+import MostViewed from './components/MostViewed';
 import Navbar from './components/Navbar';
 import NeedHelp from './components/NeedHelp';
 import ScrapSegregation from './components/ScrapSegregation';
@@ -18,8 +19,9 @@ export default function Page() {
         <Header />
         <Navbar />
         <Banner />
-        <Box>
+        <Box display='flex' justifyContent='center'>
           <CurrentPrice />
+          <MostViewed />
         </Box>
         <NeedHelp />
         <ScrapSegregation />
