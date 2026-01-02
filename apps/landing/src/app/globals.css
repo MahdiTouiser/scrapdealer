@@ -4,15 +4,12 @@
 }
 
 @font-face {
-  font-family: 'Vazirmatn';
-  src: url('/fonts/Vazirmatn-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
+  font-family: 'IranYekan';
+  src: url('/fonts/Qs_Iranyekan extrablack.ttf.ttf') format('truetype');
 }
 html,
 body {
-  font-family: 'Vazirmatn', sans-serif !important;
+  font-family: 'IranYekan', sans-serif !important;
 }
 html,
 body {
