@@ -5,11 +5,11 @@
 
 @font-face {
   font-family: 'IranYekan';
-  src: url('/fonts/Qs_Iranyekan extrablack.ttf.ttf') format('truetype');
+  src: url('/fonts/IranYekan.ttf') format('truetype');
 }
 html,
 body {
-  font-family: 'IranYekan', sans-serif !important;
+  font-family: 'IranYekan', sans-serif;
 }
 html,
 body {
