@@ -5,6 +5,7 @@ import { Box } from '@mui/material';
 
 import AboutSection from './components/AboutSection';
 import Banner from './components/Banner';
+import BannersSection from './components/BannersSection';
 import CurrentPrice from './components/CurrentPrice';
 import FeaturesSection from './components/FeaturesSection';
 import Header from './components/Header';
@@ -42,6 +43,7 @@ export default function Page() {
         <ScrapSegregation />
         <AboutSection />
         <FeaturesSection />
+        <BannersSection />
       </Box>
     </ThemeProvider>
   );
