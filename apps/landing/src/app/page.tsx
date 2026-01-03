@@ -3,8 +3,10 @@ import './globals.css';
 
 import { Box } from '@mui/material';
 
+import AboutSection from './components/AboutSection';
 import Banner from './components/Banner';
 import CurrentPrice from './components/CurrentPrice';
+import FeaturesSection from './components/FeaturesSection';
 import Header from './components/Header';
 import MostViewed from './components/MostViewed';
 import Navbar from './components/Navbar';
@@ -38,6 +40,8 @@ export default function Page() {
         <NeedHelp />
         <ScrapsGrid />
         <ScrapSegregation />
+        <AboutSection />
+        <FeaturesSection />
       </Box>
     </ThemeProvider>
   );

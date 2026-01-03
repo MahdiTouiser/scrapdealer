@@ -1,4 +1,8 @@
-import { LocalShipping, Recycling, Speed, TrendingUp } from '@mui/icons-material';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import ConnectWithoutContactIcon
+  from '@mui/icons-material/ConnectWithoutContact';
+import PriceCheckIcon from '@mui/icons-material/PriceCheck';
+import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 
 export const prices = [
   {
@@ -46,8 +50,8 @@ export const news = [
 ];
 
 export const features = [
-  { icon: TrendingUp, title: 'قیمت‌های لحظه‌ای', desc: 'بروزترین قیمت‌های بازار ضایعات' },
-  { icon: Speed, title: 'پاسخ سریع', desc: 'پاسخگویی در کمتر از ۲۴ ساعت' },
-  { icon: LocalShipping, title: 'حمل رایگان', desc: 'حمل‌ونقل رایگان برای مقادیر بالا' },
-  { icon: Recycling, title: 'صدیق محیط زیست', desc: 'بازیافت اصولی و حفظ محیط زیست' },
+  { icon: ConnectWithoutContactIcon, title: 'اتصال خریدار با فروشنده', desc: 'ایجاد ارتباط مستقیم و بدون واسطه میان فعالان بازار ضایعات' },
+  { icon: PriceCheckIcon, title: 'شفافیت در قیمت', desc: 'نمایش قیمت‌ها به‌صورت شفاف و مطابق با نرخ واقعی بازار' },
+  { icon: AccessTimeIcon, title: 'صرفه‌جویی در زمان', desc: 'کاهش مراحل معامله و تسریع فرآیند خرید و فروش' },
+  { icon: SupportAgentIcon, title: 'پشتیبانی صفر تا صد', desc: 'همراهی کامل از ثبت درخواست تا نهایی‌شدن معامله' },
 ];
