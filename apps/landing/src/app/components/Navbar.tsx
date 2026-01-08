@@ -48,9 +48,12 @@ const Navbar = () => {
                     </Button>
                 </Link>
 
-                <Button sx={{ fontWeight: 700, color: '#000', fontSize: { xs: 14, sm: 15 } }} disableRipple>
-                    درباره ضایعات چی
-                </Button>
+                <Link href="/faqs" passHref>
+                    <Button sx={{ fontWeight: 700, color: '#000', fontSize: { xs: 14, sm: 15 } }} disableRipple>
+                        سوالات متداول
+                    </Button>
+                </Link>
+
             </Box>
         </Box>
     )
