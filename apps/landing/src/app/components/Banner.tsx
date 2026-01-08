@@ -45,7 +45,7 @@ const Banner = () => {
                         fontWeight: 900,
                         fontSize: { xs: 48, sm: 64, md: 80 },
                         color: '#06975C',
-                        WebkitTextStroke: { xs: '2px #FFFFFF', md: '3px #FFFFFF' },
+                        WebkitTextStroke: { xs: '.5px #FFFFFF', md: '2px #FFFFFF' },
                         lineHeight: 1,
                     }}
                 >

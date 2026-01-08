@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link';
+
 import {
   Box,
   Button,
@@ -27,21 +29,31 @@ const Navbar = () => {
                     whiteSpace: 'nowrap',
                 }}
             >
-                <Button sx={{ fontWeight: 700, color: '#000', fontSize: { xs: 14, sm: 15 } }} disableRipple>
+                {/* <Button sx={{ fontWeight: 700, color: '#000', fontSize: { xs: 14, sm: 15 } }} disableRipple>
                     خرید ضایعات
                 </Button>
                 <Button sx={{ fontWeight: 700, color: '#000', fontSize: { xs: 14, sm: 15 } }} disableRipple>
                     فروش ضایعات
-                </Button>
-                <Button sx={{ fontWeight: 700, color: '#000', fontSize: { xs: 14, sm: 15 } }} disableRipple>
-                    بلاگ
-                </Button>
-                <Button sx={{ fontWeight: 700, color: '#000', fontSize: { xs: 14, sm: 15 } }} disableRipple>
-                    ارتباط با ما
-                </Button>
-                <Button sx={{ fontWeight: 700, color: '#000', fontSize: { xs: 14, sm: 15 } }} disableRipple>
-                    درباره ضایعات چی
-                </Button>
+                </Button> */}
+                <Link href="/scraps" passHref>
+                    <Button sx={{ fontWeight: 700, color: '#000', fontSize: { xs: 14, sm: 15 } }} disableRipple>
+                        معرفی ضایعات
+                    </Button>
+                </Link>
+
+
+                <Link href="/contact" passHref>
+                    <Button sx={{ fontWeight: 700, color: '#000', fontSize: { xs: 14, sm: 15 } }} disableRipple>
+                        ارتباط با ما
+                    </Button>
+                </Link>
+
+                <Link href="/faqs" passHref>
+                    <Button sx={{ fontWeight: 700, color: '#000', fontSize: { xs: 14, sm: 15 } }} disableRipple>
+                        سوالات متداول
+                    </Button>
+                </Link>
+
             </Box>
         </Box>
     )
