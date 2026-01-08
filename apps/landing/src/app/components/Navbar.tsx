@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link';
+
 import {
   Box,
   Button,
@@ -36,9 +38,13 @@ const Navbar = () => {
                 <Button sx={{ fontWeight: 700, color: '#000', fontSize: { xs: 14, sm: 15 } }} disableRipple>
                     بلاگ
                 </Button>
-                <Button sx={{ fontWeight: 700, color: '#000', fontSize: { xs: 14, sm: 15 } }} disableRipple>
-                    ارتباط با ما
-                </Button>
+
+                <Link href="/contact" passHref>
+                    <Button sx={{ fontWeight: 700, color: '#000', fontSize: { xs: 14, sm: 15 } }} disableRipple>
+                        ارتباط با ما
+                    </Button>
+                </Link>
+
                 <Button sx={{ fontWeight: 700, color: '#000', fontSize: { xs: 14, sm: 15 } }} disableRipple>
                     درباره ضایعات چی
                 </Button>
